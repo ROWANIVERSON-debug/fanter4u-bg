@@ -103,20 +103,20 @@ function toggleFavSidebar() {
       const cardRect = card.getBoundingClientRect();
       const isFaved = favs.includes(card.querySelector("p").textContent);
       if (!isFaved) {
-        const flyY = -(cardRect.top - searchRect.bottom + cardRect.height);
-        card.style.transition = `transform 0.35s ease ${delay}s, opacity 0.35s ease ${delay}s`;
+      const flyY = -(cardRect.top - searchRect.top);
+       card.style.transition = `transform 0.2s ease ${delay}s, opacity 0.2s ease ${delay}s`;
         card.style.transform = `translateY(${flyY}px)`;
         card.style.opacity = "0";
-        delay += 0.03;
+        delay += 0.015;
       }
     });
 
-    setTimeout(() => {
+  setTimeout(() => {
       localStorage.setItem("favFilter", "true");
       handleSearchInput();
-    }, delay * 1000 + 350);
-
+    }, delay * 1000 + 200);
   } else {
+    
     // turning OFF - just show all
     localStorage.setItem("favFilter", "false");
     handleSearchInput();
