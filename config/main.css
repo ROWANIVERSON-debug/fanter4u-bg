@@ -144,7 +144,10 @@ body::after {
   border-radius: 15px;
 
   animation: drift 6s ease-in-out infinite;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, outline 0.3s ease, outline-offset 0.3s ease;
+  position: relative;   
+  z-index: 2;           
+}
 }
 
 .game:hover {
@@ -169,7 +172,7 @@ body::after {
   cursor: pointer;
 
   transition: all 0.3s ease;
-  animation: glow 5s ease-in-out infinite;
+
 }
 
 .game img:hover {
