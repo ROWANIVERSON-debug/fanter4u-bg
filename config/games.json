@@ -12,21 +12,21 @@
     "new": true
   },
   {
-    "name": "10 Minutes Till Dawn",
-    "image": "splash.png",
-    "url": "10-minutes-till-dawn",
-    "new": false
+    "name": "brotato",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyDe2stCyUFVRMAqp2eD8f-kcWjJ6k2mm2RQ&s",
+    "url": "https://abcatlmfao.github.io/BrotatoWeb/",
+    "new": true
   },
   {
-    "name": "100ng",
-    "image": "100ng.jpg",
-    "url": "100ng",
-    "new": false
+    "name": "ovo",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7a8NY9ACBZXwsfacA2CuEbSyDZqwcw3J9bQ&s",
+    "url": "https://chipikipal800.github.io/OvO/",
+    "new": true
   },
   {
-    "name": "2048",
-    "image": "2048.png",
-    "url": "2048",
+    "name": "granny",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8X5JjpaXIFfsI2KKuU_kjCFDAGJZxktgz3g&s",
+    "url": "https://chipikipal800.github.io/Granny/",
     "new": false
   },
   {
