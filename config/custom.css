@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.background {
+  position: fixed;
+  width: 200%; /* smooth loop hhere */
+  height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/stardust.png');
+  animation: moveBg 20s linear infinite;
+}
+
+@keyframes moveBg {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="background"></div>
+
+</body>
+</html>
