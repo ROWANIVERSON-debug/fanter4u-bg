@@ -65,7 +65,6 @@ function handleSearchInput() {
       game.name.toLowerCase().includes(searchInputValue)
     );
   }
-  }
   displayFilteredGames(filteredGames);
 }
 
