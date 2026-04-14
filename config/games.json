@@ -43,32 +43,32 @@
   },
   {
     "name": "doge miner",
-    "image": "favicon.ico",
-    "url": "https://abcatlmfao.github.io/DogeMiner/ ",
+    "image": "https://www.dolldivine.com/images/doge-coin-miner-game.png",
+    "url": "https://abcatlmfao.github.io/DogeMiner/",
     "new": true
   },
   {
     "name": "hex-gl",
-    "image": "icon.png",
+    "image": "https://dashboard.snapcraft.io/site_media/appmedia/2017/01/HexGL256.png",
     "url": "https://fosiper.com/games/hexgl-lite/",
     "new": true
   },
   {
-    "name": "Offline Paradise",
-    "image": "assets/icon.jpeg",
-    "url": "OfflineParadise",
-    "new": false
+    "name": "mario kart 64",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg-jsp3ybVxF1nRmQALpSDyJDWuoMwXDyF5w&s",
+    "url": "https://chipikipal800.github.io/MarioKart64-1/",
+    "new": true
   },
   {
-    "name": "Stickman Survival",
-    "image": "Icon.png",
-    "url": "Stickman-Survival",
-    "new": false
+    "name": "balatro",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKuR6qaIOpYc06olEbuAQhFaKqRhsURM4P4A&s",
+    "url": "https://outblade.github.io/balatro-web/",
+    "new": true
   },
   {
     "name": "a dance of fire and ice",
-    "image": "splash.png",
-    "url": "https://chipikipal800.github.io/adofai/ ",
+    "image": "https://pbs.twimg.com/profile_images/1316068262845710336/3obYu4Lq_400x400.jpg",
+    "url": "https://chipikipal800.github.io/adofai/",
     "new": true
   },
   {
