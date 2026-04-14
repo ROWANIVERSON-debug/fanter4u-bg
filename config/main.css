@@ -305,3 +305,30 @@ body::after {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 15px;
 }
+
+/* favoirite button */
+.fav-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 26px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+}
+
+.fav-btn:hover {
+  transform: scale(1.4);
+  color: gold;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+}
+
+.fav-btn.active {
+  color: gold;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  animation: glow 2s ease-in-out infinite;
+}
