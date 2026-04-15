@@ -104,7 +104,67 @@
         updateFavBtn();
       }
 
-      updateFavBtn();
-    </script>
+     updateFavBtn();
+
+    function openSafetyKeyMenu() {
+      const overlay = document.getElementById("safetyKeyOverlay");
+      const urlInput = document.getElementById("safetyUrl");
+      const keyDisplay = document.getElementById("keyDisplay");
+      overlay.style.display = "flex";
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          overlay.classList.add("visible");
+        });
+      });
+      const savedUrl = localStorage.getItem("safetyUrl") || "";
+      const savedKey = localStorage.getItem("safetyKey") || "";
+      urlInput.value = savedUrl;
+      if (savedKey) {
+        keyDisplay.textContent = savedKey.toUpperCase();
+        keyDisplay.classList.add("set");
+      } else {
+        keyDisplay.textContent = "press a key...";
+        keyDisplay.classList.remove("set");
+      }
+    }
+
+    function closeSafetyKeyMenu() {
+      const overlay = document.getElementById("safetyKeyOverlay");
+      overlay.classList.remove("visible");
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 400);
+    }
+
+    function saveSafetyKey() {
+      const url = document.getElementById("safetyUrl").value.trim();
+      const key = localStorage.getItem("safetyKeyTemp") || localStorage.getItem("safetyKey");
+      if (!url) { alert("please enter a url!"); return; }
+      if (!key) { alert("please select a key!"); return; }
+      localStorage.setItem("safetyUrl", url);
+      localStorage.setItem("safetyKey", key);
+      closeSafetyKeyMenu();
+      alert("safety key saved! ✅");
+    }
+
+    document.getElementById("safetyKeyInput").addEventListener("keydown", (e) => {
+      e.preventDefault();
+      const key = e.key;
+      localStorage.setItem("safetyKeyTemp", key);
+      const display = document.getElementById("keyDisplay");
+      display.textContent = key.toUpperCase();
+      display.classList.add("set");
+    });
+
+    document.getElementById("safetyKeyOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "safetyKeyOverlay") closeSafetyKeyMenu();
+    });
+
+    window.openSafetyKeyMenu = openSafetyKeyMenu;
+    window.closeSafetyKeyMenu = closeSafetyKeyMenu;
+    window.saveSafetyKey = saveSafetyKey;
+
+  </script>
+    
   </body>
 </html>
