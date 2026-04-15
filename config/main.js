@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const current = localStorage.getItem("favFilter") === "true";
     localStorage.setItem("favFilter", (!current).toString());
     handleSearchInput();
-    // Update button text if on settings page
     const favToggleBtn = document.getElementById("favToggleBtn");
     if (favToggleBtn) {
       const on = localStorage.getItem("favFilter") === "true";
@@ -202,12 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch((error) => console.error("Error fetching games:", error));
 
-  // Set up event listeners - CHECK IF ELEMENTS EXIST FIRST
+  // Set up event listeners
   const searchInput = document.getElementById("searchInput");
   if (searchInput) {
     searchInput.addEventListener("input", handleSearchInput);
-  } else {
-    console.warn("searchInput element not found!");
   }
   
   const titleEl = document.getElementById("title");
