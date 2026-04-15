@@ -45,19 +45,25 @@ window.loadAndApplyTheme = function() {
     console.log("Applied font size:", settings.fontSize);
   }
   
- if (settings.font) {
-  const fontMap = {
-    'ubuntu': 'Ubuntu, sans-serif',
-    'orbitron': 'Orbitron, monospace',
-    'rajdhani': 'Rajdhani, sans-serif',
-    'exo2': "'Exo 2', sans-serif",
-    'spacegrotesk': "'Space Grotesk', sans-serif"
-  };
-  const fontValue = fontMap[settings.font] || settings.font;
-  document.documentElement.style.setProperty('--site-font', fontValue);
-  document.body.style.fontFamily = fontValue;
-  console.log("Applied font:", settings.font);
-}
+  if (settings.font) {
+    const fontMap = {
+      'ubuntu': 'Ubuntu, sans-serif',
+      'orbitron': 'Orbitron, monospace',
+      'rajdhani': 'Rajdhani, sans-serif',
+      'exo2': "'Exo 2', sans-serif",
+      'spacegrotesk': "'Space Grotesk', sans-serif"
+    };
+    const fontValue = fontMap[settings.font] || settings.font;
+    document.documentElement.style.setProperty('--site-font', fontValue);
+    document.body.style.fontFamily = fontValue;
+    console.log("Applied font:", settings.font);
+  }
+
+  // Apply card background color
+  if (settings.cardBg) {
+    document.documentElement.style.setProperty('--card-bg', settings.cardBg);
+    console.log("Applied card background:", settings.cardBg);
+  }
 };
 
 // Run when DOM is ready
