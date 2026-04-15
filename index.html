@@ -11,32 +11,30 @@
 
   <body>
     
-<!-- Loadng Screen -->
+<!-- Loading Screen -->
 <div id="loadingScreen">
-  <!-- Hidden overlay to block background content -->
   <div class="loading-blocker"></div>
   
   <div class="loading-content">
     <div class="loading-icon"></div>
-    <h1 class="loading-title">loading fanter.OS</h1>
+    <h1 class="loading-title">Loading fanter.OS</h1>
     <div class="loading-progress">
       <div class="loading-progress-bar"></div>
     </div>
-    <p class="loading-status">initializing systems...</p>
+    <p class="loading-status">Initializing systems...</p>
   </div>
   
-  <!-- Matrix rain canvas -->
   <canvas id="matrixCanvas"></canvas>
-  
-  <!-- Broken wall breaktroughs -->
   <div id="brokenWallContainer"></div>
-  
-  <!-- Glitch overlay -->
   <div class="glitch-overlay"></div>
-  
-  <!-- Matrix scanlines (pure hack screen) -->
   <div class="matrix-scanlines"></div>
 </div>
+
+<!-- White flash overlay for transition -->
+<div id="whiteFlash" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100001; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;"></div>
+
+<!--- line overlay -->
+<div id="revealOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; z-index: 100002; transform: scaleX(0); transform-origin: left; transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);"></div>
 
     <script>
       let lastKeyTime = 0;
