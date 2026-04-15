@@ -1,31 +1,9 @@
-hey :)
+hey, this is fanter. OS an unblocked games website developed by one person, me (accounts: ChipikiPal800, abcatlmfao, abcatlmfao69) 
 
- this is the offical github repo ( i still cant spell it off memory :c) of my unblocked games website, this website has 200+ unblocked games that you can play.
+i made this for my school (normally my grade since i dont speak to the higher / lower grade levels often)
+however if you think its cool or want to use the code to study or use as a baseplan for your code, feel free to :p 
 
- if you fork / copy this repo idc lol use it as a template or steal the games iyw
+yes i kind of suck at english
 
- this ubg site is for my school specifically but if u wanna use it you can.
-
-
-  i used the "native" ubg template for this as i didnt want to code all of the css and html for my ubg website, i made this so i wouldnt need to have the ugly google sites stuff.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  credits for games on site (sorry if i missed some i forgot, i made fanter 2 yrs ago): bog (aukak on github), breadbb, corbins98,
+ i hope you enjoy using fanter. OS
+ 
