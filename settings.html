@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fanter v0.2 | settings</title>
-    <link rel="stylesheet" href="config/custom.css" />
     <link rel="stylesheet" href="config/main.css" />
-    <script src="config/main.js" type="module"></script>
+    <script src="config/theme-loader.js"></script>
+    <script src="config/main.js"></script>
   </head>
   <body>
     <span id="title" style="display:none"></span>
@@ -325,32 +325,63 @@
       selectFont(selectedFontFamily);
       selectTheme(selectedTheme);
       updateFontPreview();
+      // Also sync solid color picker
+      if (themeSettings.solidColor) {
+        document.getElementById("solidColorPicker").value = themeSettings.solidColor;
+      }
     }
 
     function saveTheme() {
       const solidColor = document.getElementById("solidColorPicker").value;
+      const fontSize = document.getElementById("fontSizeSlider").value;
+      const fontColor = document.getElementById("fontColorPicker").value;
+      
       themeSettings = {
         bg: selectedBg,
         solidColor: solidColor,
         font: selectedFontFamily,
-        fontSize: selectedFontSize,
-        fontColor: selectedFontColor,
+        fontSize: parseInt(fontSize),
+        fontColor: fontColor,
         theme: selectedTheme
       };
+      
       localStorage.setItem("themeSettings", JSON.stringify(themeSettings));
-      applyTheme(themeSettings);
+      
+      // Apply to settings page immediately
+      applyThemeToPage();
+      
       closeThemeMenu();
-      alert("theme saved! ✅ refresh the main page to see changes.");
+      alert("Theme saved! ✅ Changes will appear on all pages after refresh.");
     }
 
-    function applyTheme(s) {
-      document.documentElement.style.setProperty("--text-color", s.fontColor || "#ffffff");
-      document.body.style.fontSize = (s.fontSize || 16) + "px";
-      document.body.style.fontFamily = s.font || "ubuntu";
+    // Apply theme to current page
+    function applyThemeToPage() {
+      const s = themeSettings;
+      
+      // Remove old classes
+      document.body.classList.remove(
+        'theme-bg-chill', 'theme-bg-parallax', 'theme-bg-solid', 'theme-bg-aurora', 'theme-bg-void',
+        'theme-dark', 'theme-light', 'theme-rainbow', 'theme-neon'
+      );
+      
+      if (s.bg) document.body.classList.add(`theme-bg-${s.bg}`);
+      if (s.solidColor && s.bg === 'solid') {
+        document.body.style.setProperty('--solid-bg-color', s.solidColor);
+      }
+      if (s.theme && s.theme !== 'chill') document.body.classList.add(`theme-${s.theme}`);
+      if (s.fontColor) document.documentElement.style.setProperty('--text-color', s.fontColor);
+      if (s.fontSize) document.body.style.fontSize = s.fontSize + 'px';
+      if (s.font) {
+        const fontMap = {
+          'ubuntu': 'Ubuntu, sans-serif',
+          'orbitron': 'Orbitron, monospace',
+          'rajdhani': 'Rajdhani, sans-serif',
+          'exo2': "'Exo 2', sans-serif",
+          'spacegrotesk': "'Space Grotesk', sans-serif"
+        };
+        document.body.style.fontFamily = fontMap[s.font] || s.font;
+      }
     }
-
-    // apply on load
-    applyTheme(themeSettings);
 
     document.getElementById("themeOverlay").addEventListener("click", (e) => {
       if (e.target.id === "themeOverlay") closeThemeMenu();
