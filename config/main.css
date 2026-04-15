@@ -1192,3 +1192,8 @@ html {
   opacity: 0;
   visibility: hidden;
 }
+
+@keyframes glitchFlash {
+  0% { opacity: 0.8; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(0); }
+}
