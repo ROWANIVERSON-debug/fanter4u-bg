@@ -1194,3 +1194,59 @@ input, textarea, #searchInput {
   cursor: text;
 }
 
+/* Settings Toggle Switch */
+.settings-toggle {
+  width: 50px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s;
+}
+
+.settings-toggle.active {
+  background: #00ff88;
+}
+
+.settings-toggle::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  transition: 0.2s;
+}
+
+.settings-toggle.active::after {
+  left: 26px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+/* Perormance Modes */
+body.low-perf .game {
+  animation: none !important;
+  transition: none !important;
+}
+
+body.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+body.no-animations * {
+  animation: none !important;
+  transition: none !important;
+}
