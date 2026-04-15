@@ -120,7 +120,10 @@
           <div id="fontPreview" class="font-preview">preview text 🎮</div>
 
           <label style="margin-top:18px;">font color</label>
-          <input type="color" id="fontColorPicker" value="#ffffff" style="width:100%; height:45px; border-radius:10px; border:none; cursor:pointer; margin-top:8px;" oninput="updateFontPreview()" />
+         <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+     <input type="color" id="fontColorPicker" value="#ffffff" style="flex:1; height:45px; border-radius:10px; border:none; cursor:pointer;" oninput="updateFontPreview()" />
+     <button class="settings-btn" onclick="resetFontColor()" style="white-space:nowrap;">↺ reset</button>
+    </div>
 
           <label style="margin-top:18px;">font style</label>
           <div class="theme-option-grid">
