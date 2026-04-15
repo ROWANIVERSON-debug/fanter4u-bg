@@ -1,9 +1,11 @@
 // Theme loader - runs on every page
 (function() {
-  const settings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
-  
-  function applyThemeToPage() {
-    if (!settings || Object.keys(settings).length === 0) return;
+  function loadAndApplyTheme() {
+    const settings = JSON.parse(localStorage.getItem("themeSettings") || "{}");
+    
+    console.log("Loading theme settings:", settings); // Debug: check if loading
+    
+    if (Object.keys(settings).length === 0) return;
     
     // Remove existing theme classes
     document.body.classList.remove(
@@ -18,7 +20,13 @@
       // Handle solid color
       if (settings.bg === 'solid' && settings.solidColor) {
         document.body.style.setProperty('--solid-bg-color', settings.solidColor);
+        // Also apply directly to body background
+        document.body.style.background = settings.solidColor;
+        document.body.style.animation = 'none';
       }
+    } else {
+      // Default to chill if nothing is set
+      document.body.classList.add('theme-bg-chill');
     }
     
     // Apply theme preset (overrides some styles)
@@ -48,5 +56,9 @@
     }
   }
   
-  applyThemeToPage();
+  // Run immediately
+  loadAndApplyTheme();
+  
+  // Also run after a tiny delay to ensure DOM is ready
+  setTimeout(loadAndApplyTheme, 50);
 })();
