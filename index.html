@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fanter v0.2</title>
     <link rel="stylesheet" href="config/main.css" />
+    <!-- Theme loader MUST load first -->
     <script src="config/theme-loader.js"></script>
     <script src="config/main.js"></script>
+    <script src="config/custom.js"></script>
   </head>
   <body>
+    <!-- rest of your body stays the same -->
     <button class="fav-sidebar-btn" id="favSidebarBtn" onclick="toggleFavSidebar()">★</button>
-   <div class="center">
-  <h1 id="title"></h1>
-  <p id="subtitle"></p>
-  <button class="settings-btn" onclick="window.location.href='settings.html'">⚙ Settings</button>
-</div>
+    <div class="center">
+      <h1 id="title"></h1>
+      <p id="subtitle"></p>
+      <button class="settings-btn" onclick="window.location.href='settings.html'">⚙ Settings</button>
+    </div>
     <div class="center">
       <input type="text" id="searchInput" placeholder="search 4 games" />
     </div>
@@ -25,24 +28,22 @@
     </div>
 
     <script>
-  let lastKeyTime = 0;
-  let lastKey = "";
-  document.addEventListener("keydown", (e) => {
-    const safetyKey = localStorage.getItem("safetyKey");
-    const safetyUrl = localStorage.getItem("safetyUrl");
-    if (!safetyKey || !safetyUrl) return;
-    const now = Date.now();
-    const pressedKey = e.key.toLowerCase();
-    const storedKey = safetyKey.toLowerCase();
-    if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 1000) {
-      e.preventDefault();
-      window.location.href = safetyUrl;
-    }
-    lastKey = pressedKey;
-    lastKeyTime = now;
-  });
-</script>
-
-    
+      let lastKeyTime = 0;
+      let lastKey = "";
+      document.addEventListener("keydown", (e) => {
+        const safetyKey = localStorage.getItem("safetyKey");
+        const safetyUrl = localStorage.getItem("safetyUrl");
+        if (!safetyKey || !safetyUrl) return;
+        const now = Date.now();
+        const pressedKey = e.key.toLowerCase();
+        const storedKey = safetyKey.toLowerCase();
+        if (pressedKey === storedKey && pressedKey === lastKey && now - lastKeyTime < 1000) {
+          e.preventDefault();
+          window.location.href = safetyUrl;
+        }
+        lastKey = pressedKey;
+        lastKeyTime = now;
+      });
+    </script>
   </body>
 </html>
