@@ -129,7 +129,7 @@
       <div class="settings-card">
         <div class="settings-card-icon">🌐</div>
         <h2>language</h2>
-        <p>change the language of the site.</p>
+        <p>change the language of the site (no ugly bar!).</p>
         <div class="lang-dropdown-wrap">
           <button class="settings-btn" id="langTriggerBtn" onclick="toggleLangDropdown(event)">🌐 select language</button>
         </div>
@@ -159,9 +159,6 @@
       </div>
 
     </div>
-
-    <!-- Hidden container for Google Translate -->
-    <div id="google_translate_element" style="display: none;"></div>
 
     <!-- Language dropdown -->
     <div id="langDropdown">
@@ -284,99 +281,98 @@
     </div>
 
     <script>
-      // ========== GOOGLE TRANSLATE (WORKING VERSION) ==========
-      let translateInitialized = false;
+      // ========== MICROSOFT TRANSLATOR (NO BAR!) ==========
+      const LANGUAGES = [
+        { code: "en", name: "English", flag: "🇬🇧" },
+        { code: "es", name: "Spanish", flag: "🇪🇸" },
+        { code: "fr", name: "French", flag: "🇫🇷" },
+        { code: "de", name: "German", flag: "🇩🇪" },
+        { code: "it", name: "Italian", flag: "🇮🇹" },
+        { code: "pt", name: "Portuguese", flag: "🇧🇷" },
+        { code: "ru", name: "Russian", flag: "🇷🇺" },
+        { code: "zh-Hans", name: "Chinese (Simplified)", flag: "🇨🇳" },
+        { code: "ja", name: "Japanese", flag: "🇯🇵" },
+        { code: "ko", name: "Korean", flag: "🇰🇷" },
+        { code: "ar", name: "Arabic", flag: "🇸🇦" },
+        { code: "hi", name: "Hindi", flag: "🇮🇳" },
+        { code: "nl", name: "Dutch", flag: "🇳🇱" },
+        { code: "pl", name: "Polish", flag: "🇵🇱" },
+        { code: "tr", name: "Turkish", flag: "🇹🇷" },
+        { code: "sv", name: "Swedish", flag: "🇸🇪" },
+        { code: "no", name: "Norwegian", flag: "🇳🇴" },
+        { code: "da", name: "Danish", flag: "🇩🇰" },
+        { code: "fi", name: "Finnish", flag: "🇫🇮" },
+        { code: "uk", name: "Ukrainian", flag: "🇺🇦" },
+        { code: "vi", name: "Vietnamese", flag: "🇻🇳" },
+        { code: "th", name: "Thai", flag: "🇹🇭" },
+        { code: "el", name: "Greek", flag: "🇬🇷" },
+        { code: "he", name: "Hebrew", flag: "🇮🇱" },
+        { code: "hu", name: "Hungarian", flag: "🇭🇺" },
+        { code: "cs", name: "Czech", flag: "🇨🇿" },
+        { code: "ro", name: "Romanian", flag: "🇷🇴" },
+        { code: "bg", name: "Bulgarian", flag: "🇧🇬" },
+      ];
+
       let currentLang = localStorage.getItem("siteLang") || "en";
+      let translateTimeout = null;
 
-      // Load Google Translate API
-      function loadGoogleTranslate() {
-        if (document.querySelector('script[src*="translate.google.com"]')) return;
-        
-        // Set the default language via cookie
-        document.cookie = "googtrans=/en/" + currentLang + "; path=/";
-        
-        // Create callback function
-        window.googleTranslateElementInit = function() {
-          new google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: currentLang === 'en' ? 'en' : currentLang,
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: true
-          }, 'google_translate_element');
-          translateInitialized = true;
-        };
-        
-        // Add the script
-        const script = document.createElement('script');
-        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-        script.async = true;
-        document.head.appendChild(script);
-      }
-
-      // Remove translation and reset to English
-      function removeTranslation() {
-        // Remove Google Translate frame
-        const frame = document.querySelector('.goog-te-banner-frame');
-        if (frame) frame.remove();
-        
-        // Remove any translate elements
-        const translateElements = document.querySelectorAll('.goog-te-balloon-frame, .goog-te-banner-frame, .goog-te-menu-frame');
-        translateElements.forEach(el => el.remove());
-        
-        // Reset cookie
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=." + window.location.hostname + "; path=/";
-        
-        // Remove the translate class from body
-        document.body.classList.remove('translated');
-        
-        // Reload the page to reset (simplest approach)
-        window.location.reload();
-      }
-
-      // Apply translation
-      function applyTranslation(langCode) {
+      // Apply Microsoft Translator (NO BAR!)
+      function applyMicrosoftTranslate(langCode) {
         if (langCode === 'en') {
-          removeTranslation();
+          // Remove translation and reload
+          localStorage.setItem("siteLang", "en");
+          removeMicrosoftTranslate();
+          window.location.reload();
           return;
         }
         
-        currentLang = langCode;
         localStorage.setItem("siteLang", langCode);
         
-        // Set cookie and reload for clean translation
-        document.cookie = "googtrans=/en/" + langCode + "; path=/";
-        window.location.reload();
+        // Remove any existing translate widgets
+        removeMicrosoftTranslate();
+        
+        // Create invisible container for the widget
+        let container = document.getElementById('MicrosoftTranslatorWidget');
+        if (!container) {
+          container = document.createElement('div');
+          container.id = 'MicrosoftTranslatorWidget';
+          container.style.cssText = 'display: none; position: absolute; top: -9999px; left: -9999px; visibility: hidden;';
+          document.body.appendChild(container);
+        }
+        
+        // Add Microsoft Translator script
+        const script = document.createElement('script');
+        script.src = 'https://www.microsoft.com/translator/embed/translator.js?&auto=true&to=' + langCode;
+        script.async = true;
+        script.onload = function() {
+          // Force translation after load
+          setTimeout(() => {
+            if (typeof Microsoft !== 'undefined' && Microsoft.Translator) {
+              Microsoft.Translator.Widget.Translate(langCode);
+            }
+          }, 100);
+        };
+        document.head.appendChild(script);
+        
+        // Show confirmation
+        const langName = LANGUAGES.find(l => l.code === langCode)?.name || langCode;
+        console.log(`Translating to: ${langName}`);
+      }
+
+      function removeMicrosoftTranslate() {
+        // Remove the script
+        const scripts = document.querySelectorAll('script[src*="microsofttranslator"]');
+        scripts.forEach(script => script.remove());
+        
+        // Remove widget container
+        const container = document.getElementById('MicrosoftTranslatorWidget');
+        if (container) container.remove();
+        
+        // Reset any translation classes
+        document.body.classList.remove('translated');
       }
 
       // ========== LANGUAGE DROPDOWN ==========
-      const LANGUAGES = [
-        { code: "en", name: "English",    flag: "🇬🇧" },
-        { code: "es", name: "Spanish",    flag: "🇪🇸" },
-        { code: "fr", name: "French",     flag: "🇫🇷" },
-        { code: "de", name: "German",     flag: "🇩🇪" },
-        { code: "it", name: "Italian",    flag: "🇮🇹" },
-        { code: "pt", name: "Portuguese", flag: "🇧🇷" },
-        { code: "ru", name: "Russian",    flag: "🇷🇺" },
-        { code: "zh-CN", name: "Chinese (Simplified)", flag: "🇨🇳" },
-        { code: "ja", name: "Japanese",   flag: "🇯🇵" },
-        { code: "ko", name: "Korean",     flag: "🇰🇷" },
-        { code: "ar", name: "Arabic",     flag: "🇸🇦" },
-        { code: "hi", name: "Hindi",      flag: "🇮🇳" },
-        { code: "nl", name: "Dutch",      flag: "🇳🇱" },
-        { code: "pl", name: "Polish",     flag: "🇵🇱" },
-        { code: "tr", name: "Turkish",    flag: "🇹🇷" },
-        { code: "sv", name: "Swedish",    flag: "🇸🇪" },
-        { code: "no", name: "Norwegian",  flag: "🇳🇴" },
-        { code: "da", name: "Danish",     flag: "🇩🇰" },
-        { code: "fi", name: "Finnish",    flag: "🇫🇮" },
-        { code: "uk", name: "Ukrainian",  flag: "🇺🇦" },
-        { code: "vi", name: "Vietnamese", flag: "🇻🇳" },
-        { code: "th", name: "Thai",       flag: "🇹🇭" },
-        { code: "el", name: "Greek",      flag: "🇬🇷" },
-        { code: "he", name: "Hebrew",     flag: "🇮🇱" },
-      ];
-
       let langDropdownOpen = false;
 
       function buildLangList(filter = "") {
@@ -403,8 +399,58 @@
         buildLangList(document.getElementById("langSearch").value);
         closeLangDropdown();
         
-        // Apply translation (page will reload for non-English)
-        applyTranslation(lang.code);
+        // Apply the translation
+        applyMicrosoftTranslate(lang.code);
+        
+        // Show a subtle notification (no ugly bar!)
+        showToast(`🌐 Translating to ${lang.name}...`);
+      }
+
+      function showToast(message) {
+        // Create a temporary toast notification
+        let toast = document.getElementById('translation-toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'translation-toast';
+          toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(45, 90, 227, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: ubuntu, sans-serif;
+            font-size: 14px;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            animation: fadeInOut 2s ease forwards;
+            pointer-events: none;
+          `;
+          document.body.appendChild(toast);
+          
+          // Add animation
+          const style = document.createElement('style');
+          style.textContent = `
+            @keyframes fadeInOut {
+              0% { opacity: 0; transform: translateY(20px); }
+              15% { opacity: 1; transform: translateY(0); }
+              85% { opacity: 1; transform: translateY(0); }
+              100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        toast.textContent = message;
+        toast.style.animation = 'none';
+        toast.offsetHeight; // Force reflow
+        toast.style.animation = 'fadeInOut 2s ease forwards';
+        
+        // Remove after animation
+        setTimeout(() => {
+          if (toast.parentNode) toast.remove();
+        }, 2000);
       }
 
       window.toggleLangDropdown = function(e) {
@@ -453,21 +499,13 @@
         }
       });
 
-      // Check if we need to apply translation on page load
-      (function initTranslation() {
-        const savedLang = localStorage.getItem("siteLang");
-        if (savedLang && savedLang !== "en") {
-          currentLang = savedLang;
-          const cur = LANGUAGES.find(l => l.code === savedLang);
-          if (cur) {
-            document.getElementById("langTriggerBtn").textContent = `${cur.flag} ${cur.name}`;
-          }
-          // Set cookie and load translate
-          document.cookie = "googtrans=/en/" + savedLang + "; path=/";
-          loadGoogleTranslate();
-        } else {
-          currentLang = "en";
-          localStorage.setItem("siteLang", "en");
+      // Initialize button text on load
+      (function initLanguage() {
+        const cur = LANGUAGES.find(l => l.code === currentLang);
+        if (cur && cur.code !== "en") {
+          document.getElementById("langTriggerBtn").textContent = `${cur.flag} ${cur.name}`;
+          // Auto-translate if not English
+          applyMicrosoftTranslate(currentLang);
         }
       })();
 
@@ -627,7 +665,7 @@
         localStorage.setItem("themeSettings", JSON.stringify(themeToSave));
         if (typeof window.loadAndApplyTheme === 'function') window.loadAndApplyTheme();
         closeThemeMenu();
-        alert("Theme saved! ✅");
+        showToast("Theme saved! ✅");
       };
       document.getElementById("themeOverlay").addEventListener("click", (e) => {
         if (e.target.id === "themeOverlay") closeThemeMenu();
