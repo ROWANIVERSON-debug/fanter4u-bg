@@ -24,7 +24,6 @@
         min-width: 220px;
         box-shadow: 0 20px 60px rgba(45, 90, 227, 0.45);
         backdrop-filter: blur(12px);
-
         opacity: 0;
         transform: scale(0.92) translateY(-8px);
         pointer-events: none;
@@ -51,7 +50,6 @@
         outline: none;
         box-sizing: border-box;
         margin-bottom: 8px;
-        transition: border-color 0.2s;
       }
       .lang-search:focus {
         border-color: var(--accent-color);
@@ -64,7 +62,6 @@
         flex-direction: column;
         gap: 3px;
         scrollbar-width: thin;
-        scrollbar-color: rgba(45,90,227,0.4) transparent;
       }
 
       .lang-option {
@@ -104,6 +101,69 @@
         margin-top: 10px;
         padding-top: 8px;
         border-top: 1px solid rgba(255,255,255,0.08);
+      }
+
+      /* ===== HIDE GOOGLE TRANSLATE BAR COMPLETELY ===== */
+      .goog-te-banner-frame,
+      .goog-te-banner,
+      .goog-te-banner-frame.skiptranslate,
+      iframe.skiptranslate,
+      div.skiptranslate,
+      .goog-te-balloon-frame,
+      .goog-te-menu-frame,
+      .goog-te-cta-bar,
+      .goog-te-banner-frame iframe,
+      body > .skiptranslate {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+      }
+
+      body {
+        top: 0px !important;
+        position: static !important;
+      }
+
+      html {
+        margin-top: 0px !important;
+        overflow-x: hidden !important;
+      }
+
+      body {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+      }
+
+      /* Toast notification */
+      #translation-toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(45, 90, 227, 0.95);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-family: ubuntu, sans-serif;
+        font-size: 14px;
+        z-index: 10000;
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+      
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(20px); }
+        15% { opacity: 1; transform: translateY(0); }
+        85% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
       }
     </style>
   </head>
@@ -170,7 +230,6 @@
     <!-- Theme Menu -->
     <div id="themeOverlay" style="display:none;">
       <div id="themeMenu">
-
         <div id="themeTabSelector">
           <h2>🎨 customize</h2>
           <p class="safety-desc">pick a category to customize.</p>
@@ -194,7 +253,6 @@
           </div>
         </div>
 
-        <!-- Background tab -->
         <div id="themeTab-background" class="theme-tab-content" style="display:none;">
           <button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button>
           <h2>🌅 background</h2>
@@ -212,27 +270,22 @@
           </div>
         </div>
 
-        <!-- Text tab -->
         <div id="themeTab-text" class="theme-tab-content" style="display:none;">
           <button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button>
           <h2>🔤 text styling</h2>
           <p class="safety-desc">customize how text looks across the site.</p>
-
           <label>font size</label>
           <div class="theme-slider-row">
             <span>small</span>
             <input type="range" id="fontSizeSlider" min="12" max="24" value="16" oninput="updateFontPreview()" />
             <span>large</span>
           </div>
-
           <label style="margin-top:18px;">font color</label>
           <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
             <input type="color" id="fontColorPicker" value="#ffffff" style="flex:1; height:45px; border-radius:10px; border:none; cursor:pointer;" oninput="updateFontPreview()" />
             <button class="settings-btn" onclick="resetFontColor()" style="white-space:nowrap;">↺ reset</button>
           </div>
-
           <div id="fontPreview" class="font-preview">preview text 🎮</div>
-
           <label style="margin-top:18px;">font style</label>
           <div class="theme-option-grid">
             <button class="theme-option-btn" onclick="selectFont('ubuntu')" id="font-ubuntu" style="font-family:ubuntu">Ubuntu</button>
@@ -243,7 +296,6 @@
           </div>
         </div>
 
-        <!-- Themes tab -->
         <div id="themeTab-themes" class="theme-tab-content" style="display:none;">
           <button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button>
           <h2>✨ themes</h2>
@@ -256,7 +308,6 @@
             <button class="theme-option-btn theme-preset" onclick="selectTheme('neon')" id="theme-neon">neon city</button>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -265,14 +316,11 @@
       <div id="safetyKeyMenu">
         <h2>safety key 🔑</h2>
         <p class="safety-desc">set a url and a key — press it twice quickly on any page to escape there instantly.</p>
-
         <label>redirect url</label>
         <input type="text" id="safetyUrl" placeholder="https://google.com" />
-
         <label>escape key</label>
         <div id="keyDisplay" class="key-display">press a key...</div>
         <input type="text" id="safetyKeyInput" class="key-capture" placeholder="click here then press a key" readonly />
-
         <div class="safety-btn-row">
           <button class="settings-btn" onclick="saveSafetyKey()">save</button>
           <button class="settings-btn danger-btn" onclick="closeSafetyKeyMenu()">cancel</button>
@@ -281,7 +329,7 @@
     </div>
 
     <script>
-      // ========== MICROSOFT TRANSLATOR (NO BAR!) ==========
+      // ========== GOOGLE TRANSLATE WITH HIDDEN BAR ==========
       const LANGUAGES = [
         { code: "en", name: "English", flag: "🇬🇧" },
         { code: "es", name: "Spanish", flag: "🇪🇸" },
@@ -290,7 +338,7 @@
         { code: "it", name: "Italian", flag: "🇮🇹" },
         { code: "pt", name: "Portuguese", flag: "🇧🇷" },
         { code: "ru", name: "Russian", flag: "🇷🇺" },
-        { code: "zh-Hans", name: "Chinese (Simplified)", flag: "🇨🇳" },
+        { code: "zh-CN", name: "Chinese", flag: "🇨🇳" },
         { code: "ja", name: "Japanese", flag: "🇯🇵" },
         { code: "ko", name: "Korean", flag: "🇰🇷" },
         { code: "ar", name: "Arabic", flag: "🇸🇦" },
@@ -310,66 +358,90 @@
         { code: "hu", name: "Hungarian", flag: "🇭🇺" },
         { code: "cs", name: "Czech", flag: "🇨🇿" },
         { code: "ro", name: "Romanian", flag: "🇷🇴" },
-        { code: "bg", name: "Bulgarian", flag: "🇧🇬" },
       ];
 
       let currentLang = localStorage.getItem("siteLang") || "en";
-      let translateTimeout = null;
 
-      // Apply Microsoft Translator (NO BAR!)
-      function applyMicrosoftTranslate(langCode) {
+      function showToast(message) {
+        let toast = document.getElementById('translation-toast');
+        if (toast) toast.remove();
+        
+        toast = document.createElement('div');
+        toast.id = 'translation-toast';
+        toast.textContent = message;
+        toast.style.animation = 'fadeInOut 2s ease forwards';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          if (toast) toast.remove();
+        }, 2000);
+      }
+
+      function applyTranslation(langCode) {
         if (langCode === 'en') {
-          // Remove translation and reload
+          // Remove translation
+          document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           localStorage.setItem("siteLang", "en");
-          removeMicrosoftTranslate();
-          window.location.reload();
+          showToast("🌐 English selected - refreshing...");
+          setTimeout(() => window.location.reload(), 500);
           return;
         }
         
         localStorage.setItem("siteLang", langCode);
         
-        // Remove any existing translate widgets
-        removeMicrosoftTranslate();
+        // Remove any existing translate elements
+        const existingScript = document.querySelector('script[src*="translate.google"]');
+        if (existingScript) existingScript.remove();
         
-        // Create invisible container for the widget
-        let container = document.getElementById('MicrosoftTranslatorWidget');
+        // Set cookie for Google Translate
+        document.cookie = "googtrans=/en/" + langCode + "; path=/";
+        
+        // Load Google Translate
+        window.googleTranslateElementInit = function() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: langCode,
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: true
+          }, 'google_translate_element');
+          
+          // Aggressively hide the bar
+          setTimeout(() => {
+            const bars = document.querySelectorAll('.goog-te-banner-frame, .skiptranslate, iframe.skiptranslate');
+            bars.forEach(bar => {
+              if (bar) {
+                bar.style.display = 'none';
+                bar.style.visibility = 'hidden';
+                if (bar.remove) bar.remove();
+              }
+            });
+            document.body.style.top = '0px';
+            document.body.style.position = 'static';
+            document.documentElement.style.marginTop = '0px';
+          }, 100);
+        };
+        
+        // Add hidden container
+        let container = document.getElementById('google_translate_element');
         if (!container) {
           container = document.createElement('div');
-          container.id = 'MicrosoftTranslatorWidget';
-          container.style.cssText = 'display: none; position: absolute; top: -9999px; left: -9999px; visibility: hidden;';
+          container.id = 'google_translate_element';
+          container.style.display = 'none';
           document.body.appendChild(container);
         }
         
-        // Add Microsoft Translator script
+        // Add the script
         const script = document.createElement('script');
-        script.src = 'https://www.microsoft.com/translator/embed/translator.js?&auto=true&to=' + langCode;
+        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
         script.async = true;
-        script.onload = function() {
-          // Force translation after load
-          setTimeout(() => {
-            if (typeof Microsoft !== 'undefined' && Microsoft.Translator) {
-              Microsoft.Translator.Widget.Translate(langCode);
-            }
-          }, 100);
-        };
         document.head.appendChild(script);
         
-        // Show confirmation
-        const langName = LANGUAGES.find(l => l.code === langCode)?.name || langCode;
-        console.log(`Translating to: ${langName}`);
-      }
-
-      function removeMicrosoftTranslate() {
-        // Remove the script
-        const scripts = document.querySelectorAll('script[src*="microsofttranslator"]');
-        scripts.forEach(script => script.remove());
+        showToast(`🌐 Translating to ${LANGUAGES.find(l => l.code === langCode)?.name}...`);
         
-        // Remove widget container
-        const container = document.getElementById('MicrosoftTranslatorWidget');
-        if (container) container.remove();
-        
-        // Reset any translation classes
-        document.body.classList.remove('translated');
+        // Reload after translation loads
+        setTimeout(() => {
+          window.location.reload();
+        }, 800);
       }
 
       // ========== LANGUAGE DROPDOWN ==========
@@ -386,71 +458,13 @@
           const btn = document.createElement("button");
           btn.className = "lang-option" + (lang.code === currentLang ? " active" : "");
           btn.innerHTML = `<span class="lang-flag">${lang.flag}</span><span>${lang.name}</span>`;
-          btn.onclick = () => selectLang(lang);
+          btn.onclick = () => {
+            currentLang = lang.code;
+            applyTranslation(lang.code);
+            closeLangDropdown();
+          };
           list.appendChild(btn);
         });
-      }
-
-      function selectLang(lang) {
-        currentLang = lang.code;
-        localStorage.setItem("siteLang", lang.code);
-        document.getElementById("langCurrentLabel").textContent = `current: ${lang.name}`;
-        document.getElementById("langTriggerBtn").textContent = `${lang.flag} ${lang.name}`;
-        buildLangList(document.getElementById("langSearch").value);
-        closeLangDropdown();
-        
-        // Apply the translation
-        applyMicrosoftTranslate(lang.code);
-        
-        // Show a subtle notification (no ugly bar!)
-        showToast(`🌐 Translating to ${lang.name}...`);
-      }
-
-      function showToast(message) {
-        // Create a temporary toast notification
-        let toast = document.getElementById('translation-toast');
-        if (!toast) {
-          toast = document.createElement('div');
-          toast.id = 'translation-toast';
-          toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(45, 90, 227, 0.9);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-family: ubuntu, sans-serif;
-            font-size: 14px;
-            z-index: 10000;
-            backdrop-filter: blur(10px);
-            animation: fadeInOut 2s ease forwards;
-            pointer-events: none;
-          `;
-          document.body.appendChild(toast);
-          
-          // Add animation
-          const style = document.createElement('style');
-          style.textContent = `
-            @keyframes fadeInOut {
-              0% { opacity: 0; transform: translateY(20px); }
-              15% { opacity: 1; transform: translateY(0); }
-              85% { opacity: 1; transform: translateY(0); }
-              100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-        
-        toast.textContent = message;
-        toast.style.animation = 'none';
-        toast.offsetHeight; // Force reflow
-        toast.style.animation = 'fadeInOut 2s ease forwards';
-        
-        // Remove after animation
-        setTimeout(() => {
-          if (toast.parentNode) toast.remove();
-        }, 2000);
       }
 
       window.toggleLangDropdown = function(e) {
@@ -465,19 +479,15 @@
       function openLangDropdown(triggerBtn) {
         const dropdown = document.getElementById("langDropdown");
         const rect = triggerBtn.getBoundingClientRect();
-
         dropdown.style.top = (rect.bottom + window.scrollY + 8) + "px";
         dropdown.style.left = (rect.left + window.scrollX) + "px";
-
         buildLangList();
         document.getElementById("langSearch").value = "";
-
         const cur = LANGUAGES.find(l => l.code === currentLang);
         if (cur) {
           document.getElementById("langCurrentLabel").textContent = `current: ${cur.name}`;
           document.getElementById("langTriggerBtn").textContent = `${cur.flag} ${cur.name}`;
         }
-
         dropdown.classList.add("open");
         langDropdownOpen = true;
         setTimeout(() => document.getElementById("langSearch").focus(), 50);
@@ -499,13 +509,15 @@
         }
       });
 
-      // Initialize button text on load
-      (function initLanguage() {
+      // Initialize
+      (function init() {
         const cur = LANGUAGES.find(l => l.code === currentLang);
-        if (cur && cur.code !== "en") {
+        if (cur) {
           document.getElementById("langTriggerBtn").textContent = `${cur.flag} ${cur.name}`;
-          // Auto-translate if not English
-          applyMicrosoftTranslate(currentLang);
+        }
+        // If not English, apply translation on load
+        if (currentLang !== "en") {
+          setTimeout(() => applyTranslation(currentLang), 100);
         }
       })();
 
