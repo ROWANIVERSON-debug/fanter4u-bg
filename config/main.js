@@ -464,3 +464,118 @@ window.addEventListener('storage', function(e) {
     updateAccountButtonDisplay();
   }
 });
+
+
+// ===== ACCOUNT SYNC FUNCTIONS =====
+
+// Get current logged in user
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+}
+
+// Update user data in localStorage
+function updateUserInStorage(updatedUser) {
+  // Update current user
+  localStorage.setItem('fanter_currentUser', JSON.stringify(updatedUser));
+  
+  // Update in users array
+  let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
+  const index = users.findIndex(u => u.id === updatedUser.id);
+  if (index !== -1) {
+    users[index] = updatedUser;
+    localStorage.setItem('fanter_users', JSON.stringify(users));
+  }
+}
+
+// Sync favorites from account to the global favorites system
+function syncFavoritesFromAccount() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  
+  // Get account favorites
+  const accountFavorites = currentUser.favorites || [];
+  
+  // Get local favorites
+  let localFavorites = JSON.parse(localStorage.getItem("favourites") || "[]");
+  
+  // Merge: account favorites take priority
+  const mergedFavorites = [...new Set([...accountFavorites, ...localFavorites])];
+  
+  // Save merged favorites to localStorage
+  localStorage.setItem("favourites", JSON.stringify(mergedFavorites));
+  
+  // Update user's favorites array
+  currentUser.favorites = mergedFavorites;
+  currentUser.stats.favoritesCount = mergedFavorites.length;
+  updateUserInStorage(currentUser);
+  
+  console.log(`✅ Synced ${mergedFavorites.length} favorites from account`);
+}
+
+// Sync local favorites to account (when user adds/removes a favorite)
+function syncFavoriteToAccount(gameName, isAdding) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  
+  let favorites = currentUser.favorites || [];
+  
+  if (isAdding) {
+    if (!favorites.includes(gameName)) {
+      favorites.push(gameName);
+    }
+  } else {
+    favorites = favorites.filter(f => f !== gameName);
+  }
+  
+  currentUser.favorites = favorites;
+  currentUser.stats.favoritesCount = favorites.length;
+  updateUserInStorage(currentUser);
+  
+  // Also update the global localStorage
+  localStorage.setItem("favourites", JSON.stringify(favorites));
+  
+  console.log(`✅ ${isAdding ? 'Added' : 'Removed'} ${gameName} from account favorites`);
+}
+
+// Track played gqme
+function trackPlayedGame(gameName) {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  
+  let playedGames = currentUser.playedGames || [];
+  
+  // Add to played games (avoid duplicates, add to front for recent)
+  if (!playedGames.includes(gameName)) {
+    playedGames.unshift(gameName);
+  } else {
+    // Move to front if already exists
+    const index = playedGames.indexOf(gameName);
+    playedGames.splice(index, 1);
+    playedGames.unshift(gameName);
+  }
+  
+  // Keep only last 50 played games
+  if (playedGames.length > 50) playedGames.pop();
+  
+  currentUser.playedGames = playedGames;
+  currentUser.stats.gamesPlayed = playedGames.length;
+  updateUserInStorage(currentUser);
+  
+  console.log(`✅ Tracked played game: ${gameName}`);
+}
+
+// Load user's favourites on page load
+function loadUserFavorites() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+  
+  const favorites = currentUser.favorites || [];
+  localStorage.setItem("favourites", JSON.stringify(favorites));
+  
+  // Refresh the game dislay if handleSearchInput exists
+  if (typeof handleSearchInput === 'function') {
+    handleSearchInput();
+  }
+  
+  console.log(`✅ Loaded ${favorites.length} favorites from account`);
+}
