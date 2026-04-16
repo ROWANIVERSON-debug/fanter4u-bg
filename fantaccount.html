@@ -589,6 +589,12 @@
     // Initial render
     renderProfile();
     updateAccountButton();
+    
+    // Check achievements on page load (for existing users)
+if (currentUser && typeof checkAchievements === 'function') {
+  setTimeout(() => checkAchievements(), 500);
+}
+    
   </script>
 </body>
 </html>
