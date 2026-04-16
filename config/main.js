@@ -59,38 +59,47 @@ document.addEventListener('DOMContentLoaded', function() {
       gameImage.src = imageSrc;
       gameImage.alt = game.name;
       
-      // GAME CLICK HANDLER - OPENS IN NEW TAB
-      gameImage.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Track game play count for Addicted/Committed achievements
-        if (typeof trackGamePlayCount === 'function') {
-          trackGamePlayCount(game.name);
-        }
-        
-        // Check for food game (Big Back achievement)
-        if (typeof isFoodGame === 'function' && isFoodGame(game.name)) {
-          if (typeof checkAndUnlockAchievement === 'function') {
-            checkAndUnlockAchievement(57);
-          }
-        }
-        
-        // Track played game for account stats
-        if (typeof trackPlayedGame === 'function') {
-          trackPlayedGame(game.name);
-        }
-        
-        // OPEN IN NEW TAB
-        const gameUrl = game.url.startsWith('http') ? game.url : `play.html?gameurl=${game.url}/`;
-        window.open(gameUrl, '_blank');
-        
-        return false;
-      };
-      
-      const gameName = document.createElement("p");
-      gameName.textContent = game.name;
-      
+     gameImage.onclick = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  // Track game play count
+  if (typeof trackGamePlayCount === 'function') {
+    trackGamePlayCount(game.name);
+  }
+  
+  // Check for food game
+  if (typeof isFoodGame === 'function' && isFoodGame(game.name)) {
+    if (typeof checkAndUnlockAchievement === 'function') {
+      checkAndUnlockAchievement(57);
+    }
+  }
+  
+  // Track played game
+  if (typeof trackPlayedGame === 'function') {
+    trackPlayedGame(game.name);
+  }
+  
+  // Build URL
+  let gameUrl;
+  if (game.url.startsWith('http')) {
+    gameUrl = game.url;
+  } else {
+    gameUrl = `play.html?gameurl=${game.url}/&game=${encodeURIComponent(game.name)}`;
+  }
+  
+  console.log('Launching game:', game.name, 'URL:', gameUrl);
+  
+  // Try to open in new tab
+  const newTab = window.open(gameUrl, '_blank');
+  
+  // If popup blocked, notify user
+  if (!newTab) {
+    alert('Popup blocked! Please allow popups for this site or hold Ctrl/Cmd while clicking.');
+  }
+  
+  return false;
+};
       // FAVORITE BUTTON
       const favBtn = document.createElement("button");
       favBtn.classList.add("fav-btn");
