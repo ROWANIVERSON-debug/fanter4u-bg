@@ -13,176 +13,462 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0a0a1a, #0f0f2a);
+      background: linear-gradient(135deg, #0a0a1a, #0f0f2a, #1a0a2a);
+      background-size: 400% 400%;
+      animation: bgShift 15s ease infinite;
       min-height: 100vh;
       font-family: 'Ubuntu', sans-serif;
+      overflow: hidden;
     }
 
-    /* Game Container */
-    .game-container {
+    @keyframes bgShift {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    /* Main Layout */
+    .game-layout {
       display: flex;
-      flex-direction: column;
       height: 100vh;
       width: 100%;
     }
 
-    /* Top Bar */
-    .top-bar {
-      background: rgba(10, 15, 30, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(45, 90, 227, 0.3);
-      padding: 10px 20px;
+    /* ===== SIDE MENU (Like Truffled) ===== */
+    .game-sidebar {
+      width: 320px;
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(45, 90, 227, 0.3);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .game-sidebar.collapsed {
+      width: 60px;
+    }
+
+    .game-sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(45, 90, 227, 0.9);
+      border: 1px solid rgba(255, 204, 0, 0.3);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 101;
+      transition: all 0.2s ease;
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-toggle:hover {
+      background: #ffcc00;
+      color: #1a1a2e;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .sidebar-header {
+      padding: 25px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    .game-sidebar.collapsed .sidebar-header {
+      padding: 25px 10px;
+    }
+
+    .sidebar-header h2 {
+      color: #ffcc00;
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+    }
+
+    .game-sidebar.collapsed .sidebar-header h2 {
+      font-size: 0;
+    }
+
+    .game-sidebar.collapsed .sidebar-header h2::before {
+      content: "🎮";
+      font-size: 24px;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Sidebar Cards (like settings cards) */
+    .sidebar-card {
+      background: rgba(20, 30, 50, 0.6);
+      border: 1px solid rgba(45, 90, 227, 0.3);
+      border-radius: 16px;
+      margin: 15px;
+      padding: 15px;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-card:hover {
+      border-color: rgba(255, 204, 0, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 12px;
+      color: #ffcc00;
+      font-family: 'Orbitron', monospace;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .coin-amount {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffcc00;
+      font-family: 'Orbitron', monospace;
+      text-align: center;
+    }
+
+    .coin-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+
+    .playtime-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2d5ae3;
+      font-family: 'Orbitron', monospace;
+      text-align: center;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      background: rgba(45, 90, 227, 0.2);
+      border: 1px solid rgba(45, 90, 227, 0.3);
+      border-radius: 30px;
+      padding: 10px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .sidebar-btn:hover {
+      background: rgba(45, 90, 227, 0.4);
+      border-color: #ffcc00;
+      transform: translateY(-2px);
+    }
+
+    .back-btn {
+      background: rgba(220, 50, 50, 0.2);
+      border-color: rgba(220, 50, 50, 0.3);
+    }
+
+    .back-btn:hover {
+      background: rgba(220, 50, 50, 0.4);
+      border-color: #ffcc00;
+    }
+
+    /* ===== MAIN CONTENT AREA ===== */
+    .game-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    /* Game Container - Centered, Smaller */
+    .game-container {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 24px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(45, 90, 227, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .game-container.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-width: 100%;
+      border-radius: 0;
+      z-index: 1000;
+    }
+
+    .game-header {
+      background: rgba(10, 15, 30, 0.8);
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      border-bottom: 1px solid rgba(45, 90, 227, 0.3);
     }
 
-    .game-title {
-      font-size: 18px;
+    .game-name {
+      font-size: 16px;
       font-weight: bold;
       color: #ffcc00;
       font-family: 'Orbitron', monospace;
     }
 
-    .stats {
+    .game-controls {
       display: flex;
-      gap: 20px;
+      gap: 10px;
     }
 
-    .stat {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 18px;
-      font-weight: bold;
-      color: #2d5ae3;
-      font-family: 'Orbitron', monospace;
-    }
-
-    .stat-label {
-      font-size: 10px;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .control-btn {
-      background: rgba(20,30,50,0.8);
-      border: 1px solid rgba(45,90,227,0.4);
-      border-radius: 30px;
-      padding: 8px 20px;
+    .game-control-btn {
+      background: rgba(20, 30, 50, 0.8);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 20px;
+      padding: 5px 12px;
       color: white;
-      font-size: 13px;
+      font-size: 11px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .control-btn:hover {
+    .game-control-btn:hover {
       border-color: #ffcc00;
       transform: translateY(-2px);
     }
 
-    /* Game Wrapper */
     .game-wrapper {
-      flex: 1;
-      background: rgba(0,0,0,0.3);
-      position: relative;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      background: #000;
     }
 
     .game-frame {
       width: 100%;
       height: 100%;
       border: none;
-      background: white;
     }
 
-    /* Back Link */
-    .back-link {
-      color: white;
-      text-decoration: none;
-      padding: 8px 16px;
-      background: rgba(45,90,227,0.2);
-      border-radius: 30px;
-      font-size: 13px;
+    /* External notice */
+    .external-notice {
+      text-align: center;
+      padding: 8px;
+      background: rgba(0,0,0,0.6);
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
     }
 
-    .back-link:hover {
-      background: rgba(45,90,227,0.4);
-    }
-
-    /* Fullscreen */
-    .game-wrapper.fullscreen {
+    /* Floating particles background */
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1000;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .fullscreen-active {
-      background: rgba(255,204,0,0.2);
-      border-color: #ffcc00;
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(45, 90, 227, 0.5);
+      border-radius: 50%;
+      animation: floatParticle 20s linear infinite;
+    }
+
+    @keyframes floatParticle {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Scrollbar */
+    .sidebar-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-content::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .sidebar-content::-webkit-scrollbar-thumb {
+      background: #2d5ae3;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <div class="top-bar">
-      <div class="game-title" id="gameTitle">Loading...</div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-value" id="coinAmount">0</div>
-          <div class="stat-label">🪙 coins</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="playtimeDisplay">00:00:00</div>
-          <div class="stat-label">played</div>
-        </div>
+  <!-- Floating particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="game-layout">
+    <!-- Side Menu (Truffled Style) -->
+    <div class="game-sidebar" id="gameSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">◀</div>
+      
+      <div class="sidebar-header">
+        <h2>fanter</h2>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button class="control-btn" id="fullscreenBtn">🖥️ fullscreen</button>
-        <a href="index.html" class="back-link">← back</a>
+      
+      <div class="sidebar-content">
+        <!-- Game Info Card -->
+        <div class="sidebar-card">
+          <div class="card-icon">🎮</div>
+          <div class="card-title">now playing</div>
+          <div class="game-name-display" id="gameNameDisplay" style="text-align: center; font-size: 14px; word-break: break-word;">Loading...</div>
+        </div>
+        
+        <!-- Coins Card -->
+        <div class="sidebar-card">
+          <div class="card-icon">🪙</div>
+          <div class="card-title">your coins</div>
+          <div class="coin-amount" id="coinAmount">0</div>
+          <div class="coin-label">earned this session</div>
+          <div class="coin-label" style="font-size: 9px;">+0.01 per second</div>
+        </div>
+        
+        <!-- Playtime Card -->
+        <div class="sidebar-card">
+          <div class="card-icon">⏱️</div>
+          <div class="card-title">session time</div>
+          <div class="playtime-value" id="playtimeDisplay">00:00:00</div>
+        </div>
+        
+        <!-- Shop Button -->
+        <div class="sidebar-card">
+          <div class="card-icon">🛒</div>
+          <div class="card-title">shop</div>
+          <button class="sidebar-btn" id="shopBtn" onclick="alert('🪙 Shop coming soon! Use your coins to buy themes, cursors, and pets!')">visit shop →</button>
+        </div>
+        
+        <!-- Links Card -->
+        <div class="sidebar-card">
+          <div class="card-icon">🔗</div>
+          <div class="card-title">links</div>
+          <button class="sidebar-btn" onclick="window.location.href='index.html'">← back to games</button>
+          <button class="sidebar-btn" onclick="window.location.href='fantaccount.html'">👤 my account</button>
+        </div>
       </div>
     </div>
     
-    <div class="game-wrapper" id="gameWrapper">
-      <iframe class="game-frame" id="gameFrame" src="about:blank" allowfullscreen></iframe>
+    <!-- Main Game Area -->
+    <div class="game-main">
+      <div class="game-container" id="gameContainer">
+        <div class="game-header">
+          <span class="game-name" id="gameTitle">Loading game...</span>
+          <div class="game-controls">
+            <button class="game-control-btn" id="fullscreenBtn">🖥️ fullscreen</button>
+            <button class="game-control-btn" id="refreshBtn">🔄 refresh</button>
+          </div>
+        </div>
+        <div class="game-wrapper">
+          <iframe class="game-frame" id="gameFrame" src="about:blank" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
+        </div>
+        <div class="external-notice" id="externalNotice" style="display: none;">⚠️ external site - some features may be limited</div>
+      </div>
     </div>
   </div>
 
   <script>
+    // ===== CREATE FLOATING PARTICLES =====
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = 15 + Math.random() * 15 + 's';
+        particle.style.width = Math.random() * 4 + 1 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.background = `rgba(${45 + Math.random() * 50}, ${90 + Math.random() * 50}, ${227}, ${0.2 + Math.random() * 0.3})`;
+        container.appendChild(particle);
+      }
+    }
+    createParticles();
+
     // ===== GET GAME INFO FROM URL =====
     const urlParams = new URLSearchParams(window.location.search);
     let gameUrl = urlParams.get("gameurl");
     let gameName = urlParams.get("game") || "Game";
 
-    console.log("🔍 Game URL param:", gameUrl);
+    console.log("🔍 Game URL:", gameUrl);
     console.log("📝 Game name:", gameName);
 
-    // Fix the game URL
+    const isExternal = gameUrl && (gameUrl.startsWith('http://') || gameUrl.startsWith('https://'));
+    
     let embedUrl;
-    if (gameUrl && gameUrl.startsWith('http')) {
+    if (isExternal) {
       embedUrl = gameUrl;
+      document.getElementById('externalNotice').style.display = 'block';
     } else if (gameUrl) {
       embedUrl = `https://gms.parcoil.com/${gameUrl}`;
     } else {
       embedUrl = 'about:blank';
-      alert('No game URL provided!');
     }
 
-    console.log("🎮 Loading embed URL:", embedUrl);
-    
-    // Load the game
     const gameFrame = document.getElementById('gameFrame');
     if (gameFrame) {
       gameFrame.src = embedUrl;
     }
     
-    document.getElementById('gameTitle').textContent = `🎮 ${decodeURIComponent(gameName)}`;
+    document.getElementById('gameTitle').textContent = decodeURIComponent(gameName);
+    document.getElementById('gameNameDisplay').textContent = decodeURIComponent(gameName);
 
-    // ===== COIN SYSTEM =====
+    // ===== SIDEBAR COLLAPSE =====
+    let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    const sidebar = document.getElementById('gameSidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    
+    function toggleSidebar() {
+      sidebarCollapsed = !sidebarCollapsed;
+      localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+      if (sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+        toggleBtn.innerHTML = '▶';
+      } else {
+        sidebar.classList.remove('collapsed');
+        toggleBtn.innerHTML = '◀';
+      }
+    }
+    
+    toggleBtn.onclick = toggleSidebar;
+    
+    if (sidebarCollapsed) {
+      sidebar.classList.add('collapsed');
+      toggleBtn.innerHTML = '▶';
+    }
+
+    // ===== COIN & PLAYTIME SYSTEM =====
     let sessionStartTime = Date.now();
     let totalCoinsEarned = 0;
     let coinInterval = null;
@@ -256,20 +542,18 @@
     });
     
     // ===== FULLSCREEN TOGGLE =====
-    const gameWrapper = document.getElementById('gameWrapper');
+    const gameContainer = document.getElementById('gameContainer');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     let isFullscreen = false;
     
     function toggleFullscreen() {
       if (!isFullscreen) {
-        gameWrapper.classList.add('fullscreen');
+        gameContainer.classList.add('fullscreen');
         fullscreenBtn.innerHTML = '⬛ exit';
-        fullscreenBtn.classList.add('fullscreen-active');
         isFullscreen = true;
       } else {
-        gameWrapper.classList.remove('fullscreen');
+        gameContainer.classList.remove('fullscreen');
         fullscreenBtn.innerHTML = '🖥️ fullscreen';
-        fullscreenBtn.classList.remove('fullscreen-active');
         isFullscreen = false;
       }
     }
@@ -281,6 +565,25 @@
         toggleFullscreen();
       }
     });
+    
+    // ===== REFRESH BUTTON =====
+    document.getElementById('refreshBtn').onclick = () => {
+      if (gameFrame) {
+        gameFrame.src = embedUrl;
+      }
+    };
+    
+    // ===== TRACK GAME PLAY =====
+    function trackGamePlay(gameNameParam) {
+      if (typeof window.trackPlayedGame === 'function') {
+        window.trackPlayedGame(gameNameParam);
+      }
+      if (typeof window.trackGamePlayCount === 'function') {
+        window.trackGamePlayCount(gameNameParam);
+      }
+    }
+    
+    trackGamePlay(decodeURIComponent(gameName));
     
     console.log('✅ Game player ready!');
   </script>
