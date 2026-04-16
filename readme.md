@@ -73,7 +73,7 @@ credits:
 
 built by abcatlmfao
 
-contributors (ideas etc.): creamypeanut, bloxy, :), 
+contributors (ideas etc.): creamypeanut, bloxy, :), rowan
 
 parcoil network for the game api (https://dsc.gg/parcoil)
 
