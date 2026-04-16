@@ -1665,3 +1665,57 @@ body.no-animations * {
   color: gold;
   font-family: monospace;
 }
+
+
+/* ===== ACCOUNT BUTTON ===== */
+.account-btn-container {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 100;
+}
+
+.account-btn {
+  background: rgba(20, 30, 50, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(45, 90, 227, 0.4);
+  border-radius: 30px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+  color: white;
+}
+
+.account-btn:hover {
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(45, 90, 227, 0.3);
+}
+
+.account-icon {
+  font-size: 16px;
+}
+
+.account-name {
+  font-weight: 500;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobile adjutment */
+@media (max-width: 600px) {
+  .account-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .account-name {
+    max-width: 70px;
+  }
+}
