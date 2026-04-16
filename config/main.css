@@ -3,23 +3,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&family=Exo+2:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap");
 
-/* FORCE ALLOW OVERFLOW FOR CHINCHILLA */
-html, body {
-  overflow-x: visible !important;
-  overflow-y: auto !important;
-  max-width: 100%;
-}
-
-* {
-  max-width: 100%;
-}
-
-.chinchilla-container,
-.chinchilla-image {
-  max-width: none !important;
-  overflow: visible !important;
-}
-
 :root {
   --background-color: #1a1a2e !important;
   --text-color: #FFFFFF;
@@ -74,11 +57,10 @@ body {
   user-select: none;
   min-height: 100vh;
   position: relative;
-  overflow-x: visible;  /* ← CHANGED from hidden to visible */
+  overflow-x: visible;
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.08);
 }
 
-/* Allow chinchilla to show cmpletely */
 html {
   overflow-x: visible !important;
 }
@@ -1184,10 +1166,6 @@ body.loading .fav-sidebar-btn {
   -webkit-transform: translateZ(0);
 }
 
-body {
-  overflow-x: hidden;
-}
-
 html {
   scroll-behavior: smooth;
 }
@@ -1257,7 +1235,7 @@ input, textarea, #searchInput {
   border-radius: 8px;
 }
 
-/* Perormance Modes */
+/* Performance Modes */
 body.low-perf .game {
   animation: none !important;
   transition: none !important;
@@ -1439,9 +1417,7 @@ body.no-animations * {
   border-radius: 4px;
 }
 
-/* Add to your main.css */
-
-/* Featured settings card (larger) */
+/* Featured settings card */
 .settings-card.featured {
   width: 540px;
   max-width: calc(100% - 40px);
@@ -1459,7 +1435,7 @@ body.no-animations * {
   50% { transform: scale(1.1); text-shadow: 0 0 20px gold; }
 }
 
-/* Mini card (for less important settings) */
+/* Mini card */
 .settings-card.mini {
   width: 180px;
   padding: 15px;
@@ -1475,7 +1451,7 @@ body.no-animations * {
 
 .settings-card.mini p {
   font-size: 11px;
-  display: none; /* Hide description on mini cards */
+  display: none;
 }
 
 /* Horizontal card */
