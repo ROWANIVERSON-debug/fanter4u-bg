@@ -181,7 +181,6 @@
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loading-text { color: #00ff88; font-family: 'Orbitron', monospace; font-size: 14px; letter-spacing: 2px; }
-    .loading-game-name { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 15px; }
     
     @media (max-width: 768px) {
       .game-sidebar { width: 240px; }
@@ -196,7 +195,6 @@
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
     <div class="loading-text">LOADING GAME...</div>
-    <div class="loading-game-name" id="loadingGameName">Preparing fanter player</div>
   </div>
 
   <div class="game-layout">
@@ -213,8 +211,7 @@
           <div class="card-icon">🪙</div>
           <div class="card-title">your coins</div>
           <div class="coin-amount" id="coinAmount">0</div>
-          <div class="coin-label">earned this session</div>
-          <div class="coin-label" style="font-size: 9px;">+0.01 per second</div>
+          <div class="coin-label">+0.01 per second</div>
         </div>
         <div class="sidebar-card">
           <div class="card-icon">⏱️</div>
@@ -222,13 +219,6 @@
           <div class="playtime-value" id="playtimeDisplay">00:00:00</div>
         </div>
         <div class="sidebar-card">
-          <div class="card-icon">🛒</div>
-          <div class="card-title">shop</div>
-          <button class="sidebar-btn" onclick="alert('🪙 Shop coming soon!')">visit shop →</button>
-        </div>
-        <div class="sidebar-card">
-          <div class="card-icon">🔗</div>
-          <div class="card-title">links</div>
           <button class="sidebar-btn" onclick="window.location.href='index.html'">← back to games</button>
           <button class="sidebar-btn" onclick="window.location.href='fantaccount.html'">👤 my account</button>
         </div>
@@ -238,7 +228,7 @@
     <div class="game-main">
       <div class="game-container" id="gameContainer">
         <div class="game-header">
-          <span class="game-name" id="gameTitle">Loading game...</span>
+          <span class="game-name" id="gameTitle">Loading...</span>
           <div class="game-controls">
             <button class="game-control-btn" id="fullscreenBtn">🖥️ fullscreen</button>
             <button class="game-control-btn" id="refreshBtn">🔄 refresh</button>
@@ -253,183 +243,125 @@
   </div>
 
   <script>
-    // ===== GET GAME INFO FROM URL =====
+    // Get game info from URL
     const urlParams = new URLSearchParams(window.location.search);
     let gameUrl = urlParams.get("gameurl");
     let gameName = urlParams.get("game") || "Game";
     const decodedGameName = decodeURIComponent(gameName);
     
-    console.log("🔍 Raw gameUrl param:", gameUrl);
-    console.log("📝 Game name:", decodedGameName);
-    
     // Update UI
-    const gameTitle = document.getElementById('gameTitle');
-    const gameNameDisplay = document.getElementById('gameNameDisplay');
-    const loadingGameNameEl = document.getElementById('loadingGameName');
+    document.getElementById('gameTitle').textContent = decodedGameName;
+    document.getElementById('gameNameDisplay').textContent = decodedGameName;
     
-    if (gameTitle) gameTitle.textContent = decodedGameName;
-    if (gameNameDisplay) gameNameDisplay.textContent = decodedGameName;
-    if (loadingGameNameEl) loadingGameNameEl.textContent = `Loading ${decodedGameName}...`;
-    
-    // Check if gameUrl is missing
-    if (!gameUrl || gameUrl === 'undefined' || gameUrl === 'null' || gameUrl === '') {
+    if (!gameUrl || gameUrl === 'undefined' || gameUrl === 'null') {
+      // Show error if no game URL
       document.getElementById('gameContainer').innerHTML = `
         <div class="game-header">
           <span class="game-name">Error</span>
-          <div class="game-controls">
-            <button class="game-control-btn" onclick="window.location.href='index.html'">← back</button>
-          </div>
+          <button class="game-control-btn" onclick="window.location.href='index.html'">← back</button>
         </div>
         <div style="text-align: center; padding: 60px 20px;">
           <div style="font-size: 64px; margin-bottom: 20px;">😵</div>
           <div style="font-size: 24px; color: #ff4444; margin-bottom: 10px;">Game URL Not Found</div>
-          <div style="color: rgba(255,255,255,0.7);">No game URL was provided. Please go back and try again.</div>
+          <div style="color: rgba(255,255,255,0.7);">Please go back and try again.</div>
         </div>
       `;
       document.getElementById('loadingOverlay').classList.add('hide');
     } else {
-      // Build the embed URL
-      let embedUrl;
+      // Load the game
       const isExternal = gameUrl.startsWith('http://') || gameUrl.startsWith('https://');
+      let finalUrl;
       
       if (isExternal) {
-        // External game - use directly
-        embedUrl = gameUrl;
-        console.log("🌐 External game - loading from:", embedUrl);
+        finalUrl = gameUrl;
       } else {
-        // Internal game - use CDN
         let cleanUrl = gameUrl.replace(/\/$/, '');
-        embedUrl = `https://gms.parcoil.com/${cleanUrl}`;
-        console.log("🎮 Internal game - loading from CDN:", embedUrl);
+        finalUrl = `https://gms.parcoil.com/${cleanUrl}`;
       }
       
       const gameFrame = document.getElementById('gameFrame');
       const loadingOverlay = document.getElementById('loadingOverlay');
       
-      function onGameLoad() {
-        console.log("✅ Game loaded successfully!");
-        if (loadingOverlay) loadingOverlay.classList.add('hide');
-      }
+      gameFrame.onload = () => {
+        loadingOverlay.classList.add('hide');
+      };
       
-      if (gameFrame) {
-        gameFrame.onload = onGameLoad;
-        gameFrame.src = embedUrl;
-        
-        // Fallback timeout
-        setTimeout(() => {
-          if (loadingOverlay && !loadingOverlay.classList.contains('hide')) {
-            console.log("⚠️ Game load timeout, forcing hide");
-            onGameLoad();
-          }
-        }, 8000);
-      }
+      gameFrame.src = finalUrl;
       
-      // ===== FULLSCREEN TOGGLE =====
-      const fullscreenBtn = document.getElementById('fullscreenBtn');
-      const refreshBtn = document.getElementById('refreshBtn');
-      const gameContainer = document.getElementById('gameContainer');
+      // Timeout fallback
+      setTimeout(() => {
+        if (loadingOverlay && !loadingOverlay.classList.contains('hide')) {
+          loadingOverlay.classList.add('hide');
+        }
+      }, 8000);
+      
+      // Fullscreen toggle
       let isFullscreen = false;
-      
-      if (fullscreenBtn) {
-        fullscreenBtn.onclick = () => {
-          if (!isFullscreen) {
-            gameContainer.classList.add('fullscreen');
-            fullscreenBtn.innerHTML = '⬛ exit';
-            isFullscreen = true;
-          } else {
-            gameContainer.classList.remove('fullscreen');
-            fullscreenBtn.innerHTML = '🖥️ fullscreen';
-            isFullscreen = false;
-          }
-        };
-      }
+      document.getElementById('fullscreenBtn').onclick = () => {
+        const container = document.getElementById('gameContainer');
+        if (!isFullscreen) {
+          container.classList.add('fullscreen');
+          document.getElementById('fullscreenBtn').innerHTML = '⬛ exit';
+          isFullscreen = true;
+        } else {
+          container.classList.remove('fullscreen');
+          document.getElementById('fullscreenBtn').innerHTML = '🖥️ fullscreen';
+          isFullscreen = false;
+        }
+      };
       
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && isFullscreen) {
-          gameContainer.classList.remove('fullscreen');
-          if (fullscreenBtn) fullscreenBtn.innerHTML = '🖥️ fullscreen';
+          document.getElementById('gameContainer').classList.remove('fullscreen');
+          document.getElementById('fullscreenBtn').innerHTML = '🖥️ fullscreen';
           isFullscreen = false;
         }
       });
       
       // Refresh button
-      if (refreshBtn) {
-        refreshBtn.onclick = () => {
-          if (gameFrame) {
-            if (loadingOverlay) loadingOverlay.classList.remove('hide');
-            gameFrame.src = embedUrl;
-          }
-        };
-      }
+      document.getElementById('refreshBtn').onclick = () => {
+        loadingOverlay.classList.remove('hide');
+        gameFrame.src = finalUrl;
+      };
       
-      // Track game play for achievements
+      // Track game play
       if (typeof window.trackPlayedGame === 'function') window.trackPlayedGame(decodedGameName);
       if (typeof window.trackGamePlayCount === 'function') window.trackGamePlayCount(decodedGameName);
       
-      // ===== COIN SYSTEM =====
+      // Coin system
       let sessionStartTime = Date.now();
       let totalCoinsEarned = 0;
       let coinInterval = null;
       let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
       
-      function loadUserCoins() {
-        if (currentUser && currentUser.coins !== undefined) totalCoinsEarned = currentUser.coins;
-        const coinEl = document.getElementById('coinAmount');
-        if (coinEl) coinEl.textContent = Math.floor(totalCoinsEarned * 100) / 100;
-      }
+      if (currentUser && currentUser.coins !== undefined) totalCoinsEarned = currentUser.coins;
+      document.getElementById('coinAmount').textContent = Math.floor(totalCoinsEarned * 100) / 100;
+      
+      setInterval(() => {
+        const elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const hours = Math.floor(elapsedSeconds / 3600);
+        const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+        const seconds = elapsedSeconds % 60;
+        document.getElementById('playtimeDisplay').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
       
       function saveUserCoins() {
         if (!currentUser) return;
         currentUser.coins = totalCoinsEarned;
         localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-        let users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex !== -1) {
-          users[userIndex].coins = totalCoinsEarned;
-          localStorage.setItem('fanter_users', JSON.stringify(users));
+      }
+      
+      coinInterval = setInterval(() => {
+        if (!document.hidden) {
+          totalCoinsEarned += 0.01;
+          document.getElementById('coinAmount').textContent = Math.floor(totalCoinsEarned * 100) / 100;
+          saveUserCoins();
         }
-      }
+      }, 1000);
       
-      function updateCoinDisplay() {
-        const coinEl = document.getElementById('coinAmount');
-        if (coinEl) coinEl.textContent = Math.floor(totalCoinsEarned * 100) / 100;
-      }
-      
-      function updatePlaytimeDisplay() {
-        const elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
-        const hours = Math.floor(elapsedSeconds / 3600);
-        const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-        const seconds = elapsedSeconds % 60;
-        const display = document.getElementById('playtimeDisplay');
-        if (display) display.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
-      
-      function startCoinEarning() {
-        if (coinInterval) clearInterval(coinInterval);
-        coinInterval = setInterval(() => {
-          if (!document.hidden) {
-            totalCoinsEarned += 0.01;
-            updateCoinDisplay();
-            saveUserCoins();
-          }
-        }, 1000);
-      }
-      
-      setInterval(updatePlaytimeDisplay, 1000);
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          if (coinInterval) clearInterval(coinInterval);
-          coinInterval = null;
-        } else {
-          if (!coinInterval) startCoinEarning();
-        }
-      });
-      
-      loadUserCoins();
-      startCoinEarning();
       window.addEventListener('beforeunload', () => saveUserCoins());
       
-      // ===== SIDEBAR COLLAPSE =====
+      // Sidebar collapse
       let sidebarCollapsed = localStorage.getItem('sidebarCollapsed_play') === 'true';
       const sidebar = document.getElementById('gameSidebar');
       const toggleBtn = document.getElementById('sidebarToggle');
@@ -439,19 +371,17 @@
         localStorage.setItem('sidebarCollapsed_play', sidebarCollapsed);
         if (sidebarCollapsed) {
           sidebar.classList.add('collapsed');
-          if (toggleBtn) toggleBtn.innerHTML = '▶';
+          toggleBtn.innerHTML = '▶';
         } else {
           sidebar.classList.remove('collapsed');
-          if (toggleBtn) toggleBtn.innerHTML = '◀';
+          toggleBtn.innerHTML = '◀';
         }
       }
-      if (toggleBtn) toggleBtn.onclick = toggleSidebar;
+      toggleBtn.onclick = toggleSidebar;
       if (sidebarCollapsed) {
         sidebar.classList.add('collapsed');
-        if (toggleBtn) toggleBtn.innerHTML = '▶';
+        toggleBtn.innerHTML = '▶';
       }
-      
-      console.log('✅ Game player ready!');
     }
   </script>
 </body>
