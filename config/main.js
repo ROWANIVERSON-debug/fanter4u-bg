@@ -1,4 +1,4 @@
-// ===== MAIN.JS - COMPLETE REWRITE =====
+// ===== MAIN.JS - COMPLETE FULL VERSION =====
 
 // Make gamesData global
 window.gamesData = [];
@@ -40,82 +40,168 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof syncFavoriteToAccount === 'function') {
       syncFavoriteToAccount(gameName, isAdding);
     }
+    
+    if (typeof checkAchievements === 'function') {
+      setTimeout(function() { checkAchievements(); }, 100);
+    }
   };
 
-  // Steam-like game card display
+  // MAIN DISPLAY FUNCTION - STEAM STYLE
   window.displayFilteredGames = function(filteredGames) {
     var gamesContainer = document.getElementById("gamesContainer");
     if (!gamesContainer) return;
     gamesContainer.innerHTML = "";
     
-    // Get coin multiplier from equipped pet
-    var coinMultiplier = getActiveCoinMultiplier();
+    if (!filteredGames || filteredGames.length === 0) {
+      gamesContainer.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);">no games found 😔</div>';
+      return;
+    }
     
     for (var i = 0; i < filteredGames.length; i++) {
       var game = filteredGames[i];
       var gameDiv = document.createElement("div");
       gameDiv.classList.add("game");
       
-      // Get game earnings
+      // Game image container
+      var gameImageContainer = document.createElement("div");
+      gameImageContainer.className = "game-image-container";
+      
+      var gameImage = document.createElement("img");
+      var imageSrc;
+      if (game.image && game.image.indexOf('http') === 0) {
+        imageSrc = game.image;
+      } else if (game.image) {
+        imageSrc = serverUrl1 + "/" + game.url + "/" + game.image;
+      } else {
+        imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
+      }
+      gameImage.src = imageSrc;
+      gameImage.alt = game.name;
+      gameImage.loading = "lazy";
+      gameImageContainer.appendChild(gameImage);
+      
+      // Game info container
+      var gameInfo = document.createElement("div");
+      gameInfo.className = "game-info";
+      
+      var gameName = document.createElement("div");
+      gameName.className = "game-name";
+      gameName.textContent = game.name;
+      
+      var gameDetails = document.createElement("div");
+      gameDetails.className = "game-details";
+      gameDetails.textContent = getGameDescription(game.name, game.category);
+      
       var earnedCoins = window.gameEarnings[game.name] || 0;
       var playCount = window.gamePlayCounts[game.name] || 0;
+      var gameRating = (typeof globalRatings !== 'undefined' && globalRatings[game.name]) ? globalRatings[game.name].average.toFixed(1) : '0.0';
       
-      // Estimate load time based on game type
-      var loadTime = game.url.startsWith('http') ? '2-4 seconds' : '1-2 seconds';
+      var gameStats = document.createElement("div");
+      gameStats.className = "game-stats";
+      gameStats.innerHTML = '<span>⭐ ' + gameRating + '</span><span>🎮 ' + playCount + ' plays</span>';
       
-      // Release date (default to today if not set)
-      var releaseDate = game.releaseDate || new Date().toLocaleDateString();
+      var gameCategory = document.createElement("div");
+      gameCategory.className = "game-category";
+      gameCategory.style.cssText = 'display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;background:' + getCategoryColor(game.category) + '20;color:' + getCategoryColor(game.category) + ';margin-bottom:10px;';
+      gameCategory.innerHTML = getCategoryIcon(game.category) + ' ' + (game.category || 'other');
       
-      // Game description (your typing style)
-      var gameDescription = game.description || getGameDescription(game.name, game.category);
+      var gameRelease = document.createElement("div");
+      gameRelease.className = "game-release";
+      gameRelease.textContent = '📅 added: ' + (game.releaseDate || new Date().toLocaleDateString());
       
-      gameDiv.innerHTML = `
-        <div class="game-image-container">
-          <img src="${getGameImage(game)}" alt="${escapeHtml(game.name)}" loading="lazy">
-        </div>
-        <div class="game-info">
-          <div class="game-name">${escapeHtml(game.name)}</div>
-          <div class="game-details">${escapeHtml(gameDescription)}</div>
-          <div class="game-stats">
-            <span>⭐ ${getGameRating(game.name)}</span>
-            <span>🎮 ${playCount} plays</span>
-          </div>
-          <div class="game-category" style="background: ${getCategoryColor(game.category)}20; color: ${getCategoryColor(game.category)}">
-            ${getCategoryIcon(game.category)} ${game.category || 'other'}
-          </div>
-          <div class="game-release">📅 added: ${releaseDate}</div>
-          <div class="game-earnings">🪙 earned: ${Math.floor(earnedCoins * 100) / 100} coins</div>
-          <div class="game-load-time">⏱️ est. load time: ${loadTime}</div>
-          <div class="game-actions">
-            <button class="game-play-btn">🎮 play now</button>
-            <button class="game-fav-btn ${getFavourites().indexOf(game.name) !== -1 ? 'active' : ''}" data-game="${escapeHtml(game.name)}">${getFavourites().indexOf(game.name) !== -1 ? '★' : '☆'}</button>
-          </div>
-          <div class="game-rating" data-game="${escapeHtml(game.name)}">
-            <div class="stars">
-              ${[1,2,3,4,5].map(s => `<span class="star" data-value="${s}">★</span>`).join('')}
-            </div>
-            <div class="rating-average">⭐ ${getGameRating(game.name)}</div>
-          </div>
-        </div>
-      `;
+      var gameEarningsDiv = document.createElement("div");
+      gameEarningsDiv.className = "game-earnings";
+      gameEarningsDiv.textContent = '🪙 earned: ' + Math.floor(earnedCoins * 100) / 100 + ' coins';
+      
+      var gameLoadTime = document.createElement("div");
+      gameLoadTime.className = "game-load-time";
+      gameLoadTime.textContent = (game.url && game.url.indexOf('http') === 0) ? '⏱️ est. load time: 2-4 seconds' : '⏱️ est. load time: 1-2 seconds';
+      
+      var gameActions = document.createElement("div");
+      gameActions.className = "game-actions";
+      
+      var playBtn = document.createElement("button");
+      playBtn.className = "game-play-btn";
+      playBtn.textContent = "🎮 play now";
+      playBtn.onclick = (function(url, name) {
+        return function() {
+          if (typeof trackPlayedGame === 'function') trackPlayedGame(name);
+          if (typeof trackGamePlayCount === 'function') trackGamePlayCount(name);
+          if (typeof isFoodGame === 'function' && isFoodGame(name)) {
+            if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(57);
+          }
+          var playUrl = 'play.html?gameurl=' + encodeURIComponent(url) + '&game=' + encodeURIComponent(name);
+          window.open(playUrl, '_blank');
+        };
+      })(game.url, game.name);
+      
+      var favBtn = document.createElement("button");
+      favBtn.className = "game-fav-btn";
+      favBtn.setAttribute("data-game", game.name);
+      var isFav = getFavourites().indexOf(game.name) !== -1;
+      favBtn.textContent = isFav ? "★" : "☆";
+      favBtn.classList.toggle('active', isFav);
+      favBtn.onclick = (function(e, name) {
+        return function(ev) {
+          ev.stopPropagation();
+          window.toggleFavourite(name);
+          var nowFav = getFavourites().indexOf(name) !== -1;
+          ev.target.textContent = nowFav ? "★" : "☆";
+          ev.target.classList.toggle('active', nowFav);
+        };
+      })(null, game.name);
+      
+      gameActions.appendChild(playBtn);
+      gameActions.appendChild(favBtn);
+      
+      // Rating stars
+      var gameRatingDiv = document.createElement("div");
+      gameRatingDiv.className = "game-rating";
+      gameRatingDiv.setAttribute("data-game", game.name);
+      
+      var starsDiv = document.createElement("div");
+      starsDiv.className = "stars";
+      for (var s = 1; s <= 5; s++) {
+        var star = document.createElement("span");
+        star.className = "star";
+        star.setAttribute("data-value", s);
+        star.textContent = "★";
+        star.onclick = (function(name, value) {
+          return function() {
+            if (typeof submitRating === 'function') submitRating(name, value);
+          };
+        })(game.name, s);
+        starsDiv.appendChild(star);
+      }
+      
+      var avgDiv = document.createElement("div");
+      avgDiv.className = "rating-average";
+      avgDiv.innerHTML = '⭐ ' + gameRating;
+      
+      gameRatingDiv.appendChild(starsDiv);
+      gameRatingDiv.appendChild(avgDiv);
+      
+      gameInfo.appendChild(gameName);
+      gameInfo.appendChild(gameDetails);
+      gameInfo.appendChild(gameStats);
+      gameInfo.appendChild(gameCategory);
+      gameInfo.appendChild(gameRelease);
+      gameInfo.appendChild(gameEarningsDiv);
+      gameInfo.appendChild(gameLoadTime);
+      gameInfo.appendChild(gameActions);
+      gameInfo.appendChild(gameRatingDiv);
+      
+      gameDiv.appendChild(gameImageContainer);
+      gameDiv.appendChild(gameInfo);
       
       gamesContainer.appendChild(gameDiv);
     }
     
-    attachGameEvents();
-    if (typeof attachRatingListeners === 'function') attachRatingListeners();
-    
     console.log("✅ Displayed " + filteredGames.length + " games");
   };
   
-  function getGameImage(game) {
-    if (game.image && game.image.indexOf('http') === 0) return game.image;
-    if (game.image) return serverUrl1 + "/" + game.url + "/" + game.image;
-    return 'https://via.placeholder.com/200x200?text=No+Image';
-  }
-  
   function getGameDescription(name, category) {
-    const descriptions = {
+    var descriptions = {
       'action': 'fast-paced, intense gameplay that\'ll keep you on the edge of your seat',
       'puzzle': 'challenge your brain with tricky puzzles and mind-bending mechanics',
       'racing': 'burn rubber and race to the finish line in high-speed competition',
@@ -128,18 +214,11 @@ document.addEventListener('DOMContentLoaded', function() {
       'simulation': 'build, manage, and create your own world',
       'sandbox': 'no rules, no limits - just pure creativity'
     };
-    return descriptions[category] || `a fun ${category || 'arcade'} game that'll keep you entertained for hours`;
-  }
-  
-  function getGameRating(gameName) {
-    if (typeof globalRatings !== 'undefined' && globalRatings[gameName]) {
-      return globalRatings[gameName].average.toFixed(1);
-    }
-    return '0.0';
+    return descriptions[category] || 'a fun ' + (category || 'arcade') + ' game that\'ll keep you entertained for hours';
   }
   
   function getCategoryIcon(category) {
-    const icons = {
+    var icons = {
       'action': '⚔️', 'puzzle': '🧩', 'racing': '🏎️', 'sports': '⚽',
       'adventure': '🗺️', 'platformer': '🏃', 'strategy': '♟️',
       'horror': '👻', 'arcade': '🕹️', 'simulation': '🏭', 'sandbox': '🎨'
@@ -148,65 +227,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function getCategoryColor(category) {
-    const colors = {
+    var colors = {
       'action': '#ff4444', 'puzzle': '#44ff44', 'racing': '#ff8844',
       'sports': '#44ff88', 'adventure': '#44aaff', 'platformer': '#ff44ff',
       'strategy': '#88ff44', 'horror': '#aa44ff', 'arcade': '#ff44aa',
       'simulation': '#44ffcc', 'sandbox': '#ff8844'
     };
     return colors[category] || '#aaaaaa';
-  }
-  
-  function attachGameEvents() {
-    document.querySelectorAll('.game-play-btn').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        var gameDiv = btn.closest('.game');
-        var gameName = gameDiv.querySelector('.game-name')?.textContent;
-        if (gameName && window.gamesData) {
-          var game = window.gamesData.find(g => g.name === gameName);
-          if (game) {
-            trackGamePlay(game.name);
-            var playUrl = 'play.html?gameurl=' + encodeURIComponent(game.url) + '&game=' + encodeURIComponent(game.name);
-            window.open(playUrl, '_blank');
-          }
-        }
-      };
-    });
-    
-    document.querySelectorAll('.game-fav-btn').forEach(btn => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        var gameName = btn.getAttribute('data-game');
-        if (gameName) {
-          window.toggleFavourite(gameName);
-          var isFav = getFavourites().indexOf(gameName) !== -1;
-          btn.textContent = isFav ? '★' : '☆';
-          btn.classList.toggle('active', isFav);
-        }
-      };
-    });
-    
-    document.querySelectorAll('.star').forEach(star => {
-      star.onclick = (e) => {
-        e.stopPropagation();
-        var ratingDiv = star.closest('.game-rating');
-        var gameName = ratingDiv.getAttribute('data-game');
-        var value = parseInt(star.getAttribute('data-value'));
-        if (gameName && typeof submitRating === 'function') {
-          submitRating(gameName, value);
-          updateStarDisplayLocal(ratingDiv, value);
-        }
-      };
-    });
-  }
-  
-  function updateStarDisplayLocal(ratingDiv, userRating) {
-    var stars = ratingDiv.querySelectorAll('.star');
-    for (var i = 0; i < stars.length; i++) {
-      if (i < userRating) stars[i].classList.add('active');
-      else stars[i].classList.remove('active');
-    }
   }
 
   function handleSearchInput() {
@@ -261,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
       handleSearchInput();
       console.log("✅ Loaded " + window.gamesData.length + " games successfully!");
       if (typeof updateGameOfDay === 'function') updateGameOfDay();
+      if (typeof loadUserFavorites === 'function') loadUserFavorites();
     })
     .catch(function(error) { console.error("Error fetching games:", error); });
 
@@ -275,6 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var subtitleEl = document.getElementById("subtitle");
   if (subtitleEl) subtitleEl.innerHTML = subtext;
 });
+
 
 // ===== GAME RATINGS SYSTEM =====
 const RATINGS_BIN_ID = "69e045ec856a6821893bc134";
@@ -356,6 +385,13 @@ function submitRating(gameName, rating) {
   saveGlobalRatings();
   showRatingToast('You rated "' + gameName + '" ' + rating + '★!');
   updateStarDisplay(gameName, rating);
+  
+  if (typeof checkAchievements === 'function') {
+    setTimeout(function() { checkAchievements(); }, 100);
+  }
+  if (typeof checkLoyalCustomer === 'function') {
+    setTimeout(function() { checkLoyalCustomer(); }, 100);
+  }
 }
 
 function updateStarDisplay(gameName, userRating) {
@@ -364,8 +400,11 @@ function updateStarDisplay(gameName, userRating) {
   
   var stars = ratingContainer.querySelectorAll('.star');
   for (var i = 0; i < stars.length; i++) {
-    if (i < userRating) stars[i].classList.add('active');
-    else stars[i].classList.remove('active');
+    if (i < userRating) {
+      stars[i].classList.add('active');
+    } else {
+      stars[i].classList.remove('active');
+    }
   }
   
   var avgDisplay = ratingContainer.querySelector('.rating-average');
@@ -385,8 +424,11 @@ function refreshAllRatings() {
     
     var stars = container.querySelectorAll('.star');
     for (var s = 0; s < stars.length; s++) {
-      if (s < userRating) stars[s].classList.add('active');
-      else stars[s].classList.remove('active');
+      if (s < userRating) {
+        stars[s].classList.add('active');
+      } else {
+        stars[s].classList.remove('active');
+      }
     }
     
     var avgDisplay = container.querySelector('.rating-average');
@@ -410,27 +452,8 @@ function showRatingToast(message) {
   }, 2000);
 }
 
-function attachRatingListeners() {
-  var ratingContainers = document.querySelectorAll('.game-rating');
-  for (var i = 0; i < ratingContainers.length; i++) {
-    var container = ratingContainers[i];
-    var gameName = container.getAttribute('data-game');
-    var stars = container.querySelectorAll('.star');
-    
-    for (var s = 0; s < stars.length; s++) {
-      var star = stars[s];
-      var ratingValue = parseInt(star.getAttribute('data-value'));
-      
-      star.removeEventListener('click', star.clickHandler);
-      star.clickHandler = function(name, value) {
-        return function() { submitRating(name, value); };
-      }(gameName, ratingValue);
-      star.addEventListener('click', star.clickHandler);
-    }
-  }
-}
-
 loadGlobalRatings();
+
 
 // ===== ACCOUNT SYSTEM HELPER FUNCTIONS =====
 function updateAccountButtonDisplay() {
@@ -493,70 +516,25 @@ function syncFavoriteToAccount(gameName, isAdding) {
   localStorage.setItem("favourites", JSON.stringify(favorites));
 }
 
-// ===== GAME TRACKING WITH COIN MULTIPLIER =====
-function getActiveCoinMultiplier() {
-  var equippedPet = localStorage.getItem('equippedPet');
-  var petMultipliers = {
-    'chinchilla': 1.0,
-    'dragon': 1.5,
-    'cat': 1.2,
-    'dog': 1.2,
-    'owl': 1.3,
-    'fox': 1.4
-  };
-  return petMultipliers[equippedPet] || 1.0;
-}
-
 function trackPlayedGame(gameName) {
   var currentUser = getCurrentUser();
+  if (!currentUser) return;
   
-  // Track play count
-  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
-  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
+  var playedGames = currentUser.playedGames || [];
   
-  // Track earnings with multiplier
-  var multiplier = getActiveCoinMultiplier();
-  var baseEarnings = 0.05;
-  var earned = baseEarnings * multiplier;
-  
-  window.gameEarnings[gameName] = (window.gameEarnings[gameName] || 0) + earned;
-  localStorage.setItem('gameEarnings', JSON.stringify(window.gameEarnings));
-  
-  if (currentUser) {
-    currentUser.coins = (currentUser.coins || 0) + earned;
-    
-    var playedGames = currentUser.playedGames || [];
-    if (playedGames.indexOf(gameName) === -1) {
-      playedGames.unshift(gameName);
-    } else {
-      var index = playedGames.indexOf(gameName);
-      playedGames.splice(index, 1);
-      playedGames.unshift(gameName);
-    }
-    if (playedGames.length > 50) playedGames.pop();
-    
-    currentUser.playedGames = playedGames;
-    currentUser.stats.gamesPlayed = playedGames.length;
-    updateUserInStorage(currentUser);
+  if (playedGames.indexOf(gameName) === -1) {
+    playedGames.unshift(gameName);
+  } else {
+    var index = playedGames.indexOf(gameName);
+    playedGames.splice(index, 1);
+    playedGames.unshift(gameName);
   }
   
-  // Update UI
-  updateHeaderCoins();
+  if (playedGames.length > 50) playedGames.pop();
   
-  console.log(`🎮 Played: ${gameName} | +${earned.toFixed(2)}🪙 (${multiplier}x multiplier)`);
-  return earned;
-}
-
-function trackGamePlayCount(gameName) {
-  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
-  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
-  
-  if (window.gamePlayCounts[gameName] >= 50) {
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(59);
-  }
-  if (window.gamePlayCounts[gameName] >= 100) {
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(60);
-  }
+  currentUser.playedGames = playedGames;
+  currentUser.stats.gamesPlayed = playedGames.length;
+  updateUserInStorage(currentUser);
 }
 
 function loadUserFavorites() {
@@ -571,7 +549,20 @@ function loadUserFavorites() {
   }
 }
 
+
 // ===== ACHIEVEMENT TRIGGERS =====
+function trackGamePlayCount(gameName) {
+  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
+  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
+  
+  if (window.gamePlayCounts[gameName] >= 50) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(59);
+  }
+  if (window.gamePlayCounts[gameName] >= 100) {
+    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(60);
+  }
+}
+
 function trackThemeChange() {
   var themeChangeCount = parseInt(localStorage.getItem('themeChangeCount') || '0');
   themeChangeCount++;
@@ -721,8 +712,6 @@ function checkAndUnlockAchievement(achievementId) {
   
   showAchievementToastNotification(achievementNames[achievementId] || "Achievement Unlocked!", achievementIcons[achievementId] || "🏆", coinReward);
   console.log('🏆 Achievement Unlocked: ' + (achievementNames[achievementId] || "Unknown") + ' +' + coinReward + '🪙');
-  
-  if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
 }
 
 function showAchievementToastNotification(name, icon, coins) {
@@ -733,7 +722,7 @@ function showAchievementToastNotification(name, icon, coins) {
     document.body.appendChild(toast);
   }
   
-  toast.innerHTML = '<span class="achievement-icon">' + icon + '</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT UNLOCKED!</div><div class="achievement-name">' + name + '</div><div class="achievement-reward">+' + coins + ' 🪙</div></div>';
+  toast.innerHTML = '<span class="achievement-icon">' + icon + '</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT UNLOCKED!</div><div class="achievement-name">' + name + '</div><div class="achievement-reward" style="color:#ffcc00; font-size:11px; margin-top:4px;">+' + coins + ' 🪙</div></div>';
   
   toast.classList.add('show');
   setTimeout(function() {
@@ -794,6 +783,19 @@ function updateHeaderCoins() {
   if (coinEl && currentUser) {
     coinEl.textContent = Math.floor((currentUser.coins || 0) * 100) / 100;
   }
+}
+
+function getActiveCoinMultiplier() {
+  var equippedPet = localStorage.getItem('equippedPet');
+  var petMultipliers = {
+    'chinchilla': 1.0,
+    'dragon': 1.5,
+    'cat': 1.2,
+    'dog': 1.2,
+    'owl': 1.3,
+    'fox': 1.4
+  };
+  return petMultipliers[equippedPet] || 1.0;
 }
 
 function escapeHtml(str) {
