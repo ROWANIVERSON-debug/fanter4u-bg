@@ -210,39 +210,39 @@
     "category": "horror"
   },
   {
-    "name": "Baldi's Basics",
-    "image": "splash.png",
-    "url": "baldis-basics",
-    "new": false,
-    "category": "horror"
+    "name": "All old prodigy versions",
+    "image": "https://i.ytimg.com/vi/FXWR8HiAfpw/sddefault.jpg?v=67523680",
+    "url": "https://xpmuser.github.io/oldprodigy/select/",
+    "new": true,
+    "category": "adventure"
   },
   {
-    "name": "Ballistic Chickens",
-    "image": "logo.png",
-    "url": "ballistic-chickens",
-    "new": false,
-    "category": "arcade"
+    "name": "Minecraft 1.8",
+    "image": "https://static0.gamerantimages.com/wordpress/wp-content/uploads/Minecraft-1.8-Adventure-Update-Trailer.jpg",
+    "url": "https://abcatlmfao69.github.io/minraft/",
+    "new": true,
+    "category": "adventure"
   },
   {
-    "name": "Basket Random",
-    "image": "splash.jpeg",
-    "url": "basket-random",
-    "new": false,
-    "category": "sports"
+    "name": "Minecraft beta 1.0",
+    "image": "https://minecraft.wiki/images/thumb/Beta_1.0_menu.png/280px-Beta_1.0_menu.png?f3530",
+    "url": "https://rowaniverson-debug.github.io/Eaglercraft-Beta-1.0/",
+    "new": true,
+    "category": "adventure"
   },
   {
-    "name": "Basketball Stars",
-    "image": "assets/images/basketball-stars.png",
-    "url": "basketball-stars",
-    "new": false,
-    "category": "sports"
+    "name": "Minecraft better eagler",
+    "image": "https://zapgames.io/data/image/game/eaglercraft.jpg",
+    "url": "https://rowaniverson-debug.github.io/EaglerCraft-1.20/",
+    "new": true,
+    "category": "adventure"
   },
   {
-    "name": "Basketbros.io",
-    "image": "thumb.jpg",
-    "url": "basketbros-io",
-    "new": false,
-    "category": "sports"
+    "name": "Pokemon leafgreen",
+    "image": "https://assets-prd.ignimgs.com/2022/01/31/pokemon-leafgreen-button-crop-v3-1643617153926.jpg",
+    "url": "https://javyquavy.github.io/PokemonLeafGreen/",
+    "new": true,
+    "category": "strategy"
   },
   {
     "name": "Battle for Gondor",
