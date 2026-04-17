@@ -35,18 +35,6 @@
       width: 100%;
       border: none;
     }
-    .info {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      padding: 5px 10px;
-      border-radius: 8px;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 11px;
-      z-index: 100;
-    }
   </style>
 </head>
 <body>
@@ -54,45 +42,33 @@
     <span class="game-title" id="gameTitle">Loading...</span>
     <button onclick="window.location.href='index.html'">← Back</button>
   </div>
-  <iframe id="gameFrame" src="about:blank"></iframe>
-  <div class="info" id="info"></div>
+  <iframe id="gameFrame" src="about:blank" allowfullscreen></iframe>
 
   <script>
-    // Get parameters from URL
+    // Get the URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     let gameUrl = urlParams.get("gameurl");
     let gameName = urlParams.get("game") || "Game";
     
-    // Decode
+    // Decode the URL
     if (gameUrl) {
       gameUrl = decodeURIComponent(gameUrl);
     }
     const decodedName = decodeURIComponent(gameName);
     
     document.getElementById('gameTitle').textContent = decodedName;
-    document.getElementById('info').innerHTML = `🎮 ${decodedName}<br>📡 ${gameUrl}`;
     
-    console.log("=== PLAY PAGE LOADED ===");
-    console.log("Game name:", decodedName);
-    console.log("Game URL:", gameUrl);
+    console.log("=== PLAY PAGE ===");
+    console.log("Game:", decodedName);
+    console.log("URL:", gameUrl);
     
     if (gameUrl && gameUrl !== 'null' && gameUrl !== 'undefined') {
+      // DIRECTLY load the URL - no extra checks, no fallbacks
       const iframe = document.getElementById('gameFrame');
       iframe.src = gameUrl;
-      console.log("✅ Iframe src set to:", gameUrl);
-      
-      // Optional: Show when iframe loads
-      iframe.onload = () => {
-        console.log("✅ Iframe loaded successfully!");
-        document.getElementById('info').style.background = "rgba(0,128,0,0.7)";
-      };
-      iframe.onerror = () => {
-        console.error("❌ Iframe failed to load");
-        document.getElementById('info').style.background = "rgba(255,0,0,0.7)";
-      };
+      console.log("✅ Iframe loading:", gameUrl);
     } else {
-      console.error("❌ No game URL provided");
-      document.getElementById('gameFrame').style.display = 'none';
+      console.error("❌ No game URL");
       document.body.innerHTML += '<div style="padding:40px;text-align:center;color:#ff4444;">❌ No game URL provided</div>';
     }
   </script>
