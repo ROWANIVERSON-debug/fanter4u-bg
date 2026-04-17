@@ -6,7 +6,7 @@ window.gamesData = [];
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
   var sitename = "fanter beta.";
-  var subtext = "v0.02, achievements added, bugfixes and more coming soon! :3";
+  var subtext = "v0.03, sorry for not adding much, i spent 3 hours fixing a bug :c ";
 
   var serverUrl1 = "https://gms.parcoil.com";
   var currentPageTitle = document.title;
