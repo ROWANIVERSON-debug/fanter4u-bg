@@ -1939,3 +1939,142 @@ body.no-animations * {
   color: rgba(255,255,255,0.6);
   margin-top: 15px;
 }
+
+/* Clean Game Card Styles */
+.game {
+  background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(15, 20, 40, 0.95));
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(45, 90, 227, 0.3);
+  cursor: pointer;
+  width: 100%;
+}
+
+.game:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.game-image-container {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.game-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.game:hover .game-image-container img {
+  transform: scale(1.03);
+}
+
+.game-info {
+  padding: 12px;
+}
+
+.game-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.game-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 85%;
+}
+
+.game-fav-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-fav-btn.active {
+  color: #ffcc00;
+}
+
+.game-category-tag {
+  display: inline-block;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.game-stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.game-stats-row span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.game-rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.game-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.game-star {
+  font-size: 11px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.game-star.active {
+  color: #ffcc00;
+}
+
+.game-rating-text {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.game-play-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #2d5ae3, #1a3a8a);
+  border: none;
+  border-radius: 20px;
+  padding: 6px;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.game-play-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(45, 90, 227, 0.4);
+}
