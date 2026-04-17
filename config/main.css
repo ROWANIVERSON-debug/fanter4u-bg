@@ -1884,3 +1884,58 @@ body.no-animations * {
   width: 0%;
   border-radius: 3px;
 }
+
+/* Coin Display Header */
+.coin-display-header {
+  position: fixed;
+  top: 75px;
+  left: 15px;
+  z-index: 100;
+  background: rgba(20, 30, 50, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 204, 0, 0.3);
+  border-radius: 30px;
+  padding: 6px 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.coin-display-header:hover {
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(45, 90, 227, 0.3);
+}
+
+.coin-icon {
+  font-size: 16px;
+}
+
+.coin-amount-header {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffcc00;
+  font-family: 'Orbitron', monospace;
+}
+
+.coin-label-header {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+/* Mobile adjustment */
+@media (max-width: 600px) {
+  .coin-display-header {
+    top: 65px;
+    left: 10px;
+    padding: 4px 12px;
+  }
+  .coin-icon {
+    font-size: 12px;
+  }
+  .coin-amount-header {
+    font-size: 12px;
+  }
+}
