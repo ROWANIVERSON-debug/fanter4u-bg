@@ -84,130 +84,130 @@
     "category": "arcade"
   },
   {
-    "name": "Achievement Unlocked",
-    "image": "achievementunlocked.png",
-    "url": "achievementunlocked",
-    "new": false,
+    "name": "ultrakill",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRipnEUkFwPl2HDexU5SGTeKCQ-kA6s-o79df42EJpypoez7xC8AZFbKqRDWnp0F4QU9SkU&s=10",
+    "url": "https://chipikipal800.github.io/UK-web/",
+    "new": true,
+    "category": "action"
+  },
+  {
+    "name": "five nights at freddys",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBU9TZMVSwBKPArio3k4uR1GgnwXrBEgHlPw&s",
+    "url": "https://abcatlmfao.github.io/FNAF1/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "five nights at freddys 2 ",
+    "image": ".https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTyHgdbC707702_nFjZwWTu15WCsoIFslXrg&s",
+    "url": "https://abcatlmfao.github.io/FNAF2/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": " five nights at freddys 3",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwVsJ6A2CpSZFwlu7vSwYTnk9OCt5vpvMZ6w&s",
+    "url": "https://abcatlmfao.github.io/fnaf3/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "five nights at freddys 4  ",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0aQHJAFA8x15Il01UMvTu9oDuMPuD4mH7RA&s",
+    "url": "https://abcatlmfao.github.io/FNAF4/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "fnaf sister location ",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQjQUV7ZiKtyLjytmJgVaQuUWIPd22J13g8g&s",
+    "url": "https://abcatlmfao.github.io/sister-location/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "fnaf pizzeria simulator",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/738060/capsule_616x353.jpg?t=1512422259",
+    "url": "https://abcatlmfao.github.io/pizzarea-sim/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "fnaf world",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJUIrNRfBzYPJPbVq9AhjZ_Fvx6ULYN47pqg&s",
+    "url": "https://justpoosay.github.io/fnaf-world/",
+    "new": true,
     "category": "arcade"
   },
   {
-    "name": "A Dark Room",
-    "image": "splash.png",
-    "url": "adarkroom",
-    "new": false,
-    "category": "adventure"
+    "name": "solar smash",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigwB_Yj4T8eRJ-CGybIW98_nNXI1wmUSroA&s",
+    "url": "https://abcatlmfao.github.io/Solar-SmashRalph/",
+    "new": true,
+    "category": "arcade"
   },
   {
-    "name": "Adrenaline Challenge",
-    "image": "adrenalinechallenge.jpg",
-    "url": "adrenalinechallenge",
-    "new": false,
-    "category": "action"
-  },
-  {
-    "name": "Adventure Drivers",
-    "image": "splash.png",
-    "url": "adventure-drivers",
-    "new": false,
-    "category": "racing"
-  },
-  {
-    "name": "Ages of Conflict",
-    "image": "splash.jpg",
-    "url": "ages-of-conflict",
-    "new": false,
-    "category": "strategy"
-  },
-  {
-    "name": "Alien Hominid",
-    "image": "alienhominid.jpg",
-    "url": "alienhominid",
-    "new": false,
-    "category": "action"
-  },
-  {
-    "name": "Align 4",
-    "image": "board.png",
-    "url": "align-4",
-    "new": false,
-    "category": "puzzle"
-  },
-  {
-    "name": "Amidst the Clouds",
-    "image": "splash.png",
-    "url": "amidst-the-clouds",
-    "new": false,
-    "category": "platformer"
-  },
-  {
-    "name": "Among Us",
-    "image": "red.png",
-    "url": "among-us",
-    "new": false,
-    "category": "multiplayer"
-  },
-  {
-    "name": "Angry Sharks",
-    "image": "assets/img/splash.png",
-    "url": "angry-sharks",
-    "new": false,
+    "name": "crazy cattle 3d",
+    "image": "https://speedstars2.io/data/image/crazy-cattle-3d.png",
+    "url": "https://kkorenn.github.io/cattle3d/",
+    "new": true,
     "category": "action"
   },
   {
     "name": "Aquapark Slides",
-    "image": "splash.png",
+    "image": "https://play-lh.googleusercontent.com/u1Z-wRullWJBvInhY4gdFxg_Q8Pz6clUQd7thoQNQNHQ1ghNeUf-lsJandlp1vFKhBk",
     "url": "https://chipikipal800.github.io/aquapark-slides-unblocked/",
     "new": true,
     "category": "racing"
   },
   {
-    "name": "Astray",
-    "image": "splash.png",
-    "url": "astray",
-    "new": false,
-    "category": "adventure"
-  },
-  {
-    "name": "Avalanche",
-    "image": "avalanche.png",
-    "url": "avalanche",
-    "new": false,
-    "category": "arcade"
-  },
-  {
-    "name": "Awesome Tanks 2",
-    "image": "awesometanks2.jpg",
-    "url": "awesometanks2",
-    "new": false,
-    "category": "action"
-  },
-  {
-    "name": "Backrooms",
-    "image": "img/splash.jpg",
-    "url": "backrooms",
-    "new": false,
+    "name": "shift at midnight",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2395260/capsule_616x353.jpg?t=1683035360",
+    "url": "https://chipikipal800.github.io/ShiftAtMidnightPort/",
+    "new": true,
     "category": "horror"
   },
   {
-    "name": "Bad Ice Cream",
-    "image": "bad-ice-cream.png",
-    "url": "bad-ice-cream",
-    "new": false,
+    "name": "final fantasy VII ",
+    "image": "https://upload.wikimedia.org/wikipedia/en/c/c2/Final_Fantasy_VII_Box_Art.jpg",
+    "url": "avalanche",
+    "new": true,
+    "category": "adventure"
+  },
+  {
+    "name": "kindergarten 3",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2695570/aea05b007bb517c3f078a0ce2d9bc4a891a56bf3/capsule_616x353.jpg?t=1764790984",
+    "url": "https://abcatlmfao.github.io/Kindergarten3Port/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "backrooms doom",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/HobbyTown_USA_Oshkosh_interior_under_construction_2002_%28The_Backrooms%29.jpg/250px-HobbyTown_USA_Oshkosh_interior_under_construction_2002_%28The_Backrooms%29.jpg",
+    "url": "https://abcatlmfao.github.io/BackroomsGame/",
+    "new": true,
+    "category": "horror"
+  },
+  {
+    "name": "gunspin",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUopaywVAmAk7cCdg-Pj24PFA8MhVMBUgRbA&s",
+    "url": "https://chipikipal800.github.io/a-REAL-copy-of-gunspin/",
+    "new": true,
     "category": "arcade"
   },
   {
-    "name": "Bad Ice Cream 2",
-    "image": "bad-ice-cream-2.png",
-    "url": "bad-ice-cream-2",
-    "new": false,
-    "category": "arcade"
+    "name": "tattletail",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjNkLsBxPjXKpa8D6jTzir9wzxDrVboZhKgpMpmmbtQzJFDTKzn3sDfNfhmaQec2QX0V6b&s=10",
+    "url": "https://chipikipal800.github.io/Tattletail/",
+    "new": true,
+    "category": "horror"
   },
   {
-    "name": "Bad Ice Cream 3",
-    "image": "bad-ice-cream-3.png",
-    "url": "bad-ice-cream-3",
-    "new": false,
-    "category": "arcade"
+    "name": "bad parenting",
+    "image": "https://www.fortnite.com/@scriptvex/4838-2432-0639",
+    "url": "https://oshkii.github.io/badparenting-webport/",
+    "new": true,
+    "category": "horror"
   },
   {
     "name": "Baldi's Basics",
