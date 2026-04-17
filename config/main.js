@@ -41,98 +41,98 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
-  function displayFilteredGames(filteredGames) {
-    const gamesContainer = document.getElementById("gamesContainer");
-    if (!gamesContainer) return;
-    gamesContainer.innerHTML = "";
+function displayFilteredGames(filteredGames) {
+  const gamesContainer = document.getElementById("gamesContainer");
+  if (!gamesContainer) return;
+  gamesContainer.innerHTML = "";
+  
+  filteredGames.forEach((game) => {
+    const gameDiv = document.createElement("div");
+    gameDiv.classList.add("game");
     
-    filteredGames.forEach((game, idx) => {
-      // Get game data - make a copy to avoid reference issues
-      const gameName = game.name;
-      const gameUrlValue = game.url;
-      const gameImageValue = game.image;
+    const gameImage = document.createElement("img");
+    let imageSrc;
+    if (game.image && game.image.startsWith('http')) {
+      imageSrc = game.image;
+    } else if (game.image) {
+      imageSrc = `${serverUrl1}/${game.url}/${game.image}`;
+    } else {
+      imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
+    }
+    gameImage.src = imageSrc;
+    gameImage.alt = game.name;
+    gameImage.style.cursor = 'pointer';
+    
+    // IMPORTANT: Store the URL and name as data attributes
+    gameImage.setAttribute('data-game-url', game.url);
+    gameImage.setAttribute('data-game-name', game.name);
+    
+    // GAME CLICK HANDLER
+    gameImage.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       
-      console.log(`[${idx}] Game: "${gameName}", URL: "${gameUrlValue}"`);
+      // Get the URL from the data attribute
+      const url = this.getAttribute('data-game-url');
+      const name = this.getAttribute('data-game-name');
       
-      const gameDiv = document.createElement("div");
-      gameDiv.classList.add("game");
+      console.log("🎮 Game clicked:", name);
+      console.log("🔗 URL from attribute:", url);
       
-      const gameImage = document.createElement("img");
-      let imageSrc;
-      if (gameImageValue && gameImageValue.startsWith('http')) {
-        imageSrc = gameImageValue;
-      } else if (gameImageValue) {
-        imageSrc = `${serverUrl1}/${gameUrlValue}/${gameImageValue}`;
-      } else {
-        imageSrc = 'https://via.placeholder.com/200x200?text=No+Image';
-      }
-      gameImage.src = imageSrc;
-      gameImage.alt = gameName;
-      gameImage.style.cursor = 'pointer';
-      
-      // Store URL directly on the image element
-      gameImage.setAttribute('data-game-url', gameUrlValue || '');
-      gameImage.setAttribute('data-game-name', gameName);
-      
-      gameImage.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const url = this.getAttribute('data-game-url');
-        const name = this.getAttribute('data-game-name');
-        
-        console.log("🎮 Game clicked:", name);
-        console.log("🔗 URL from data attribute:", url);
-        
-        if (!url || url === 'undefined' || url === 'null' || url === '') {
-          console.error("❌ No valid URL for game:", name);
-          alert(`Game "${name}" has no valid URL. Please check the games.json file.`);
-          return;
-        }
-        
-        const playUrl = `play.html?gameurl=${encodeURIComponent(url)}&game=${encodeURIComponent(name)}`;
-        console.log("🚀 Opening:", playUrl);
-        window.open(playUrl, '_blank');
-        
-        return false;
-      };
-      
-      const gameNameElem = document.createElement("p");
-      gameNameElem.textContent = gameName;
-      
-      const favBtn = document.createElement("button");
-      favBtn.classList.add("fav-btn");
-      favBtn.setAttribute("data-game", gameName);
-      favBtn.textContent = getFavourites().includes(gameName) ? "★" : "☆";
-      favBtn.title = "favourite";
-      favBtn.onclick = (e) => {
-        e.stopPropagation();
-        window.toggleFavourite(gameName);
-        favBtn.textContent = getFavourites().includes(gameName) ? "★" : "☆";
-      };
-      
-      gameDiv.appendChild(gameImage);
-      gameDiv.appendChild(gameNameElem);
-      gameDiv.appendChild(favBtn);
-      
-      if (typeof createRatingHTML === 'function') {
-        try {
-          const userVotesGlobal = JSON.parse(localStorage.getItem('userVotes') || '{}');
-          gameDiv.insertAdjacentHTML('beforeend', createRatingHTML(gameName, userVotesGlobal[gameName] || 0));
-        } catch (err) {
-          console.error("Error adding rating:", err);
-        }
+      if (!url || url === 'undefined' || url === 'null' || url === '') {
+        console.error("❌ No valid URL for game:", name);
+        alert(`Game "${name}" has no valid URL. Please check the games.json file.`);
+        return;
       }
       
-      gamesContainer.appendChild(gameDiv);
-    });
+      // Build the play.html URL
+      const playUrl = `play.html?gameurl=${encodeURIComponent(url)}&game=${encodeURIComponent(name)}`;
+      console.log("🚀 Opening:", playUrl);
+      
+      // Open in new tab
+      window.open(playUrl, '_blank');
+      
+      return false;
+    };
     
-    if (typeof attachRatingListeners === 'function') {
-      attachRatingListeners();
+    const gameNameElem = document.createElement("p");
+    gameNameElem.textContent = game.name;
+    
+    // FAVORITE BUTTON
+    const favBtn = document.createElement("button");
+    favBtn.classList.add("fav-btn");
+    favBtn.setAttribute("data-game", game.name);
+    favBtn.textContent = getFavourites().includes(game.name) ? "★" : "☆";
+    favBtn.title = "favourite";
+    favBtn.onclick = (e) => {
+      e.stopPropagation();
+      window.toggleFavourite(game.name);
+      favBtn.textContent = getFavourites().includes(game.name) ? "★" : "☆";
+    };
+    
+    gameDiv.appendChild(gameImage);
+    gameDiv.appendChild(gameNameElem);
+    gameDiv.appendChild(favBtn);
+    
+    // Add ratings if available
+    if (typeof createRatingHTML === 'function') {
+      try {
+        const userVotesGlobal = JSON.parse(localStorage.getItem('userVotes') || '{}');
+        gameDiv.insertAdjacentHTML('beforeend', createRatingHTML(game.name, userVotesGlobal[game.name] || 0));
+      } catch (err) {
+        console.error("Error adding rating:", err);
+      }
     }
     
-    console.log(`✅ Displayed ${filteredGames.length} games`);
+    gamesContainer.appendChild(gameDiv);
+  });
+  
+  if (typeof attachRatingListeners === 'function') {
+    attachRatingListeners();
   }
+  
+  console.log(`✅ Displayed ${filteredGames.length} games`);
+}
 
   function handleSearchInput() {
     const searchInput = document.getElementById("searchInput");
