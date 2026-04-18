@@ -497,29 +497,111 @@
       ${renderGroup('NEW! Friend Suggestions', '✨', '#ff66cc', newAchievements, false)}`;
     }
 
-    // ===== RENDER LEADERBOARD =====
-    async function renderLeaderboard() {
-      const container = document.getElementById('leaderboardList');
-      container.innerHTML = '<div class="guest-message">loading leaderboard...</div>';
-      let players = [];
-      if (window.supabase && typeof window.supabase.from === 'function') {
-        try {
-          const orderCol = currentFilter === 'coins' ? 'coins' : currentFilter === 'games_played' ? 'games_played' : 'achievements_count';
-          const { data, error } = await window.supabase.from('profiles').select('id, username, display_name, coins, games_played, achievements_count').order(orderCol, { ascending: false }).limit(20);
-          if (!error && data) { players = data.map(p => ({ id: p.id, displayName: p.display_name || p.username || 'Unknown', username: p.username || 'unknown', coins: p.coins || 0, gamesPlayed: p.games_played || 0, achievementsCount: p.achievements_count || 0, isLocal: false })); }
-        } catch (e) { console.warn('Using local fallback:', e); }
+   // ===== RENDER LEADERBOARD =====
+async function renderLeaderboard() {
+  const container = document.getElementById('leaderboardList');
+  container.innerHTML = '<div class="guest-message">loading leaderboard...</div>';
+  let players = [];
+
+  // ALWAYS try Supabase first
+  if (window.supabase && typeof window.supabase.from === 'function') {
+    try {
+      console.log('Fetching leaderboard from Supabase...');
+      const orderCol = currentFilter === 'coins' ? 'coins' : currentFilter === 'games_played' ? 'games_played' : 'achievements_count';
+      
+      const { data, error } = await window.supabase
+        .from('profiles')
+        .select('id, username, display_name, coins, games_played, achievements_count')
+        .order(orderCol, { ascending: false })
+        .limit(50);
+
+      if (!error && data && data.length > 0) {
+        console.log('✅ Loaded', data.length, 'users from Supabase');
+        players = data.map(p => ({
+          id: p.id,
+          displayName: p.display_name || p.username || 'Unknown',
+          username: p.username || 'unknown',
+          coins: p.coins || 0,
+          gamesPlayed: p.games_played || 0,
+          achievementsCount: p.achievements_count || 0,
+          isLocal: false
+        }));
+      } else {
+        console.log('No Supabase users found, trying localStorage...');
       }
-      if (players.length === 0) {
-        const localUsers = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-        players = localUsers.map(u => ({ id: u.id, displayName: u.displayName || u.username || 'User', username: u.username || 'user', coins: u.coins || 0, gamesPlayed: u.stats?.gamesPlayed || 0, achievementsCount: Object.keys(JSON.parse(localStorage.getItem('fanter_achievements') || '{}')).length, isLocal: true }));
-        if (localUser && !players.find(p => p.id === localUser.id)) { players.push({ id: localUser.id, displayName: localUser.displayName || localUser.username || 'You', username: localUser.username || 'you', coins: localUser.coins || 0, gamesPlayed: localUser.stats?.gamesPlayed || 0, achievementsCount: Object.keys(userAchievements).length, isLocal: true }); }
-        players.sort((a, b) => currentFilter === 'coins' ? b.coins - a.coins : currentFilter === 'games_played' ? b.gamesPlayed - a.gamesPlayed : b.achievementsCount - a.achievementsCount);
-      }
-      if (players.length === 0) { container.innerHTML = '<div class="guest-message">no players yet — be the first!</div>'; return; }
-      const rankIcons = ['🥇', '🥈', '🥉'];
-      const currentUserId = localUser ? localUser.id : null;
-      container.innerHTML = players.map((player, idx) => { const rank = idx + 1; const rankDisplay = rank <= 3 ? rankIcons[rank - 1] : `#${rank}`; const isMe = player.id === currentUserId; const scoreValue = currentFilter === 'coins' ? `🪙 ${Math.floor(player.coins * 100) / 100}` : currentFilter === 'games_played' ? `🎮 ${player.gamesPlayed}` : `🏆 ${player.achievementsCount}`; return `<div class="leaderboard-item ${isMe ? 'current-user' : ''}"><div class="rank ${rank===1?'top-1':rank===2?'top-2':rank===3?'top-3':''}">${rankDisplay}</div><div class="user-avatar">${player.displayName[0].toUpperCase()}</div><div class="user-info"><div class="user-name">${player.displayName} ${isMe ? '<span style="font-size:11px;color:#ffcc00;">(you)</span>' : ''}</div><div class="user-username">@${player.username}${player.isLocal && syncStatus === 'offline' ? ' · local save' : ''}</div></div><div class="user-score">${scoreValue}</div></div>`; }).join('');
+    } catch (e) {
+      console.warn('Supabase error, trying localStorage:', e.message);
     }
+  }
+
+  // ONLY use localStorage if Supabase returned NO users
+  if (players.length === 0) {
+    console.log('Falling back to localStorage...');
+    const localUsers = JSON.parse(localStorage.getItem('fanter_users') || '[]');
+    players = localUsers.map(u => ({
+      id: u.id,
+      displayName: u.displayName || u.username || 'User',
+      username: u.username || 'user',
+      coins: u.coins || 0,
+      gamesPlayed: u.stats?.gamesPlayed || 0,
+      achievementsCount: Object.keys(JSON.parse(localStorage.getItem('fanter_achievements_' + u.id) || '{}')).length,
+      isLocal: true
+    }));
+    
+    // Add current user if not in list
+    if (localUser && !players.find(p => p.id === localUser.id)) {
+      players.push({
+        id: localUser.id,
+        displayName: localUser.displayName || localUser.username || 'You',
+        username: localUser.username || 'you',
+        coins: localUser.coins || 0,
+        gamesPlayed: localUser.stats?.gamesPlayed || 0,
+        achievementsCount: Object.keys(userAchievements).length,
+        isLocal: true
+      });
+    }
+    
+    players.sort((a, b) => {
+      if (currentFilter === 'coins') return b.coins - a.coins;
+      if (currentFilter === 'games_played') return b.gamesPlayed - a.gamesPlayed;
+      return b.achievementsCount - a.achievementsCount;
+    });
+  }
+
+  if (players.length === 0) {
+    container.innerHTML = '<div class="guest-message">no players yet — be the first!</div>';
+    return;
+  }
+
+  const rankIcons = ['🥇', '🥈', '🥉'];
+  const currentUserId = localUser ? localUser.id : (currentUser ? currentUser.id : null);
+
+  container.innerHTML = players.map((player, idx) => {
+    const rank = idx + 1;
+    const rankDisplay = rank <= 3 ? rankIcons[rank - 1] : `#${rank}`;
+    const isMe = (currentUserId && player.id === currentUserId) || 
+                 (currentUser && player.id === currentUser.id);
+    const scoreValue = currentFilter === 'coins' 
+      ? `🪙 ${Math.floor(player.coins * 100) / 100}` 
+      : currentFilter === 'games_played' 
+        ? `🎮 ${player.gamesPlayed}` 
+        : `🏆 ${player.achievementsCount}`;
+    
+    return `
+      <div class="leaderboard-item ${isMe ? 'current-user' : ''}">
+        <div class="rank ${rank===1?'top-1':rank===2?'top-2':rank===3?'top-3':''}">${rankDisplay}</div>
+        <div class="user-avatar">${(player.displayName || 'U')[0].toUpperCase()}</div>
+        <div class="user-info">
+          <div class="user-name">${player.displayName} ${isMe ? '<span style="font-size:11px;color:#ffcc00;">(you)</span>' : ''}</div>
+          <div class="user-username">@${player.username}${player.isLocal ? ' · local' : ''}</div>
+        </div>
+        <div class="user-score">${scoreValue}</div>
+      </div>
+    `;
+  }).join('');
+  
+  console.log('✅ Leaderboard rendered with', players.length, 'players');
+}
 
     // ===== UI HELPERS =====
     function setupTabs() { document.querySelectorAll('.account-tab').forEach(tab => tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')))); document.getElementById('loginForm')?.addEventListener('submit', async (e) => { e.preventDefault(); await handleLogin(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }); document.getElementById('registerForm')?.addEventListener('submit', async (e) => { e.preventDefault(); const pw = document.getElementById('regPassword').value; if (pw !== document.getElementById('regConfirmPassword').value) { showMessage('registerMessage', 'Passwords do not match', 'error'); return; } await handleRegister(document.getElementById('regUsername').value, document.getElementById('regEmail').value, document.getElementById('regDisplayName').value, pw); }); }
