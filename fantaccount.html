@@ -6,9 +6,8 @@
   <title>fanter | account</title>
   <link rel="stylesheet" href="config/main.css" />
   <script src="config/theme-loader.js"></script>
-  <script src="config/main.js"></script>
   <style>
-    /* ALL STYLES FROM PREVIOUS VERSION - KEEP EVERYTHING */
+    /* ===== ALL STYLES ===== */
     .account-container {
       max-width: 1000px;
       margin: 100px auto;
@@ -170,7 +169,30 @@
       margin: 20px 0;
     }
     
-    /* Leaderboard Styles */
+    .sync-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      margin-left: 10px;
+    }
+    
+    .sync-status.online {
+      background: rgba(0, 255, 0, 0.2);
+      color: #00ff88;
+    }
+    
+    .sync-status.offline {
+      background: rgba(255, 165, 0, 0.2);
+      color: #ffa500;
+    }
+    
+    .guest-message {
+      text-align: center;
+      padding: 40px;
+    }
+    
+    /* Leaderboard */
     .leaderboard-filters {
       display: flex;
       gap: 10px;
@@ -275,56 +297,33 @@
       font-size: 14px;
     }
     
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
+    .profile-games-section {
+      margin-top: 25px;
+      text-align: left;
     }
     
-    .modal.active {
-      display: flex;
+    .profile-games-section h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ffcc00;
+      font-family: 'Orbitron', monospace;
     }
     
-    .modal-content {
-      background: rgba(20, 30, 50, 0.95);
+    .profile-game-tag {
+      display: inline-block;
+      background: rgba(45, 90, 227, 0.3);
+      padding: 4px 12px;
       border-radius: 20px;
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      border: 1px solid rgba(45, 90, 227, 0.4);
+      font-size: 12px;
+      margin: 3px;
     }
     
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    .profile-game-tag.favorite {
+      background: rgba(255, 204, 0, 0.2);
+      color: #ffcc00;
     }
     
-    .modal-close {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      opacity: 0.7;
-    }
-    
-    .modal-close:hover {
-      opacity: 1;
-    }
-    
-    /* Achievement Styles */
+    /* Achievements */
     .achievements-header {
       display: flex;
       justify-content: space-between;
@@ -524,15 +523,9 @@
       filter: blur(3px);
       user-select: none;
     }
-    
-    .guest-message {
-      text-align: center;
-      padding: 40px;
-    }
   </style>
 </head>
 <body>
-  <!-- Account Button -->
   <div class="account-btn-container">
     <button class="account-btn" id="accountBtn" onclick="window.location.href='fantaccount.html'">
       <span class="account-icon">👤</span>
@@ -573,9 +566,9 @@
     <div id="leaderboardTab" class="account-tab-content">
       <div id="leaderboardContent">
         <div class="leaderboard-filters">
-          <button class="filter-btn active" data-filter="points">Achievement Points</button>
-          <button class="filter-btn" data-filter="coins">Coins</button>
-          <button class="filter-btn" data-filter="games_played">Games Played</button>
+          <button class="filter-btn active" data-filter="coins">💰 Coins</button>
+          <button class="filter-btn" data-filter="games_played">🎮 Games Played</button>
+          <button class="filter-btn" data-filter="achievements">🏆 Achievements</button>
         </div>
         <div id="leaderboardList" class="leaderboard-list">
           <div class="guest-message">loading leaderboard...</div>
@@ -588,12 +581,12 @@
       <form id="loginForm" class="account-form">
         <input type="email" id="loginEmail" placeholder="email" required>
         <input type="password" id="loginPassword" placeholder="password" required>
-        <button type="submit" class="settings-btn">login</button>
+        <button type="submit" class="settings-btn">login with supabase</button>
         <div id="loginMessage" class="message"></div>
       </form>
       <div style="text-align: center; margin-top: 20px;">
-        <p style="opacity: 0.7; font-size: 14px;">or continue as guest</p>
-        <button onclick="continueAsGuest()" class="settings-btn" style="margin-top: 10px;">continue as guest</button>
+        <p style="opacity: 0.7; font-size: 14px;">or</p>
+        <button onclick="continueWithLocalStorage()" class="settings-btn" style="margin-top: 10px;">continue with local save</button>
       </div>
     </div>
 
@@ -605,290 +598,310 @@
         <input type="text" id="regDisplayName" placeholder="display name (optional)">
         <input type="password" id="regPassword" placeholder="password" required>
         <input type="password" id="regConfirmPassword" placeholder="confirm password" required>
-        <button type="submit" class="settings-btn">register</button>
+        <button type="submit" class="settings-btn">register with supabase</button>
         <div id="registerMessage" class="message"></div>
       </form>
     </div>
   </div>
 
-  <!-- Public Profile Modal -->
-  <div id="profileModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalUsername">User Profile</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div id="modalContent">
-        <div class="guest-message">loading...</div>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ===== SUPABASE CONFIGURATION =====
+    // ===== SUPABASE CONFIG =====
     const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
     
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // ===== GLOBAL STATE =====
-    let currentUser = null;
-    let currentSession = null;
-    let userProfile = null;
-    let userAchievements = {};
-    let userStats = {};
-    let currentFilter = 'achievement_points';
-    
     // ===== COMPLETE ACHIEVEMENTS DATA =====
-    const ACHIEVEMENTS_DATA = {
-      newbie: {
-        name: "Newbie",
-        icon: "🌱",
-        color: "#00ff88",
-        pointsPer: 0.1,
-        achievements: [
-          { id: 1, name: "Welcome Aboard", desc: "Create an account", requirement: "register", required: 1, icon: "🎉", hint: null },
-          { id: 2, name: "First Impression", desc: "Rate your first game", requirement: "ratings_given", required: 1, icon: "⭐", hint: null },
-          { id: 3, name: "Hearted", desc: "Favorite your first game", requirement: "favorites_count", required: 1, icon: "💖", hint: null },
-          { id: 4, name: "Let's Play", desc: "Play your first game", requirement: "games_played", required: 1, icon: "🎮", hint: null },
-          { id: 5, name: "Getting There", desc: "Rate 10 games", requirement: "ratings_given", required: 10, icon: "📈", hint: null },
-          { id: 6, name: "Small Collection", desc: "Favorite 10 games", requirement: "favorites_count", required: 10, icon: "📦", hint: null },
-          { id: 7, name: "Ten Played", desc: "Play 10 games", requirement: "games_played", required: 10, icon: "🔟", hint: null },
-          { id: 8, name: "Opinionated", desc: "Rate 25 games", requirement: "ratings_given", required: 25, icon: "🗣️", hint: null },
-          { id: 9, name: "Devoted Fan", desc: "Favorite 25 games", requirement: "favorites_count", required: 25, icon: "💝", hint: null },
-          { id: 10, name: "Newbie+", desc: "Get all Newbie achievements", requirement: "categoryComplete", required: "newbie", icon: "🌟", hint: null }
-        ]
-      },
-      beginner: {
-        name: "Beginner",
-        icon: "📘",
-        color: "#2d5ae3",
-        pointsPer: 0.2,
-        achievements: [
-          { id: 11, name: "Rookie Rater", desc: "Rate 50 games", requirement: "ratings_given", required: 50, icon: "🎯", hint: "50 opinions shared. people are listening." },
-          { id: 12, name: "Budding Collector", desc: "Favorite 50 games", requirement: "favorites_count", required: 50, icon: "🌱", hint: "halfway to a full house. keep collecting." },
-          { id: 13, name: "Getting Serious", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "💪", hint: "25 games. you're not just passing through anymore." },
-          { id: 14, name: "Consistent", desc: "Log in 7 days total", requirement: "login_days", required: 7, icon: "📅", hint: "a full week of showing up. routine is forming." },
-          { id: 15, name: "Daily Driver", desc: "Log in 3 days in a row", requirement: "login_streak", required: 3, icon: "🚗", hint: "three days in a row. the habit is sticking." },
-          { id: 16, name: "Halfway There", desc: "Rate 75 games", requirement: "ratings_given", required: 75, icon: "⏳", hint: "75 ratings. the finish line is getting closer." },
-          { id: 17, name: "Almost a Hoarder", desc: "Favorite 75 games", requirement: "favorites_count", required: 75, icon: "📚", hint: "75 favorites. your collection is growing." },
-          { id: 18, name: "Twenty-Five Played", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "🎯", hint: "25 games played. variety is the spice of life." },
-          { id: 19, name: "Variety Seeker", desc: "Rate games from 5 different genres", requirement: "genres_rated", required: 5, icon: "🎭", hint: "taste tester. you like a little bit of everything." },
-          { id: 20, name: "Beginner+", desc: "Get all Beginner achievements", requirement: "categoryComplete", required: "beginner", icon: "🏅", hint: null }
-        ]
-      },
-      climbing: {
-        name: "Climbing",
-        icon: "⛰️",
-        color: "#ff8800",
-        pointsPer: 0.4,
-        achievements: [
-          { id: 21, name: "Century Approaching", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "📊", hint: "100 ratings. your voice matters." },
-          { id: 22, name: "Collection Growing", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📈", hint: "100 favorites. this is a library now." },
-          { id: 23, name: "Marathon", desc: "Play 50 games", requirement: "games_played", required: 50, icon: "🏃", hint: "50 games. you're putting in the work." },
-          { id: 24, name: "Weekly Warrior", desc: "Log in 5 days in a row", requirement: "login_streak", required: 5, icon: "⚔️", hint: "5 days. no days off." },
-          { id: 25, name: "One Session Wonder", desc: "Play 10 games in one session", requirement: "games_in_session", required: 10, icon: "⚡", hint: "10 games in one sitting. hyperfocus unlocked." },
-          { id: 26, name: "Double Time", desc: "Rate 150 games", requirement: "ratings_given", required: 150, icon: "⏱️", hint: "150 ratings. people are noticing." },
-          { id: 27, name: "Dedicated Fan", desc: "Favorite 150 games", requirement: "favorites_count", required: 150, icon: "💪", hint: "150 favorites. commitment looks good on you." },
-          { id: 28, name: "Fifty More", desc: "Play 75 games", requirement: "games_played", required: 75, icon: "🎲", hint: "75 games. the grind is real." },
-          { id: 29, name: "Genre Explorer", desc: "Play games from 10 different genres", requirement: "genres_played", required: 10, icon: "🗺️", hint: "10 genres explored. you get around." },
-          { id: 30, name: "Climbing+", desc: "Get all Climbing achievements", requirement: "categoryComplete", required: "climbing", icon: "⛰️✨", hint: null }
-        ]
-      },
-      difficult: {
-        name: "Difficult",
-        icon: "💀",
-        color: "#ff4444",
-        pointsPer: 0.7,
-        achievements: [
-          { id: 31, name: "Two Hundred Ratings", desc: "Rate 200 games", requirement: "ratings_given", required: 200, icon: "🏆", hint: "200 ratings. you're basically a critic now." },
-          { id: 32, name: "Two Hundred Favorites", desc: "Favorite 200 games", requirement: "favorites_count", required: 200, icon: "💎", hint: "200 favorites. your taste is elite." },
-          { id: 33, name: "Century Player", desc: "Play 100 games", requirement: "games_played", required: 100, icon: "🎖️", hint: "100 games. that's a lot of gaming." },
-          { id: 34, name: "Monthly Master", desc: "Log in 15 days total", requirement: "login_days", required: 15, icon: "📆", hint: "15 days total. consistency pays off." },
-          { id: 35, name: "Streak Master", desc: "Log in 10 days in a row", requirement: "login_streak", required: 10, icon: "🔥", hint: "10 days in a row. unstoppable." },
-          { id: 36, name: "Perfect Balance", desc: "Rate 10 games 1★ and 10 games 5★", requirement: "balanced_ratings", required: 10, icon: "⚖️", hint: "the yin and yang of ratings. 1★ and 5★ in harmony." },
-          { id: 37, name: "Pure Taste", desc: "Have 10 favorites that are all 5★ rated", requirement: "pure_favorites", required: 10, icon: "✨", hint: "10 favorites. all 5★. no guilty pleasures here." },
-          { id: 38, name: "Hidden Gem Hunter", desc: "Favorite a game with less than 10 total ratings", requirement: "hidden_gem", required: 1, icon: "💎", hint: "find the overlooked. greatness hides in shadows." },
-          { id: 39, name: "Trend Setter", desc: "Be among first 10 to rate a new game", requirement: "first_rater", required: 1, icon: "👑", hint: "be first. before the hype train leaves." },
-          { id: 40, name: "Difficult+", desc: "Get all Difficult achievements", requirement: "categoryComplete", required: "difficult", icon: "💀✨", hint: null }
-        ]
-      },
-      elite: {
-        name: "Elite",
-        icon: "👑",
-        color: "#ffcc00",
-        pointsPer: 1.0,
-        achievements: [
-          { id: 41, name: "Centurion", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "🏅", hint: "100 ratings. you've got opinions and you're not afraid to share." },
-          { id: 42, name: "Collector's Edition", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📀", hint: "100 favorites. your collection is impressive." },
-          { id: 43, name: "Gaming Devotee", desc: "Play 150 games", requirement: "games_played", required: 150, icon: "🎮👑", hint: "150 games. you're dedicated." },
-          { id: 44, name: "Yearly Legend", desc: "Log in 50 days total", requirement: "login_days", required: 50, icon: "📅👑", hint: "50 days total. you've been here a while." },
-          { id: 45, name: "Iron Will", desc: "Log in 14 days in a row", requirement: "login_streak", required: 14, icon: "⚙️", hint: "14 days in a row. nothing stops you." },
-          { id: 46, name: "The Decider", desc: "Your rating appears on 100+ games", requirement: "ratings_given", required: 100, icon: "⚖️👑", hint: "100+ games feel your influence." },
-          { id: 47, name: "Completionist", desc: "Get all Newbie + Beginner + Climbing + Difficult", requirement: "all_lower_categories", required: true, icon: "🏆", hint: "earn everything below. then we talk." },
-          { id: 48, name: "Elite Rater", desc: "Average rating given is within 0.5 of global average", requirement: "elite_rater", required: 1, icon: "⭐👑", hint: "your taste matches the crowd. perfectly balanced." },
-          { id: 49, name: "Community Choice", desc: "Your review liked by 10+ users", requirement: "likes_received", required: 10, icon: "💬👑", hint: "10 people liked what you had to say." },
-          { id: 50, name: "Elite+", desc: "Get all Elite achievements", requirement: "categoryComplete", required: "elite", icon: "👑✨", hint: null }
-        ]
-      },
-      secret: {
-        name: "Secret",
-        icon: "🔮",
-        color: "linear-gradient(90deg, #ff00ff, #00ffff)",
-        pointsPer: 2.0,
-        achievements: [
-          { id: 51, name: "The Owner's Gift", desc: "given by abcatlmfao", requirement: "manual", required: 1, icon: "🎁", hidden: false, hint: "special recognition from the creator" },
-          { id: 52, name: "Konami Code", desc: "↑↑↓↓←→←→BA", requirement: "konami", required: 1, icon: "🎮", hidden: false, hint: "type the konami code anywhere on the site" },
-          { id: 53, name: "The Chosen One", desc: "Find the secret dev names", requirement: "secret_names", required: 1, icon: "👑", hidden: true, hint: "try searching for something special..." },
-          { id: 54, name: "Alt+F4", desc: "Tried to escape?", requirement: "alt_f4", required: 1, icon: "💀", hidden: false, hint: "close fanter within 10 seconds of opening" },
-          { id: 55, name: "Mentally Insane", desc: "Just... why?", requirement: "idle_hour", required: 1, icon: "🤪", hidden: false, hint: "stay on fanter for 1 hour without playing anything" },
-          { id: 56, name: "Indecisive", desc: "Can't make up your mind", requirement: "theme_changes", required: 10, icon: "🎨", hidden: false, hint: "change your background 10 times" },
-          { id: 57, name: "Big Back", desc: "Hungry gamer", requirement: "food_game", required: 1, icon: "🍔", hidden: false, hint: "play a food-related game" },
-          { id: 58, name: "OG Fanter", desc: "Been here since the beginning", requirement: "early_adopter", required: 1, icon: "🦖", hidden: false, hint: "joined within first month of launch" },
-          { id: 59, name: "Addicted", desc: "One more game...", requirement: "same_game_50", required: 50, icon: "🎮", hidden: false, hint: "play the same game 50 times" },
-          { id: 60, name: "Committed", desc: "Dedication", requirement: "same_game_100", required: 100, icon: "💪", hidden: false, hint: "play the same game 100 times" },
-          { id: 61, name: "Top 1 Unemployed", desc: "No life detected", requirement: "total_play_time", required: 50, icon: "🛋️", hidden: false, hint: "play fanter for 50 hours total" },
-          { id: 62, name: "Loyal Customer", desc: "Taste tester", requirement: "rate_all_games", required: 1, icon: "⭐", hidden: false, hint: "rate every game on fanter" },
-          { id: 63, name: "System Failure", desc: "You broke it", requirement: "crash", required: 1, icon: "💻", hidden: true, hint: "find the hidden crash" }
-        ]
-      }
+const ACHIEVEMENTS_DATA = {
+  newbie: {
+    name: "Newbie",
+    icon: "🌱",
+    color: "#00ff88",
+    pointsPer: 0.1,
+    achievements: [
+      { id: 1, name: "Welcome Aboard", desc: "Create an account", requirement: "register", required: 1, icon: "🎉", hint: null },
+      { id: 2, name: "First Impression", desc: "Rate your first game", requirement: "ratings_given", required: 1, icon: "⭐", hint: null },
+      { id: 3, name: "Hearted", desc: "Favorite your first game", requirement: "favorites_count", required: 1, icon: "💖", hint: null },
+      { id: 4, name: "Let's Play", desc: "Play your first game", requirement: "games_played", required: 1, icon: "🎮", hint: null },
+      { id: 5, name: "Getting There", desc: "Rate 10 games", requirement: "ratings_given", required: 10, icon: "📈", hint: null },
+      { id: 6, name: "Small Collection", desc: "Favorite 10 games", requirement: "favorites_count", required: 10, icon: "📦", hint: null },
+      { id: 7, name: "Ten Played", desc: "Play 10 games", requirement: "games_played", required: 10, icon: "🔟", hint: null },
+      { id: 8, name: "Opinionated", desc: "Rate 25 games", requirement: "ratings_given", required: 25, icon: "🗣️", hint: null },
+      { id: 9, name: "Devoted Fan", desc: "Favorite 25 games", requirement: "favorites_count", required: 25, icon: "💝", hint: null },
+      { id: 10, name: "Newbie+", desc: "Get all Newbie achievements", requirement: "categoryComplete", required: "newbie", icon: "🌟", hint: null }
+    ]
+  },
+  beginner: {
+    name: "Beginner",
+    icon: "📘",
+    color: "#2d5ae3",
+    pointsPer: 0.2,
+    achievements: [
+      { id: 11, name: "Rookie Rater", desc: "Rate 50 games", requirement: "ratings_given", required: 50, icon: "🎯", hint: "50 opinions shared. people are listening." },
+      { id: 12, name: "Budding Collector", desc: "Favorite 50 games", requirement: "favorites_count", required: 50, icon: "🌱", hint: "halfway to a full house. keep collecting." },
+      { id: 13, name: "Getting Serious", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "💪", hint: "25 games. you're not just passing through anymore." },
+      { id: 14, name: "Consistent", desc: "Log in 7 days total", requirement: "login_days", required: 7, icon: "📅", hint: "a full week of showing up. routine is forming." },
+      { id: 15, name: "Daily Driver", desc: "Log in 3 days in a row", requirement: "login_streak", required: 3, icon: "🚗", hint: "three days in a row. the habit is sticking." },
+      { id: 16, name: "Halfway There", desc: "Rate 75 games", requirement: "ratings_given", required: 75, icon: "⏳", hint: "75 ratings. the finish line is getting closer." },
+      { id: 17, name: "Almost a Hoarder", desc: "Favorite 75 games", requirement: "favorites_count", required: 75, icon: "📚", hint: "75 favorites. your collection is growing." },
+      { id: 18, name: "Twenty-Five Played", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "🎯", hint: "25 games played. variety is the spice of life." },
+      { id: 19, name: "Variety Seeker", desc: "Rate games from 5 different genres", requirement: "genres_rated", required: 5, icon: "🎭", hint: "taste tester. you like a little bit of everything." },
+      { id: 20, name: "Beginner+", desc: "Get all Beginner achievements", requirement: "categoryComplete", required: "beginner", icon: "🏅", hint: null }
+    ]
+  },
+  climbing: {
+    name: "Climbing",
+    icon: "⛰️",
+    color: "#ff8800",
+    pointsPer: 0.4,
+    achievements: [
+      { id: 21, name: "Century Approaching", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "📊", hint: "100 ratings. your voice matters." },
+      { id: 22, name: "Collection Growing", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📈", hint: "100 favorites. this is a library now." },
+      { id: 23, name: "Marathon", desc: "Play 50 games", requirement: "games_played", required: 50, icon: "🏃", hint: "50 games. you're putting in the work." },
+      { id: 24, name: "Weekly Warrior", desc: "Log in 5 days in a row", requirement: "login_streak", required: 5, icon: "⚔️", hint: "5 days. no days off." },
+      { id: 25, name: "One Session Wonder", desc: "Play 10 games in one session", requirement: "games_in_session", required: 10, icon: "⚡", hint: "10 games in one sitting. hyperfocus unlocked." },
+      { id: 26, name: "Double Time", desc: "Rate 150 games", requirement: "ratings_given", required: 150, icon: "⏱️", hint: "150 ratings. people are noticing." },
+      { id: 27, name: "Dedicated Fan", desc: "Favorite 150 games", requirement: "favorites_count", required: 150, icon: "💪", hint: "150 favorites. commitment looks good on you." },
+      { id: 28, name: "Fifty More", desc: "Play 75 games", requirement: "games_played", required: 75, icon: "🎲", hint: "75 games. the grind is real." },
+      { id: 29, name: "Genre Explorer", desc: "Play games from 10 different genres", requirement: "genres_played", required: 10, icon: "🗺️", hint: "10 genres explored. you get around." },
+      { id: 30, name: "Climbing+", desc: "Get all Climbing achievements", requirement: "categoryComplete", required: "climbing", icon: "⛰️✨", hint: null }
+    ]
+  },
+  difficult: {
+    name: "Difficult",
+    icon: "💀",
+    color: "#ff4444",
+    pointsPer: 0.7,
+    achievements: [
+      { id: 31, name: "Two Hundred Ratings", desc: "Rate 200 games", requirement: "ratings_given", required: 200, icon: "🏆", hint: "200 ratings. you're basically a critic now." },
+      { id: 32, name: "Two Hundred Favorites", desc: "Favorite 200 games", requirement: "favorites_count", required: 200, icon: "💎", hint: "200 favorites. your taste is elite." },
+      { id: 33, name: "Century Player", desc: "Play 100 games", requirement: "games_played", required: 100, icon: "🎖️", hint: "100 games. that's a lot of gaming." },
+      { id: 34, name: "Monthly Master", desc: "Log in 15 days total", requirement: "login_days", required: 15, icon: "📆", hint: "15 days total. consistency pays off." },
+      { id: 35, name: "Streak Master", desc: "Log in 10 days in a row", requirement: "login_streak", required: 10, icon: "🔥", hint: "10 days in a row. unstoppable." },
+      { id: 36, name: "Perfect Balance", desc: "Rate 10 games 1★ and 10 games 5★", requirement: "balanced_ratings", required: 10, icon: "⚖️", hint: "the yin and yang of ratings. 1★ and 5★ in harmony." },
+      { id: 37, name: "Pure Taste", desc: "Have 10 favorites that are all 5★ rated", requirement: "pure_favorites", required: 10, icon: "✨", hint: "10 favorites. all 5★. no guilty pleasures here." },
+      { id: 38, name: "Hidden Gem Hunter", desc: "Favorite a game with less than 10 total ratings", requirement: "hidden_gem", required: 1, icon: "💎", hint: "find the overlooked. greatness hides in shadows." },
+      { id: 39, name: "Trend Setter", desc: "Be among first 10 to rate a new game", requirement: "first_rater", required: 1, icon: "👑", hint: "be first. before the hype train leaves." },
+      { id: 40, name: "Difficult+", desc: "Get all Difficult achievements", requirement: "categoryComplete", required: "difficult", icon: "💀✨", hint: null }
+    ]
+  },
+  elite: {
+    name: "Elite",
+    icon: "👑",
+    color: "#ffcc00",
+    pointsPer: 1.0,
+    achievements: [
+      { id: 41, name: "Centurion", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "🏅", hint: "100 ratings. you've got opinions and you're not afraid to share." },
+      { id: 42, name: "Collector's Edition", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📀", hint: "100 favorites. your collection is impressive." },
+      { id: 43, name: "Gaming Devotee", desc: "Play 150 games", requirement: "games_played", required: 150, icon: "🎮👑", hint: "150 games. you're dedicated." },
+      { id: 44, name: "Yearly Legend", desc: "Log in 50 days total", requirement: "login_days", required: 50, icon: "📅👑", hint: "50 days total. you've been here a while." },
+      { id: 45, name: "Iron Will", desc: "Log in 14 days in a row", requirement: "login_streak", required: 14, icon: "⚙️", hint: "14 days in a row. nothing stops you." },
+      { id: 46, name: "The Decider", desc: "Your rating appears on 100+ games", requirement: "ratings_given", required: 100, icon: "⚖️👑", hint: "100+ games feel your influence." },
+      { id: 47, name: "Completionist", desc: "Get all Newbie + Beginner + Climbing + Difficult", requirement: "all_lower_categories", required: true, icon: "🏆", hint: "earn everything below. then we talk." },
+      { id: 48, name: "Elite Rater", desc: "Average rating given is within 0.5 of global average", requirement: "elite_rater", required: 1, icon: "⭐👑", hint: "your taste matches the crowd. perfectly balanced." },
+      { id: 49, name: "Community Choice", desc: "Your review liked by 10+ users", requirement: "likes_received", required: 10, icon: "💬👑", hint: "10 people liked what you had to say." },
+      { id: 50, name: "Elite+", desc: "Get all Elite achievements", requirement: "categoryComplete", required: "elite", icon: "👑✨", hint: null }
+    ]
+  },
+  secret: {
+    name: "Secret",
+    icon: "🔮",
+    color: "linear-gradient(90deg, #ff00ff, #00ffff)",
+    pointsPer: 2.0,
+    achievements: [
+      { id: 51, name: "The Owner's Gift", desc: "given by abcatlmfao", requirement: "manual", required: 1, icon: "🎁", hidden: false, hint: "special recognition from the creator" },
+      { id: 52, name: "Konami Code", desc: "↑↑↓↓←→←→BA", requirement: "konami", required: 1, icon: "🎮", hidden: false, hint: "type the konami code anywhere on the site" },
+      { id: 53, name: "The Chosen One", desc: "Find the secret dev names", requirement: "secret_names", required: 1, icon: "👑", hidden: true, hint: "try searching for something special..." },
+      { id: 54, name: "Alt+F4", desc: "Tried to escape?", requirement: "alt_f4", required: 1, icon: "💀", hidden: false, hint: "close fanter within 10 seconds of opening" },
+      { id: 55, name: "Mentally Insane", desc: "Just... why?", requirement: "idle_hour", required: 1, icon: "🤪", hidden: false, hint: "stay on fanter for 1 hour without playing anything" },
+      { id: 56, name: "Indecisive", desc: "Can't make up your mind", requirement: "theme_changes", required: 10, icon: "🎨", hidden: false, hint: "change your background 10 times" },
+      { id: 57, name: "Big Back", desc: "Hungry gamer", requirement: "food_game", required: 1, icon: "🍔", hidden: false, hint: "play a food-related game" },
+      { id: 58, name: "OG Fanter", desc: "Been here since the beginning", requirement: "early_adopter", required: 1, icon: "🦖", hidden: false, hint: "joined within first month of launch" },
+      { id: 59, name: "Addicted", desc: "One more game...", requirement: "same_game_50", required: 50, icon: "🎮", hidden: false, hint: "play the same game 50 times" },
+      { id: 60, name: "Committed", desc: "Dedication", requirement: "same_game_100", required: 100, icon: "💪", hidden: false, hint: "play the same game 100 times" },
+      { id: 61, name: "Top 1 Unemployed", desc: "No life detected", requirement: "total_play_time", required: 50, icon: "🛋️", hidden: false, hint: "play fanter for 50 hours total" },
+      { id: 62, name: "Loyal Customer", desc: "Taste tester", requirement: "rate_all_games", required: 1, icon: "⭐", hidden: false, hint: "rate every game on fanter" },
+      { id: 63, name: "System Failure", desc: "You broke it", requirement: "crash", required: 1, icon: "💻", hidden: true, hint: "find the hidden crash" }
+    ]
+  }
+
     };
     
-    // ===== INITIALIZATION =====
-    async function initializeApp() {
-      await checkSession();
+    // ===== STATE =====
+    let currentUser = null;
+    let localUser = null;
+    let syncStatus = 'offline';
+    let currentFilter = 'coins';
+    let userAchievements = {};
+    
+    // ===== INIT =====
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        currentUser = session.user;
+        syncStatus = 'online';
+        await loadSupabaseData();
+      } else {
+        loadLocalData();
+      }
+      
       setupTabs();
       setupLeaderboardFilters();
+      updateUI();
       renderCurrentTab();
     }
     
-    async function checkSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      currentSession = session;
-      currentUser = session?.user || null;
-      
-      if (currentUser) {
-        await loadUserData();
-      } else {
-        loadGuestData();
-      }
-      
-      updateUIForAuthState();
+    function loadLocalData() {
+      localUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+      userAchievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
+      syncStatus = 'offline';
     }
     
-    async function loadUserData() {
+    async function loadSupabaseData() {
       try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+        if (profile) {
+          localUser = {
+            id: profile.id,
+            username: profile.username,
+            displayName: profile.display_name,
+            email: profile.email,
+            coins: profile.coins || 300,
+            stats: {},
+            favorites: [],
+            playedGames: []
+          };
+        }
         
-        if (profile) userProfile = profile;
-        
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .single();
-        
-        if (stats) userStats = stats;
-        
-        const { data: achievements } = await supabase
-          .from('user_achievements')
-          .select('achievement_id')
-          .eq('user_id', currentUser.id);
-        
+        const { data: achievements } = await supabase.from('user_achievements').select('achievement_id').eq('user_id', currentUser.id);
         userAchievements = {};
-        achievements?.forEach(ach => {
-          userAchievements[ach.achievement_id] = true;
-        });
+        achievements?.forEach(a => { userAchievements[a.achievement_id] = true; });
         
       } catch (error) {
-        console.error('Error loading user data:', error);
+        console.error('Error loading Supabase data:', error);
       }
     }
     
-    function loadGuestData() {
-      const guestData = localStorage.getItem('fanter_guestData');
-      if (guestData) {
-        const data = JSON.parse(guestData);
-        userStats = data.stats || {};
-        userAchievements = data.achievements || {};
+    // ===== AUTH =====
+    async function handleLogin(email, password) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        
+        currentUser = data.user;
+        syncStatus = 'online';
+        await loadSupabaseData();
+        
+        showMessage('loginMessage', 'Login successful!', 'success');
+        setTimeout(() => window.location.reload(), 1000);
+      } catch (error) {
+        showMessage('loginMessage', error.message, 'error');
       }
+    }
+    
+    async function handleRegister(username, email, displayName, password) {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { username, display_name: displayName || username } }
+        });
+        
+        if (error) throw error;
+        
+        if (data.user) {
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            username,
+            display_name: displayName || username,
+            email,
+            coins: 300
+          });
+        }
+        
+        showMessage('registerMessage', 'Account created! Check your email.', 'success');
+      } catch (error) {
+        showMessage('registerMessage', error.message, 'error');
+      }
+    }
+    
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      currentUser = null;
+      syncStatus = 'offline';
+      loadLocalData();
+      updateUI();
+      switchTab('profile');
+    }
+    
+    function continueWithLocalStorage() {
+      loadLocalData();
+      updateUI();
+      switchTab('profile');
     }
     
     // ===== RENDERING =====
     function renderProfile() {
       const container = document.getElementById('profileContent');
+      const user = localUser;
       
-      if (!currentUser) {
+      if (!user) {
         container.innerHTML = `
           <div class="guest-message">
-            <p style="margin-bottom: 20px;">You're browsing as a guest</p>
-            <p style="opacity: 0.7; font-size: 14px; margin-bottom: 20px;">Create an account to save your progress, earn achievements, and compete on the leaderboard!</p>
-            <button onclick="switchTab('register')" class="settings-btn" style="width: auto; padding: 10px 30px;">create account</button>
-            <button onclick="switchTab('login')" class="settings-btn" style="width: auto; padding: 10px 30px; margin-left: 10px;">login</button>
+            <p>You're browsing as a guest</p>
+            <button onclick="switchTab('register')" class="settings-btn" style="width:auto; padding:10px 30px;">create account</button>
           </div>
         `;
         return;
       }
       
-      const displayName = userProfile?.display_name || currentUser.email?.split('@')[0] || 'User';
-      const username = userProfile?.username || displayName.toLowerCase();
-      const coins = userProfile?.coins || 300;
-      const joinDate = userProfile?.created_at ? new Date(userProfile.created_at).toLocaleDateString() : 'Today';
+      const displayName = user.displayName || user.username || 'User';
+      const username = user.username || displayName.toLowerCase();
+      const coins = user.coins || 300;
+      const stats = user.stats || { gamesPlayed: 0, ratingsGiven: 0, favoritesCount: 0 };
+      const favorites = user.favorites || [];
+      const playedGames = user.playedGames || [];
+      const unlockedCount = Object.keys(userAchievements).length;
       
-      let totalPoints = 0;
-      let unlockedCount = Object.keys(userAchievements).length;
-      
-      for (const [catKey, catData] of Object.entries(ACHIEVEMENTS_DATA)) {
-        catData.achievements.forEach(ach => {
-          if (userAchievements[ach.id]) {
-            totalPoints += catData.pointsPer;
-          }
-        });
-      }
+      const statusDot = syncStatus === 'online' ? '🟢' : '🟠';
+      const statusText = syncStatus === 'online' ? 'Supabase' : 'Local';
       
       container.innerHTML = `
         <div class="profile-info">
-          <div class="profile-avatar">
-            ${displayName[0].toUpperCase()}
-          </div>
-          <h2>${displayName}</h2>
-          <p style="opacity: 0.7; font-size: 14px;">@${username}</p>
-          <p style="opacity: 0.5; font-size: 12px;">Member since ${joinDate}</p>
-          <div style="margin-top: 10px; display: flex; justify-content: center; gap: 15px;">
-            <span class="user-coins">💰 ${coins} coins</span>
-            <span style="color: #ffcc00;">🏆 ${totalPoints.toFixed(1)} points</span>
-          </div>
+          <div class="profile-avatar">${displayName[0].toUpperCase()}</div>
+          <h2>${displayName} <span class="sync-status ${syncStatus}">${statusDot} ${statusText}</span></h2>
+          <p style="opacity:0.7;">@${username}</p>
+          <div><span class="user-coins">💰 ${Math.floor(coins * 100) / 100} coins</span></div>
         </div>
         
         <div class="profile-stats">
-          <div class="stat">
-            <div class="stat-number">${userStats.games_played || 0}</div>
-            <div class="stat-label">Games Played</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">${userStats.ratings_given || 0}</div>
-            <div class="stat-label">Ratings</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">${userStats.favorites_count || 0}</div>
-            <div class="stat-label">Favorites</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">${unlockedCount}</div>
-            <div class="stat-label">Achievements</div>
-          </div>
+          <div class="stat"><div class="stat-number">${stats.gamesPlayed || 0}</div><div class="stat-label">Games</div></div>
+          <div class="stat"><div class="stat-number">${stats.ratingsGiven || 0}</div><div class="stat-label">Ratings</div></div>
+          <div class="stat"><div class="stat-number">${favorites.length}</div><div class="stat-label">Favorites</div></div>
+          <div class="stat"><div class="stat-number">${unlockedCount}</div><div class="stat-label">Achievements</div></div>
         </div>
+        
+        ${playedGames.length > 0 ? `
+          <div class="profile-games-section">
+            <h3>🎮 Recently Played</h3>
+            <div>${playedGames.slice(0,6).map(g => `<span class="profile-game-tag">${g}</span>`).join('')}</div>
+          </div>
+        ` : ''}
+        
+        ${favorites.length > 0 ? `
+          <div class="profile-games-section">
+            <h3>⭐ Favorites</h3>
+            <div>${favorites.slice(0,8).map(g => `<span class="profile-game-tag favorite">${g}</span>`).join('')}</div>
+          </div>
+        ` : ''}
         
         <div class="divider"></div>
         
-        <div style="display: flex; gap: 10px;">
+        <div style="display:flex; gap:10px;">
           <button class="settings-btn" onclick="switchTab('achievements')">view achievements</button>
-          <button class="settings-btn logout-btn" onclick="handleLogout()">logout</button>
+          <button class="settings-btn logout-btn" onclick="handleLogout()">${currentUser ? 'Logout' : 'Clear'}</button>
         </div>
       `;
     }
@@ -896,12 +909,8 @@
     function renderAchievements() {
       const container = document.getElementById('achievementsContent');
       
-      if (!currentUser) {
-        container.innerHTML = `
-          <div class="guest-message">
-            <p>Please log in to view achievements</p>
-          </div>
-        `;
+      if (!localUser) {
+        container.innerHTML = '<div class="guest-message">Please log in to view achievements</div>';
         return;
       }
       
@@ -910,7 +919,7 @@
       let maxPoints = 0;
       
       for (const cat of Object.values(ACHIEVEMENTS_DATA)) {
-        const progress = getCategoryProgress(cat.name.toLowerCase());
+        const progress = getCategoryProgress(cat);
         totalPoints += progress.points;
         totalAchievements += progress.earned;
         maxPoints += cat.achievements.length * cat.pointsPer;
@@ -925,31 +934,27 @@
             <span class="score-label">points</span>
           </div>
           <div class="total-progress">
-            <div class="total-progress-bar">
-              <div class="total-progress-fill" style="width: ${totalPercent}%;"></div>
-            </div>
-            <div class="total-progress-text">${totalAchievements}/63 achievements completed</div>
+            <div class="total-progress-bar"><div class="total-progress-fill" style="width:${totalPercent}%;"></div></div>
+            <div class="total-progress-text">${totalAchievements}/63 completed</div>
           </div>
         </div>
       `;
       
       for (const [catKey, catData] of Object.entries(ACHIEVEMENTS_DATA)) {
-        const progress = getCategoryProgress(catKey);
+        const progress = getCategoryProgress(catData);
         const isOpen = localStorage.getItem(`category_${catKey}_open`) === 'true';
         
         html += `
-          <div class="category-card category-${catKey} ${isOpen ? 'open' : ''}" data-category="${catKey}">
+          <div class="category-card category-${catKey} ${isOpen ? 'open' : ''}">
             <div class="category-header" onclick="toggleCategory('${catKey}')">
               <div class="category-title">
                 <span class="category-icon">${catData.icon}</span>
-                <span class="category-name" style="color: ${catData.color}">${catData.name}</span>
+                <span class="category-name" style="color:${catData.color}">${catData.name}</span>
               </div>
               <div class="category-stats">
-                <div class="category-points">${progress.points.toFixed(1)} / ${(catData.achievements.length * catData.pointsPer).toFixed(1)} pts</div>
+                <div class="category-points">${progress.points.toFixed(1)} / ${(catData.achievements.length * catData.pointsPer).toFixed(1)}</div>
                 <div class="category-progress">${progress.earned}/${progress.total}</div>
-                <div class="category-progress-bar">
-                  <div class="category-progress-fill" style="width: ${progress.percent}%;"></div>
-                </div>
+                <div class="category-progress-bar"><div class="category-progress-fill" style="width:${progress.percent}%;"></div></div>
               </div>
             </div>
             <div class="achievements-list">
@@ -957,308 +962,107 @@
         
         for (const ach of catData.achievements) {
           const isUnlocked = userAchievements[ach.id] === true;
-          const isHidden = ach.hidden === true && !isUnlocked;
-          
-          let displayName = ach.name;
-          let displayDesc = ach.desc;
-          let displayIcon = ach.icon;
-          
-          if (isHidden) {
-            displayName = '???';
-            displayDesc = ach.hint || 'secret achievement - keep exploring!';
-            displayIcon = '❓';
-          } else if (!isUnlocked && ach.hint && catKey !== 'newbie') {
-            displayDesc = ach.hint;
-          }
+          const isHidden = ach.hidden && !isUnlocked;
           
           html += `
             <div class="achievement-item ${isUnlocked ? 'unlocked' : 'locked'} ${isHidden ? 'secret-hidden' : ''}">
-              <div class="achievement-icon">${displayIcon}</div>
+              <div class="achievement-icon">${isHidden ? '❓' : ach.icon}</div>
               <div class="achievement-info">
-                <div class="achievement-name">${displayName}</div>
-                <div class="achievement-desc">${displayDesc}</div>
+                <div class="achievement-name">${isHidden ? '???' : ach.name}</div>
+                <div class="achievement-desc">${isHidden ? (ach.hint || 'secret achievement') : (isUnlocked ? ach.desc : (ach.hint || ach.desc))}</div>
               </div>
               <div class="achievement-points">+${catData.pointsPer.toFixed(1)}</div>
             </div>
           `;
         }
         
-        html += `
-            </div>
-          </div>
-        `;
+        html += `</div></div>`;
       }
       
       container.innerHTML = html;
     }
     
-    function getCategoryProgress(category) {
-      const catData = ACHIEVEMENTS_DATA[category];
-      if (!catData) return { earned: 0, total: 0, points: 0, percent: 0 };
-      
-      let earned = 0;
-      let points = 0;
-      let total = catData.achievements.length;
-      
+    function getCategoryProgress(catData) {
+      let earned = 0, points = 0;
       catData.achievements.forEach(ach => {
-        if (userAchievements[ach.id]) {
-          earned++;
-          points += catData.pointsPer;
+        if (userAchievements[ach.id]) { earned++; points += catData.pointsPer; }
+      });
+      return { earned, total: catData.achievements.length, points, percent: (earned / catData.achievements.length) * 100 };
+    }
+    
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboardList');
+      container.innerHTML = '<div class="guest-message">loading...</div>';
+      
+      const users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
+      
+      // Add achievement points to each user
+      users.forEach(u => {
+        const ach = JSON.parse(localStorage.getItem(`fanter_achievements_${u.id}`) || '{}');
+        let points = 0;
+        for (const [catKey, cat] of Object.entries(ACHIEVEMENTS_DATA)) {
+          cat.achievements.forEach(a => { if (ach[a.id]) points += cat.pointsPer; });
         }
+        u.achievementPoints = points;
       });
       
-      return { 
-        earned, 
-        total, 
-        points, 
-        percent: total > 0 ? (earned / total) * 100 : 0 
-      };
-    }
-    
-    async function renderLeaderboard() {
-      const container = document.getElementById('leaderboardList');
-      container.innerHTML = '<div class="guest-message">loading leaderboard...</div>';
+      users.sort((a, b) => {
+        if (currentFilter === 'coins') return (b.coins || 0) - (a.coins || 0);
+        if (currentFilter === 'games_played') return ((b.stats?.gamesPlayed || 0) - (a.stats?.gamesPlayed || 0));
+        return (b.achievementPoints || 0) - (a.achievementPoints || 0);
+      });
       
-      try {
-        // Get profiles with stats
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select(`
-            id,
-            username,
-            display_name,
-            coins
-          `);
+      let html = '';
+      users.slice(0, 50).forEach((u, i) => {
+        const rank = i + 1;
+        const rankClass = rank <= 3 ? `top-${rank}` : '';
+        const isCurrent = localUser && u.id === localUser.id;
+        const displayName = u.displayName || u.username || 'User';
         
-        if (error) throw error;
+        let score;
+        if (currentFilter === 'coins') score = `💰 ${Math.floor((u.coins || 0) * 100) / 100}`;
+        else if (currentFilter === 'games_played') score = `🎮 ${u.stats?.gamesPlayed || 0}`;
+        else score = `🏆 ${(u.achievementPoints || 0).toFixed(1)}`;
         
-        // Get stats and calculate achievement points
-        const leaderboardData = [];
-        
-        for (const profile of profiles) {
-          const { data: stats } = await supabase
-            .from('user_stats')
-            .select('*')
-            .eq('user_id', profile.id)
-            .single();
-          
-          const { data: achievements } = await supabase
-            .from('user_achievements')
-            .select('achievement_id')
-            .eq('user_id', profile.id);
-          
-          let achievementPoints = 0;
-          achievements?.forEach(ach => {
-            for (const cat of Object.values(ACHIEVEMENTS_DATA)) {
-              const found = cat.achievements.find(a => a.id === ach.achievement_id);
-              if (found) {
-                achievementPoints += cat.pointsPer;
-                break;
-              }
-            }
-          });
-          
-          leaderboardData.push({
-            ...profile,
-            stats: stats || {},
-            achievement_points: achievementPoints
-          });
-        }
-        
-        // Sort based on filter
-        if (currentFilter === 'coins') {
-          leaderboardData.sort((a, b) => (b.coins || 0) - (a.coins || 0));
-        } else if (currentFilter === 'games_played') {
-          leaderboardData.sort((a, b) => (b.stats?.games_played || 0) - (a.stats?.games_played || 0));
-        } else {
-          leaderboardData.sort((a, b) => b.achievement_points - a.achievement_points);
-        }
-        
-        let html = '';
-        leaderboardData.slice(0, 50).forEach((user, index) => {
-          const rank = index + 1;
-          const rankClass = rank <= 3 ? `top-${rank}` : '';
-          const isCurrentUser = currentUser && user.id === currentUser.id;
-          const displayName = user.display_name || user.username || 'User';
-          
-          let score = '';
-          if (currentFilter === 'coins') {
-            score = `💰 ${user.coins || 0}`;
-          } else if (currentFilter === 'games_played') {
-            score = `🎮 ${user.stats?.games_played || 0}`;
-          } else {
-            score = `🏆 ${user.achievement_points.toFixed(1)}`;
-          }
-          
-          html += `
-            <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}" onclick="viewPublicProfile('${user.id}')">
-              <div class="rank ${rankClass}">#${rank}</div>
-              <div class="user-avatar">${displayName[0].toUpperCase()}</div>
-              <div class="user-info">
-                <div class="user-name">${displayName}</div>
-                <div class="user-username">@${user.username}</div>
-              </div>
-              <div class="user-score">${score}</div>
+        html += `
+          <div class="leaderboard-item ${isCurrent ? 'current-user' : ''}">
+            <div class="rank ${rankClass}">#${rank}</div>
+            <div class="user-avatar">${displayName[0].toUpperCase()}</div>
+            <div class="user-info">
+              <div class="user-name">${displayName}</div>
+              <div class="user-username">@${u.username}</div>
             </div>
-          `;
-        });
-        
-        container.innerHTML = html || '<div class="guest-message">no users found</div>';
-        
-      } catch (error) {
-        console.error('Error loading leaderboard:', error);
-        container.innerHTML = '<div class="guest-message">error loading leaderboard</div>';
-      }
-    }
-    
-    async function viewPublicProfile(userId) {
-      const modal = document.getElementById('profileModal');
-      const modalContent = document.getElementById('modalContent');
-      
-      modal.classList.add('active');
-      modalContent.innerHTML = '<div class="guest-message">loading profile...</div>';
-      
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
-        
-        const { data: stats } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-        
-        const { data: achievements } = await supabase
-          .from('user_achievements')
-          .select('achievement_id')
-          .eq('user_id', userId);
-        
-        const achievementCount = achievements?.length || 0;
-        const displayName = profile?.display_name || profile?.username || 'User';
-        const joinDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown';
-        
-        document.getElementById('modalUsername').textContent = `${displayName}'s Profile`;
-        
-        modalContent.innerHTML = `
-          <div class="profile-info">
-            <div class="profile-avatar">
-              ${displayName[0].toUpperCase()}
-            </div>
-            <h3>${displayName}</h3>
-            <p style="opacity: 0.7;">@${profile?.username || 'user'}</p>
-            <p style="opacity: 0.5; font-size: 12px;">Member since ${joinDate}</p>
-            <div style="margin-top: 10px;">
-              <span class="user-coins">💰 ${profile?.coins || 0} coins</span>
-            </div>
-          </div>
-          
-          <div class="profile-stats">
-            <div class="stat">
-              <div class="stat-number">${stats?.games_played || 0}</div>
-              <div class="stat-label">Games Played</div>
-            </div>
-            <div class="stat">
-              <div class="stat-number">${stats?.ratings_given || 0}</div>
-              <div class="stat-label">Ratings</div>
-            </div>
-            <div class="stat">
-              <div class="stat-number">${stats?.favorites_count || 0}</div>
-              <div class="stat-label">Favorites</div>
-            </div>
-            <div class="stat">
-              <div class="stat-number">${achievementCount}</div>
-              <div class="stat-label">Achievements</div>
-            </div>
+            <div class="user-score">${score}</div>
           </div>
         `;
-        
-      } catch (error) {
-        console.error('Error loading public profile:', error);
-        modalContent.innerHTML = '<div class="guest-message">error loading profile</div>';
-      }
-    }
-    
-    // ===== AUTH FUNCTIONS =====
-    async function handleLogin(email, password) {
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        
-        showMessage('loginMessage', 'Login successful!', 'success');
-        setTimeout(() => window.location.reload(), 1000);
-      } catch (error) {
-        showMessage('loginMessage', error.message, 'error');
-      }
-    }
-    
-    async function handleRegister(username, email, displayName, password) {
-      try {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { username, display_name: displayName || username }
-          }
-        });
-        
-        if (error) throw error;
-        
-        showMessage('registerMessage', 'Account created! Check your email to confirm.', 'success');
-      } catch (error) {
-        showMessage('registerMessage', error.message, 'error');
-      }
-    }
-    
-    async function handleLogout() {
-      await supabase.auth.signOut();
-      currentUser = null;
-      currentSession = null;
-      userProfile = null;
-      updateUIForAuthState();
-      switchTab('profile');
-    }
-    
-    function continueAsGuest() {
-      currentUser = null;
-      loadGuestData();
-      updateUIForAuthState();
-      switchTab('profile');
+      });
+      
+      container.innerHTML = html || '<div class="guest-message">no users</div>';
     }
     
     // ===== UI HELPERS =====
     function setupTabs() {
       document.querySelectorAll('.account-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          switchTab(tab.getAttribute('data-tab'));
-        });
+        tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
       });
       
       document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        await handleLogin(
-          document.getElementById('loginEmail').value,
-          document.getElementById('loginPassword').value
-        );
+        await handleLogin(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
       });
       
       document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const password = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('regConfirmPassword').value;
-        
-        if (password !== confirm) {
+        const pw = document.getElementById('regPassword').value;
+        if (pw !== document.getElementById('regConfirmPassword').value) {
           showMessage('registerMessage', 'Passwords do not match', 'error');
           return;
         }
-        
         await handleRegister(
           document.getElementById('regUsername').value,
           document.getElementById('regEmail').value,
           document.getElementById('regDisplayName').value,
-          password
+          pw
         );
       });
     }
@@ -1275,79 +1079,53 @@
     }
     
     function switchTab(tabName) {
-      document.querySelectorAll('.account-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName);
-      });
-      
-      document.querySelectorAll('.account-tab-content').forEach(content => {
-        content.classList.toggle('active', content.id === `${tabName}Tab`);
-      });
-      
+      document.querySelectorAll('.account-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === tabName));
+      document.querySelectorAll('.account-tab-content').forEach(c => c.classList.toggle('active', c.id === `${tabName}Tab`));
       renderCurrentTab();
     }
     
     function renderCurrentTab() {
-      const activeTab = document.querySelector('.account-tab-content.active');
-      if (!activeTab) return;
-      
-      if (activeTab.id === 'profileTab') renderProfile();
-      else if (activeTab.id === 'achievementsTab') renderAchievements();
-      else if (activeTab.id === 'leaderboardTab') renderLeaderboard();
+      const active = document.querySelector('.account-tab-content.active');
+      if (!active) return;
+      if (active.id === 'profileTab') renderProfile();
+      else if (active.id === 'achievementsTab') renderAchievements();
+      else if (active.id === 'leaderboardTab') renderLeaderboard();
     }
     
-    function updateUIForAuthState() {
-      const accountName = document.getElementById('accountName');
+    function updateUI() {
+      const nameEl = document.getElementById('accountName');
       const tabs = document.querySelectorAll('.account-tab');
+      const user = localUser;
       
-      if (currentUser) {
-        const displayName = userProfile?.display_name || currentUser.email?.split('@')[0] || 'User';
-        accountName.textContent = displayName;
-        
-        tabs.forEach(tab => {
-          const tabName = tab.getAttribute('data-tab');
-          tab.style.display = (tabName === 'login' || tabName === 'register') ? 'none' : 'block';
-        });
+      if (user) {
+        nameEl.textContent = user.displayName || user.username || 'User';
+        tabs.forEach(t => { if (t.getAttribute('data-tab') === 'login' || t.getAttribute('data-tab') === 'register') t.style.display = 'none'; });
       } else {
-        accountName.textContent = 'Guest';
-        tabs.forEach(tab => tab.style.display = 'block');
-        
-        const activeTab = document.querySelector('.account-tab-content.active');
-        if (activeTab && activeTab.id === 'achievementsTab') {
-          switchTab('profile');
-        }
+        nameEl.textContent = 'Guest';
+        tabs.forEach(t => t.style.display = 'block');
       }
     }
     
-    function toggleCategory(category) {
-      const card = document.querySelector(`.category-card[data-category="${category}"]`);
+    function toggleCategory(cat) {
+      const card = document.querySelector(`.category-card[data-category="${cat}"]`) || 
+                   document.querySelector(`.category-${cat}`);
       if (card) {
         card.classList.toggle('open');
-        localStorage.setItem(`category_${category}_open`, card.classList.contains('open'));
+        localStorage.setItem(`category_${cat}_open`, card.classList.contains('open'));
       }
     }
     
-    function showMessage(elementId, message, type) {
-      const element = document.getElementById(elementId);
-      if (element) {
-        element.textContent = message;
-        element.className = `message ${type}`;
-      }
+    function showMessage(elId, msg, type) {
+      const el = document.getElementById(elId);
+      if (el) { el.textContent = msg; el.className = `message ${type}`; }
     }
     
-    function closeModal() {
-      document.getElementById('profileModal').classList.remove('active');
-    }
-    
-    // Make functions globally available
     window.switchTab = switchTab;
     window.handleLogout = handleLogout;
-    window.continueAsGuest = continueAsGuest;
-    window.viewPublicProfile = viewPublicProfile;
-    window.closeModal = closeModal;
+    window.continueWithLocalStorage = continueWithLocalStorage;
     window.toggleCategory = toggleCategory;
     
-    // Initialize
-    initializeApp();
+    init();
   </script>
 </body>
 </html>
