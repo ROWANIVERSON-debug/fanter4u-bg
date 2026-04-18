@@ -78,14 +78,14 @@
       box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
     }
 
-    /* ========== PET REALMS MODAL ========== */
-    .realms-modal-overlay {
+    /* ========== PETS MODAL - SIMPLE & CLEAN ========== */
+    .pets-modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
       z-index: 20000;
       display: flex;
@@ -96,18 +96,18 @@
       transition: all 0.3s ease;
     }
     
-    .realms-modal-overlay.show {
+    .pets-modal-overlay.show {
       opacity: 1;
       visibility: visible;
     }
     
-    .realms-modal {
+    .pets-modal {
       background: linear-gradient(135deg, #1a1a2e, #0f0f2a);
       border: 2px solid rgba(45, 90, 227, 0.5);
       border-radius: 24px;
-      width: 95%;
-      max-width: 1200px;
-      height: 85vh;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
       position: relative;
       transform: scale(0.9);
       transition: transform 0.3s ease;
@@ -116,545 +116,255 @@
       flex-direction: column;
     }
     
-    .realms-modal.show {
+    .pets-modal.show {
       transform: scale(1);
     }
     
-    /* Realm Tabs */
-    .realm-tabs {
-      display: flex;
-      gap: 5px;
-      padding: 15px 20px;
-      background: rgba(0, 0, 0, 0.3);
-      overflow-x: auto;
+    .pets-modal-header {
+      padding: 20px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-      flex-shrink: 0;
-    }
-    
-    .realm-tab {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      background: rgba(20, 30, 50, 0.6);
-      border: 1px solid rgba(45, 90, 227, 0.3);
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
     }
     
-    .realm-tab:hover {
-      border-color: #ffcc00;
-      transform: translateY(-2px);
-    }
-    
-    .realm-tab.active {
-      background: linear-gradient(135deg, rgba(45,90,227,0.3), rgba(255,204,0,0.1));
-      border-color: #ffcc00;
-    }
-    
-    .realm-tab-icon {
+    .pets-modal-title {
       font-size: 24px;
-    }
-    
-    .realm-tab-name {
-      font-size: 14px;
-      font-weight: bold;
-      color: white;
-    }
-    
-    /* Realm Content */
-    .realm-content {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .realm-pane {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      overflow-y: auto;
-    }
-    
-    .realm-pane.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    /* ===== PET REALM STYLES ===== */
-    
-    /* Chinchilla - Mountain Realm */
-    .realm-mountains {
-      background: linear-gradient(180deg, #1a3a5a, #2a5a3a, #3a2a1a);
-      position: relative;
-      min-height: 100%;
-    }
-    
-    .mountain-bg {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(180deg, #4a6a3a, #3a5a2a);
-      border-radius: 100% 100% 0 0;
-    }
-    
-    .mountain-snow {
-      position: absolute;
-      top: 20px;
-      left: 10%;
-      width: 80px;
-      height: 80px;
-      background: white;
-      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      opacity: 0.3;
-    }
-    
-    .mountain-snow2 { left: 70%; top: 50px; width: 120px; height: 120px; }
-    .mountain-snow3 { left: 30%; top: 80px; width: 60px; height: 60px; }
-    
-    /* Dragon - Sky Realm */
-    .realm-sky {
-      background: linear-gradient(180deg, #0a0a3a, #1a2a5a, #2a1a4a);
-      position: relative;
-    }
-    
-    .cloud {
-      position: absolute;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      animation: floatCloud 20s linear infinite;
-    }
-    
-    @keyframes floatCloud {
-      from { transform: translateX(-100px); }
-      to { transform: translateX(calc(100vw + 100px)); }
-    }
-    
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 2s ease-in-out infinite;
-    }
-    
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-    
-    /* Cat - Space Realm */
-    .realm-space {
-      background: #000022;
-      position: relative;
-    }
-    
-    .planet {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ff8844, #aa4422);
-      box-shadow: 0 0 20px rgba(255,136,68,0.5);
-    }
-    
-    .planet-ring {
-      position: absolute;
-      border: 2px solid rgba(255,200,100,0.5);
-      border-radius: 50%;
-      transform: rotate(-20deg);
-    }
-    
-    /* Dog - Cyberpunk Realm */
-    .realm-cyber {
-      background: linear-gradient(135deg, #0a0a1a, #1a0a2a);
-      position: relative;
-    }
-    
-    .grid-lines {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        linear-gradient(rgba(0,255,255,0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px);
-      background-size: 30px 30px;
-    }
-    
-    .neon-line {
-      position: absolute;
-      height: 2px;
-      background: linear-gradient(90deg, #00ffcc, #ff00ff);
-      animation: neonPulse 1s ease-in-out infinite;
-    }
-    
-    @keyframes neonPulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-    
-    /* Owl - Library Realm */
-    .realm-library {
-      background: linear-gradient(135deg, #2a1a0a, #1a0a05);
-      position: relative;
-    }
-    
-    .bookshelf {
-      position: absolute;
-      width: 100%;
-      height: 60px;
-      background: repeating-linear-gradient(90deg, #8B6914, #8B6914 20px, #A0822A 20px, #A0822A 40px);
-    }
-    
-    /* Fox - Forest Realm */
-    .realm-forest {
-      background: linear-gradient(180deg, #0a3a0a, #1a5a2a);
-      position: relative;
-    }
-    
-    .tree {
-      position: absolute;
-      width: 30px;
-      height: 60px;
-      background: #3a2a1a;
-      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    }
-    
-    .tree::before {
-      content: '🌳';
-      position: absolute;
-      top: -25px;
-      left: -10px;
-      font-size: 30px;
-    }
-    
-    /* Pet Container */
-    .pet-realm-container {
-      position: absolute;
-      bottom: 30%;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      z-index: 10;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .pet-realm-container:hover {
-      transform: translateX(-50%) scale(1.05);
-    }
-    
-    /* Pet Art - Detailed CSS Animals */
-    .chinchilla-art {
-      position: relative;
-      width: 120px;
-      height: 100px;
-      margin: 0 auto;
-    }
-    
-    .chinchilla-body {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 55px;
-      background: radial-gradient(ellipse at 60% 40%, #8a8a8a, #6b6b6b);
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
-    }
-    
-    .chinchilla-head {
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 45px;
-      background: radial-gradient(circle at 60% 40%, #8a8a8a, #6b6b6b);
-      border-radius: 50%;
-    }
-    
-    .chinchilla-ear {
-      position: absolute;
-      width: 15px;
-      height: 20px;
-      background: #8a8a8a;
-      border-radius: 50%;
-      top: -10px;
-    }
-    
-    .chinchilla-ear-left { left: 5px; transform: rotate(-15deg); }
-    .chinchilla-ear-right { right: 5px; transform: rotate(15deg); }
-    
-    .chinchilla-eye {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #1a1a1a;
-      border-radius: 50%;
-      top: 15px;
-    }
-    
-    .chinchilla-eye-left { left: 12px; }
-    .chinchilla-eye-right { right: 12px; }
-    
-    .chinchilla-nose {
-      position: absolute;
-      width: 4px;
-      height: 3px;
-      background: #ff9999;
-      border-radius: 50%;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    
-    .chinchilla-tail {
-      position: absolute;
-      right: -10px;
-      bottom: 10px;
-      width: 20px;
-      height: 15px;
-      background: #7a7a7a;
-      border-radius: 50%;
-    }
-    
-    /* Dragon Art */
-    .dragon-art {
-      position: relative;
-      width: 140px;
-      height: 100px;
-      margin: 0 auto;
-    }
-    
-    .dragon-body {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 45px;
-      background: linear-gradient(135deg, #ff4444, #cc2200);
-      border-radius: 50% 50% 40% 40%;
-    }
-    
-    .dragon-head {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 55px;
-      height: 40px;
-      background: #ff4444;
-      border-radius: 50%;
-    }
-    
-    .dragon-horn {
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 15px solid #ffaa00;
-      top: -10px;
-    }
-    
-    .dragon-horn-left { left: 8px; transform: rotate(-15deg); }
-    .dragon-horn-right { right: 8px; transform: rotate(15deg); }
-    
-    .dragon-wing {
-      position: absolute;
-      width: 25px;
-      height: 35px;
-      background: #ff6666;
-      border-radius: 50% 0 50% 0;
-      top: -15px;
-      animation: flapWings 0.5s ease-in-out infinite alternate;
-    }
-    
-    .dragon-wing-left { left: -15px; transform: rotate(-20deg); }
-    .dragon-wing-right { right: -15px; transform: rotate(20deg); }
-    
-    @keyframes flapWings {
-      from { transform: rotate(-30deg) scaleY(1); }
-      to { transform: rotate(10deg) scaleY(0.8); }
-    }
-    
-    .dragon-eye {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #ffcc00;
-      border-radius: 50%;
-      top: 12px;
-      box-shadow: 0 0 5px #ffcc00;
-    }
-    
-    .dragon-fire {
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 20px;
-      animation: breatheFire 1s ease-in-out infinite;
-    }
-    
-    @keyframes breatheFire {
-      0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.8); }
-      50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
-    }
-    
-    /* Cat Art - Space Cat */
-    .cat-art {
-      position: relative;
-      width: 100px;
-      height: 80px;
-      margin: 0 auto;
-    }
-    
-    .cat-body {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 40px;
-      background: #44aaff;
-      border-radius: 50%;
-    }
-    
-    .cat-head {
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 45px;
-      height: 35px;
-      background: #44aaff;
-      border-radius: 50%;
-    }
-    
-    .cat-ear {
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 15px solid #44aaff;
-      top: -8px;
-    }
-    
-    .cat-ear-left { left: 5px; }
-    .cat-ear-right { right: 5px; }
-    
-    .cat-eye {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #00ffcc;
-      border-radius: 50%;
-      top: 10px;
-      box-shadow: 0 0 5px #00ffcc;
-    }
-    
-    .cat-whisker {
-      position: absolute;
-      width: 20px;
-      height: 1px;
-      background: white;
-      top: 18px;
-    }
-    
-    /* Pet Info Panel */
-    .pet-info-panel {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 15px;
-      min-width: 200px;
-      text-align: center;
-      z-index: 20;
-    }
-    
-    .pet-info-name {
-      font-size: 18px;
-      font-weight: bold;
+      font-family: 'Orbitron', monospace;
       color: #ffcc00;
     }
     
-    .pet-info-stats {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
-      font-size: 12px;
-    }
-    
-    .pet-info-equip {
-      margin-top: 10px;
-      background: rgba(45,90,227,0.3);
-      border: 1px solid rgba(45,90,227,0.4);
-      border-radius: 30px;
-      padding: 5px 15px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .pet-info-equip:hover {
-      background: rgba(45,90,227,0.6);
-      border-color: #ffcc00;
-    }
-    
-    /* Close button */
-    .realms-modal-close {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: rgba(0,0,0,0.5);
-      border: 1px solid #ffcc00;
+    .pets-modal-close {
+      background: rgba(255,255,255,0.1);
+      border: none;
       border-radius: 50%;
       width: 35px;
       height: 35px;
       font-size: 20px;
       cursor: pointer;
       color: white;
-      z-index: 100;
       transition: all 0.2s ease;
     }
     
-    .realms-modal-close:hover {
-      background: rgba(255,204,0,0.3);
+    .pets-modal-close:hover {
+      background: rgba(255,255,255,0.2);
       transform: scale(1.1);
     }
     
-    /* Animation for pets */
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    .pets-list {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
     
-    .pet-realm-container {
-      animation: bounce 2s ease-in-out infinite;
+    .pet-item {
+      background: rgba(20, 30, 50, 0.6);
+      border: 1px solid rgba(45, 90, 227, 0.3);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.2s ease;
     }
     
-    /* No pets message */
-    .no-pets-realm {
+    .pet-item:hover {
+      border-color: #ffcc00;
+      transform: translateX(5px);
+    }
+    
+    .pet-item.equipped {
+      border-color: #ffcc00;
+      background: linear-gradient(135deg, rgba(255,204,0,0.1), rgba(255,204,0,0.02));
+    }
+    
+    .pet-icon {
+      font-size: 48px;
+      min-width: 60px;
       text-align: center;
-      padding: 60px;
+    }
+    
+    .pet-info {
+      flex: 1;
+    }
+    
+    .pet-name {
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      font-family: 'Orbitron', monospace;
+    }
+    
+    .pet-multiplier {
+      font-size: 12px;
+      color: #ffcc00;
+      margin-top: 4px;
+    }
+    
+    .pet-desc {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+    
+    .pet-equip-btn {
+      background: rgba(45, 90, 227, 0.3);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 30px;
+      padding: 8px 20px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    .pet-equip-btn:hover {
+      background: rgba(45, 90, 227, 0.6);
+      border-color: #ffcc00;
+      transform: translateY(-2px);
+    }
+    
+    .pet-equip-btn.equipped {
+      background: rgba(0, 255, 0, 0.2);
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+    
+    .no-pets-message {
+      text-align: center;
+      padding: 40px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .shop-link-modal {
+      display: block;
+      text-align: center;
+      padding: 15px;
+      background: linear-gradient(135deg, #2d5ae3, #1a3a8a);
+      margin: 15px;
+      border-radius: 30px;
+      color: white;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .shop-link-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(45,90,227,0.4);
+    }
+
+    /* ========== ALL MENU OVERLAYS ========== */
+    #gameOverlay, #visualOverlay, #audioOverlay, #performanceOverlay, #privacyOverlay, #presetOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    #gameOverlay.visible, #visualOverlay.visible, #audioOverlay.visible,
+    #performanceOverlay.visible, #privacyOverlay.visible, #presetOverlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #gameMenu, #visualMenu, #audioMenu, #performanceMenu, #privacyMenu, #presetMenu {
+      background: rgba(15, 20, 40, 0.97);
+      border: 2px solid rgba(45, 90, 227, 0.5);
+      border-radius: 24px;
+      padding: 35px 40px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(45, 90, 227, 0.4);
+      transform: translateY(60px) scale(0.95);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+    }
+
+    #gameOverlay.visible #gameMenu, #visualOverlay.visible #visualMenu,
+    #audioOverlay.visible #audioMenu, #performanceOverlay.visible #performanceMenu,
+    #privacyOverlay.visible #privacyMenu, #presetOverlay.visible #presetMenu {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    #gameMenu h2, #visualMenu h2, #audioMenu h2, #performanceMenu h2, #privacyMenu h2, #presetMenu h2 {
+      font-size: 26px;
+      margin: 0 0 8px;
+      color: #ffffff;
+    }
+
+    #gameMenu label, #visualMenu label, #audioMenu label, #performanceMenu label,
+    #privacyMenu label, #presetMenu label {
+      display: block;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 18px;
+      margin-bottom: 6px;
+    }
+
+    #gameMenu select, #visualMenu select, #audioMenu select, #performanceMenu select,
+    #privacyMenu select, #presetMenu select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid rgba(45, 90, 227, 0.4);
+      background: rgba(20, 30, 50, 0.8);
+      color: #ffffff;
+      font-size: 14px;
+      font-family: ubuntu, sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+
+    #gameMenu input[type="range"], #visualMenu input[type="range"],
+    #audioMenu input[type="range"], #performanceMenu input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-color);
+    }
+
+    #visualMenu input[type="color"] {
+      width: 100%;
+      height: 45px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #presetMenu input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid rgba(45, 90, 227, 0.4);
+      background: rgba(20, 30, 50, 0.8);
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -667,11 +377,11 @@
     </button>
   </div>
 
-  <!-- Barn Button -->
+  <!-- Pets Button -->
   <div class="barn-btn-container">
-    <button class="barn-btn" id="barnBtn" onclick="openPetRealms()">
+    <button class="barn-btn" id="barnBtn" onclick="openPetsModal()">
       <span class="barn-icon">🐾</span>
-      <span class="barn-text">pet realms</span>
+      <span class="barn-text">my pets</span>
     </button>
   </div>
 
@@ -698,7 +408,7 @@
     <div class="settings-card"><div class="settings-card-icon">✨</div><h2>theme presets</h2><p>seasonal, dynamic & custom themes.</p><button class="settings-btn" onclick="openPresetMenu()">customize</button></div>
   </div>
 
-  <!-- ==================== ALL MENUS (keep existing) ==================== -->
+  <!-- ==================== ALL MENUS ==================== -->
   <div id="themeOverlay" style="display:none;"><div id="themeMenu"><div id="themeTabSelector"><h2>🎨 customize</h2><p class="safety-desc">pick a category to customize.</p><div class="theme-tab-grid"><button class="theme-tab-card" onclick="showThemeTab('background')"><div class="theme-tab-icon">🌅</div><div>background</div></button><button class="theme-tab-card" onclick="showThemeTab('text')"><div class="theme-tab-icon">🔤</div><div>text styling</div></button><button class="theme-tab-card" onclick="showThemeTab('themes')"><div class="theme-tab-icon">✨</div><div>themes</div></button></div><div class="safety-btn-row"><button class="settings-btn" onclick="saveTheme()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closeThemeMenu()">cancel</button></div></div><div id="themeTab-background" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>🌅 background</h2><p class="safety-desc">choose how your background looks.</p><div class="theme-option-grid"><button class="theme-option-btn" onclick="selectBg('chill')" id="bg-chill">🌈 chill cycle</button><button class="theme-option-btn" onclick="selectBg('parallax')" id="bg-parallax">🌌 parallax stars</button><button class="theme-option-btn" onclick="selectBg('solid')" id="bg-solid">🎨 solid color</button><button class="theme-option-btn" onclick="selectBg('aurora')" id="bg-aurora">🌊 aurora</button><button class="theme-option-btn" onclick="selectBg('void')" id="bg-void">🕳️ void</button></div><div id="colorPickerWrap" style="display:none; margin-top:18px;"><label>pick your color</label><input type="color" id="solidColorPicker" value="#1a1a2e" style="width:100%; height:50px; border-radius:10px; border:none; cursor:pointer; margin-top:8px;" /></div></div><div id="themeTab-text" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>🔤 text styling</h2><p class="safety-desc">customize how text looks across the site.</p><label>font size</label><div class="theme-slider-row"><span>small</span><input type="range" id="fontSizeSlider" min="12" max="24" value="16" oninput="updateFontPreview()" /><span>large</span></div><label style="margin-top:18px;">font color</label><div style="display:flex; gap:10px; align-items:center; margin-top:8px;"><input type="color" id="fontColorPicker" value="#ffffff" style="flex:1; height:45px; border-radius:10px; border:none; cursor:pointer;" oninput="updateFontPreview()" /><button class="settings-btn" onclick="resetFontColor()" style="white-space:nowrap;">↺ reset</button></div><div id="fontPreview" class="font-preview">preview text 🎮</div><label style="margin-top:18px;">font style</label><div class="theme-option-grid"><button class="theme-option-btn" onclick="selectFont('ubuntu')" id="font-ubuntu" style="font-family:ubuntu">Ubuntu</button><button class="theme-option-btn" onclick="selectFont('orbitron')" id="font-orbitron" style="font-family:orbitron">Orbitron</button><button class="theme-option-btn" onclick="selectFont('rajdhani')" id="font-rajdhani" style="font-family:rajdhani">Rajdhani</button><button class="theme-option-btn" onclick="selectFont('exo2')" id="font-exo2" style="font-family:'Exo 2'">Exo 2</button><button class="theme-option-btn" onclick="selectFont('spacegrotesk')" id="font-spacegrotesk" style="font-family:'Space Grotesk'">Space Grotesk</button></div></div><div id="themeTab-themes" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>✨ themes</h2><p class="safety-desc">pick a full preset theme.</p><div class="theme-option-grid"><button class="theme-option-btn theme-preset" onclick="selectTheme('chill')" id="theme-chill">chill (normal)</button><button class="theme-option-btn theme-preset" onclick="selectTheme('dark')" id="theme-dark">dark mode</button><button class="theme-option-btn theme-preset" onclick="selectTheme('light')" id="theme-light">light mode</button><button class="theme-option-btn theme-preset" onclick="selectTheme('rainbow')" id="theme-rainbow">rainbow</button><button class="theme-option-btn theme-preset" onclick="selectTheme('neon')" id="theme-neon">neon city</button></div></div></div></div>
 
   <div id="safetyKeyOverlay" style="display:none;"><div id="safetyKeyMenu"><h2>safety key 🔑</h2><p class="safety-desc">set a url and a key — press it twice quickly on any page to escape there instantly.</p><label>redirect url</label><input type="text" id="safetyUrl" placeholder="https://google.com" /><label>escape key</label><div id="keyDisplay" class="key-display">press a key...</div><input type="text" id="safetyKeyInput" class="key-capture" placeholder="click here then press a key" readonly /><div class="safety-btn-row"><button class="settings-btn" onclick="saveSafetyKey()">save</button><button class="settings-btn danger-btn" onclick="closeSafetyKeyMenu()">cancel</button></div></div></div>
@@ -863,318 +573,113 @@
     };
     document.getElementById("themeOverlay")?.addEventListener("click", (e) => { if (e.target.id === "themeOverlay") closeThemeMenu(); });
 
-    // ========== PET REALMS SYSTEM ==========
-    const PET_REALMS = {
-      'chinchilla': {
-        name: 'Sir Chinchilla',
-        icon: '🐹',
-        realmName: 'Misty Mountains',
-        realmIcon: '⛰️',
-        bgClass: 'realm-mountains',
-        multiplier: 1.0,
-        description: 'A peaceful mountain sanctuary with fresh air and soft moss.',
-        art: 'chinchilla'
-      },
-      'dragon': {
-        name: 'Baby Dragon',
-        icon: '🐉',
-        realmName: 'Cloud Kingdom',
-        realmIcon: '☁️',
-        bgClass: 'realm-sky',
-        multiplier: 1.5,
-        description: 'Soaring through endless skies above the clouds.',
-        art: 'dragon'
-      },
-      'cat': {
-        name: 'Space Cat',
-        icon: '🐱',
-        realmName: 'Stellar Nebula',
-        realmIcon: '🌌',
-        bgClass: 'realm-space',
-        multiplier: 1.2,
-        description: 'Exploring the cosmos among twinkling stars and planets.',
-        art: 'cat'
-      },
-      'dog': {
-        name: 'Cyber Dog',
-        icon: '🐶',
-        realmName: 'Neon City',
-        realmIcon: '💠',
-        bgClass: 'realm-cyber',
-        multiplier: 1.2,
-        description: 'Running through futuristic neon-lit streets.',
-        art: 'dog'
-      },
-      'owl': {
-        name: 'Wise Owl',
-        icon: '🦉',
-        realmName: 'Ancient Library',
-        realmIcon: '📚',
-        bgClass: 'realm-library',
-        multiplier: 1.3,
-        description: 'Perched among ancient tomes and forgotten knowledge.',
-        art: 'owl'
-      },
-      'fox': {
-        name: 'Fire Fox',
-        icon: '🦊',
-        realmName: 'Enchanted Forest',
-        realmIcon: '🌲',
-        bgClass: 'realm-forest',
-        multiplier: 1.4,
-        description: 'Dashing through mystical woods with glowing fur.',
-        art: 'fox'
-      }
+    // ========== PETS MODAL - CLEAN & FUNCTIONAL ==========
+    const PETS_LIST = {
+      'chinchilla': { name: 'Sir Chinchilla', icon: '🐹', multiplier: 1.0, desc: 'Your loyal fluffy guide' },
+      'dragon': { name: 'Baby Dragon', icon: '🐉', multiplier: 1.5, desc: 'Fiery coin-earning companion' },
+      'cat': { name: 'Space Cat', icon: '🐱', multiplier: 1.2, desc: 'Interstellar coin collector' },
+      'dog': { name: 'Cyber Dog', icon: '🐶', multiplier: 1.2, desc: 'Robotic coin finder' },
+      'owl': { name: 'Wise Owl', icon: '🦉', multiplier: 1.3, desc: 'Ancient coin wisdom' },
+      'fox': { name: 'Fire Fox', icon: '🦊', multiplier: 1.4, desc: 'Flame-tailed coin hunter' }
     };
     
-    function openPetRealms() {
+    function openPetsModal() {
       const userInventory = JSON.parse(localStorage.getItem('fanter_inventory') || '{}');
+      const equippedPet = localStorage.getItem('equippedPet');
       const ownedPets = [];
       
-      for (const [petId, petData] of Object.entries(PET_REALMS)) {
+      for (const [petId, petData] of Object.entries(PETS_LIST)) {
         const inventoryKey = `pet_${petId}`;
         if (userInventory[inventoryKey]) {
           ownedPets.push({ id: petId, ...petData });
         }
       }
       
-      if (ownedPets.length === 0) {
-        showToast("🐾 You don't have any pets yet! Visit the shop to adopt some.");
-        return;
-      }
-      
-      createRealmsModal(ownedPets);
-    }
-    
-    function createRealmsModal(ownedPets) {
       // Remove existing modal
-      const existingModal = document.getElementById('realmsModal');
+      const existingModal = document.getElementById('petsModal');
       if (existingModal) existingModal.remove();
       
       const modalHTML = `
-        <div id="realmsModal" class="realms-modal-overlay">
-          <div class="realms-modal">
-            <button class="realms-modal-close" onclick="closeRealmsModal()">✕</button>
-            <div class="realm-tabs" id="realmTabs"></div>
-            <div class="realm-content" id="realmContent"></div>
+        <div id="petsModal" class="pets-modal-overlay">
+          <div class="pets-modal">
+            <div class="pets-modal-header">
+              <span class="pets-modal-title">🐾 MY PETS</span>
+              <button class="pets-modal-close" onclick="closePetsModal()">✕</button>
+            </div>
+            <div class="pets-list" id="petsList">
+              ${ownedPets.length === 0 ? `
+                <div class="no-pets-message">
+                  <div style="font-size: 48px; margin-bottom: 15px;">🐾</div>
+                  <div>you don't have any pets yet!</div>
+                  <div style="font-size: 12px; margin-top: 10px;">visit the shop to adopt your first companion</div>
+                </div>
+              ` : ''}
+            </div>
+            ${ownedPets.length === 0 ? '<a href="shop.html" class="shop-link-modal">🛒 visit shop →</a>' : ''}
           </div>
         </div>
       `;
       
       document.body.insertAdjacentHTML('beforeend', modalHTML);
       
-      const modal = document.getElementById('realmsModal');
-      const tabsContainer = document.getElementById('realmTabs');
-      const contentContainer = document.getElementById('realmContent');
+      const modal = document.getElementById('petsModal');
+      const petsList = document.getElementById('petsList');
       
-      // Create tabs
-      ownedPets.forEach((pet, index) => {
-        const tab = document.createElement('div');
-        tab.className = `realm-tab ${index === 0 ? 'active' : ''}`;
-        tab.setAttribute('data-pet-id', pet.id);
-        tab.innerHTML = `
-          <span class="realm-tab-icon">${pet.realmIcon}</span>
-          <span class="realm-tab-name">${pet.realmName}</span>
-        `;
-        tab.onclick = () => switchRealm(pet.id, index);
-        tabsContainer.appendChild(tab);
+      if (ownedPets.length > 0) {
+        ownedPets.forEach(pet => {
+          const isEquipped = equippedPet === pet.id;
+          const petItem = document.createElement('div');
+          petItem.className = `pet-item ${isEquipped ? 'equipped' : ''}`;
+          petItem.innerHTML = `
+            <div class="pet-icon">${pet.icon}</div>
+            <div class="pet-info">
+              <div class="pet-name">${pet.name}</div>
+              <div class="pet-multiplier">✨ ${pet.multiplier}x coin multiplier</div>
+              <div class="pet-desc">${pet.desc}</div>
+            </div>
+            <button class="pet-equip-btn ${isEquipped ? 'equipped' : ''}" data-pet-id="${pet.id}" data-pet-mult="${pet.multiplier}">
+              ${isEquipped ? '✓ EQUIPPED' : '⚡ EQUIP'}
+            </button>
+          `;
+          petsList.appendChild(petItem);
+        });
         
-        // Create content pane
-        const pane = document.createElement('div');
-        pane.className = `realm-pane ${index === 0 ? 'active' : ''}`;
-        pane.id = `realm-${pet.id}`;
-        pane.innerHTML = getRealmHTML(pet);
-        contentContainer.appendChild(pane);
-      });
+        // Add event listeners to equip buttons
+        document.querySelectorAll('.pet-equip-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const petId = btn.getAttribute('data-pet-id');
+            const petMult = parseFloat(btn.getAttribute('data-pet-mult'));
+            equipPet(petId, petMult);
+            closePetsModal();
+            openPetsModal(); // Refresh modal
+          });
+        });
+      }
       
       modal.classList.add('show');
-      
-      // Start realm-specific animations
-      startRealmAnimations(ownedPets[0].id);
     }
     
-    function getRealmHTML(pet) {
-      const petData = PET_REALMS[pet.id];
-      
-      // Different pet art HTML
-      let petArtHTML = '';
-      
-      switch(petData.art) {
-        case 'chinchilla':
-          petArtHTML = `
-            <div class="chinchilla-art">
-              <div class="chinchilla-ear chinchilla-ear-left"></div>
-              <div class="chinchilla-ear chinchilla-ear-right"></div>
-              <div class="chinchilla-head">
-                <div class="chinchilla-eye chinchilla-eye-left"></div>
-                <div class="chinchilla-eye chinchilla-eye-right"></div>
-                <div class="chinchilla-nose"></div>
-              </div>
-              <div class="chinchilla-body"></div>
-              <div class="chinchilla-tail"></div>
-            </div>
-          `;
-          break;
-        case 'dragon':
-          petArtHTML = `
-            <div class="dragon-art">
-              <div class="dragon-wing dragon-wing-left"></div>
-              <div class="dragon-wing dragon-wing-right"></div>
-              <div class="dragon-head">
-                <div class="dragon-horn dragon-horn-left"></div>
-                <div class="dragon-horn dragon-horn-right"></div>
-                <div class="dragon-eye" style="left: 12px;"></div>
-                <div class="dragon-eye" style="right: 12px;"></div>
-              </div>
-              <div class="dragon-body"></div>
-              <div class="dragon-fire">🔥</div>
-            </div>
-          `;
-          break;
-        case 'cat':
-          petArtHTML = `
-            <div class="cat-art">
-              <div class="cat-ear cat-ear-left"></div>
-              <div class="cat-ear cat-ear-right"></div>
-              <div class="cat-head">
-                <div class="cat-eye" style="left: 10px;"></div>
-                <div class="cat-eye" style="right: 10px;"></div>
-                <div class="cat-whisker" style="left: -15px; top: 18px;"></div>
-                <div class="cat-whisker" style="right: -15px; top: 18px;"></div>
-              </div>
-              <div class="cat-body"></div>
-            </div>
-          `;
-          break;
-        default:
-          petArtHTML = `<div style="font-size: 80px;">${pet.icon}</div>`;
-      }
-      
-      // Realm-specific background elements
-      let bgElements = '';
-      switch(pet.id) {
-        case 'dragon':
-          bgElements = `
-            <div class="cloud" style="width: 80px; height: 40px; top: 10%; left: -100px;"></div>
-            <div class="cloud" style="width: 120px; height: 50px; top: 30%; left: -200px; animation-delay: 5s;"></div>
-            <div class="cloud" style="width: 60px; height: 30px; top: 60%; left: -150px; animation-delay: 10s;"></div>
-          `;
-          break;
-        case 'cat':
-          for (let i = 0; i < 30; i++) {
-            bgElements += `<div class="star" style="top: ${Math.random() * 100}%; left: ${Math.random() * 100}%; animation-delay: ${Math.random() * 3}s;"></div>`;
-          }
-          bgElements += `<div class="planet" style="width: 60px; height: 60px; top: 15%; right: 10%;"></div>`;
-          break;
-        case 'dog':
-          bgElements = `<div class="grid-lines"></div>`;
-          for (let i = 0; i < 10; i++) {
-            bgElements += `<div class="neon-line" style="top: ${Math.random() * 100}%; left: 0; right: 0; animation-delay: ${Math.random() * 2}s;"></div>`;
-          }
-          break;
-        case 'fox':
-          for (let i = 0; i < 8; i++) {
-            bgElements += `<div class="tree" style="left: ${Math.random() * 90 + 5}%; bottom: 0;"></div>`;
-          }
-          break;
-        case 'owl':
-          bgElements = `<div class="bookshelf" style="bottom: 20%;"></div><div class="bookshelf" style="bottom: 40%;"></div><div class="bookshelf" style="bottom: 60%;"></div>`;
-          break;
-      }
-      
-      return `
-        <div class="${petData.bgClass}" style="min-height: 100%; position: relative;">
-          ${bgElements}
-          <div class="pet-realm-container" onclick="interactWithPetInRealm('${pet.id}')">
-            ${petArtHTML}
-          </div>
-          <div class="pet-info-panel">
-            <div class="pet-info-name">${petData.name}</div>
-            <div class="pet-info-stats">
-              <span>✨ ${petData.multiplier}x coins</span>
-            </div>
-            <div class="pet-info-desc" style="font-size: 11px; margin-top: 5px;">${petData.description}</div>
-            <div class="pet-info-equip" onclick="equipPetFromRealm('${pet.id}')" id="equipBtn-${pet.id}">
-              ${localStorage.getItem('equippedPet') === pet.id ? '✓ EQUIPPED' : '⚡ EQUIP'}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    
-    function switchRealm(petId, index) {
-      // Update tabs
-      document.querySelectorAll('.realm-tab').forEach((tab, i) => {
-        if (i === index) tab.classList.add('active');
-        else tab.classList.remove('active');
-      });
-      
-      // Update panes
-      document.querySelectorAll('.realm-pane').forEach(pane => {
-        pane.classList.remove('active');
-      });
-      document.getElementById(`realm-${petId}`).classList.add('active');
-      
-      startRealmAnimations(petId);
-    }
-    
-    function startRealmAnimations(petId) {
-      // Realm-specific animations can be added here
-      console.log(`Entered ${petId} realm`);
-    }
-    
-    function interactWithPetInRealm(petId) {
-      const petData = PET_REALMS[petId];
-      const messages = [
-        `${petData.name} looks at you happily! 🥰`,
-        `${petData.name} makes a cute sound! ✨`,
-        `${petData.name} nuzzles against you! 💕`,
-        `${petData.name} wants to play! 🎮`
-      ];
-      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-      showToast(randomMsg);
-      
-      // Bounce animation on the pet container
-      const petContainer = document.querySelector('.pet-realm-container');
-      if (petContainer) {
-        petContainer.style.transform = 'translateX(-50%) scale(1.1)';
-        setTimeout(() => {
-          petContainer.style.transform = 'translateX(-50%) scale(1)';
-        }, 300);
-      }
-    }
-    
-    function equipPetFromRealm(petId) {
+    function equipPet(petId, multiplier) {
       localStorage.setItem('equippedPet', petId);
-      const petData = PET_REALMS[petId];
-      showToast(`✨ ${petData.name} equipped! ${petData.multiplier}x coin multiplier active`);
+      const petName = PETS_LIST[petId]?.name || 'Pet';
+      showToast(`✨ ${petName} equipped! ${multiplier}x coin multiplier active`);
       
-      // Update all equip buttons
-      document.querySelectorAll('[id^="equipBtn-"]').forEach(btn => {
-        const id = btn.id.replace('equipBtn-', '');
-        if (id === petId) {
-          btn.textContent = '✓ EQUIPPED';
-        } else {
-          btn.textContent = '⚡ EQUIP';
-        }
-      });
-      
+      // Update any UI that shows multiplier
       if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
     }
     
-    function closeRealmsModal() {
-      const modal = document.getElementById('realmsModal');
+    function closePetsModal() {
+      const modal = document.getElementById('petsModal');
       if (modal) {
         modal.classList.remove('show');
         setTimeout(() => modal.remove(), 300);
       }
     }
     
-    window.openPetRealms = openPetRealms;
-    window.closeRealmsModal = closeRealmsModal;
-    window.switchRealm = switchRealm;
-    window.interactWithPetInRealm = interactWithPetInRealm;
-    window.equipPetFromRealm = equipPetFromRealm;
+    window.openPetsModal = openPetsModal;
+    window.closePetsModal = closePetsModal;
+    window.equipPet = equipPet;
 
     // ========== HELPER FUNCTIONS FOR NEW MENUS ==========
     function openGameMenu() { document.getElementById("gameOverlay").style.display = "flex"; requestAnimationFrame(() => document.getElementById("gameOverlay").classList.add("visible")); }
