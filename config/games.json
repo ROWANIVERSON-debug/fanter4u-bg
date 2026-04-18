@@ -460,5 +460,16 @@
     "loadTime": "4-8 seconds",
     "releaseDate": "2014-09-02",
     "developer": "lax1dude"
-  }
+  },
+  {
+    "name": "deltarune",
+    "image": "https://deltarune.com/assets/images/key-art.gif",
+    "url": "https://abcatlmfao.github.io/deltarune/",
+    "new": true,
+    "category": "adventure",
+    "desc": "a parallel world to undertale. fight, explore, and destroy bosses with an epic story and amazing soundtrack.",
+    "loadTime": "2-4 seconds",
+    "releaseDate": "2025-10-05",
+    "developer": "toby fox"
+  },
 ]
