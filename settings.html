@@ -78,7 +78,7 @@
       box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
     }
 
-    /* ========== PETS BARN MODAL ========== */
+    /* ========== BARN MODAL - REAL BARN STYLE ========== */
     .barn-modal-overlay {
       position: fixed;
       top: 0;
@@ -102,233 +102,368 @@
     }
     
     .barn-modal {
-      background: linear-gradient(135deg, #1a1a2e, #0f0f2a);
-      border: 2px solid rgba(45, 90, 227, 0.5);
-      border-radius: 24px;
-      width: 90%;
-      max-width: 900px;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 25px;
+      background: linear-gradient(135deg, #2a1a0a, #1a0f05);
+      border: 3px solid #8B6914;
+      border-radius: 30px;
+      width: 95%;
+      max-width: 1100px;
+      height: 80vh;
       position: relative;
       transform: scale(0.9);
       transition: transform 0.3s ease;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
     }
     
     .barn-modal.show {
       transform: scale(1);
     }
     
-    .barn-modal-close {
+    /* Barn Roof */
+    .barn-roof {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
+      top: -40px;
+      left: -20px;
+      right: -20px;
+      height: 80px;
+      background: #8B4513;
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+      z-index: 2;
+    }
+    
+    .barn-roof::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 30px;
+      background: #A0522D;
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    }
+    
+    /* Barn Interior */
+    .barn-interior {
+      position: relative;
+      height: 100%;
+      padding: 20px;
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      overflow: hidden;
+    }
+    
+    /* Barn Wood Panels */
+    .barn-wood-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 40px,
+        rgba(139, 69, 19, 0.2) 40px,
+        rgba(139, 69, 19, 0.2) 42px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Barn Floor */
+    .barn-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(180deg, #5a3a1a, #4a2a0a);
+      border-top: 2px solid #8B6914;
+      z-index: 2;
+    }
+    
+    .barn-floor::before {
+      content: '🌾 🌾 🌾';
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
       font-size: 20px;
-      cursor: pointer;
-      color: white;
-      transition: all 0.2s ease;
+      opacity: 0.3;
+      letter-spacing: 20px;
     }
     
-    .barn-modal-close:hover {
-      background: rgba(255,255,255,0.2);
-      transform: scale(1.1);
-    }
-    
+    /* Barn Header */
     .barn-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-      gap: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      position: relative;
+      z-index: 5;
     }
     
     .barn-title {
       font-size: 28px;
       font-family: 'Orbitron', monospace;
       color: #ffcc00;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
     
     .barn-subtitle {
       font-size: 12px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.6);
     }
     
-    .pet-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
+    /* Pet Arena - where pets walk around */
+    .pet-arena {
+      position: relative;
+      height: calc(100% - 120px);
+      overflow: hidden;
+      z-index: 10;
     }
     
-    .pet-card {
-      background: rgba(20, 30, 50, 0.6);
-      border: 1px solid rgba(45, 90, 227, 0.3);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      transition: all 0.2s ease;
+    /* Walking Pets */
+    .walking-pet {
+      position: absolute;
       cursor: pointer;
+      transition: all 0.1s linear;
+      z-index: 20;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
     }
     
-    .pet-card:hover {
-      transform: translateY(-5px);
-      border-color: #ffcc00;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    .walking-pet:hover {
+      transform: scale(1.1);
+      z-index: 30;
     }
     
-    .pet-card.owned {
-      border-color: rgba(0, 255, 0, 0.5);
+    .pet-emoji {
+      font-size: 48px;
+      display: block;
+      text-align: center;
+      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
     }
     
-    .pet-card.equipped {
-      border-color: #ffcc00;
-      background: linear-gradient(135deg, rgba(255,204,0,0.1), rgba(255,204,0,0.02));
-    }
-    
-    .pet-avatar {
-      font-size: 64px;
-      margin-bottom: 15px;
-      animation: petIdle 2s ease-in-out infinite;
-      display: inline-block;
-    }
-    
-    @keyframes petIdle {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(5deg); }
-    }
-    
-    .pet-card[data-pet="dragon"] .pet-avatar {
-      animation: dragonFly 3s ease-in-out infinite;
-    }
-    
-    @keyframes dragonFly {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.05); }
-    }
-    
-    .pet-card[data-pet="cat"] .pet-avatar {
-      animation: catSway 2.5s ease-in-out infinite;
-    }
-    
-    @keyframes catSway {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(10deg); }
-      75% { transform: rotate(-10deg); }
-    }
-    
-    .pet-card[data-pet="dog"] .pet-avatar {
-      animation: dogWag 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes dogWag {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(15deg); }
-    }
-    
-    .pet-card[data-pet="owl"] .pet-avatar {
-      animation: owlBlink 4s ease-in-out infinite;
-    }
-    
-    @keyframes owlBlink {
-      0%, 90%, 100% { transform: scaleY(1); }
-      95% { transform: scaleY(0.3); }
-    }
-    
-    .pet-card[data-pet="fox"] .pet-avatar {
-      animation: foxRun 2s ease-in-out infinite;
-    }
-    
-    @keyframes foxRun {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(5px); }
-    }
-    
-    .pet-name {
-      font-size: 16px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 5px;
-      font-family: 'Orbitron', monospace;
-    }
-    
-    .pet-multiplier {
-      font-size: 12px;
+    .pet-name-tag {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      white-space: nowrap;
       color: #ffcc00;
-      margin-bottom: 10px;
+      font-family: monospace;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
     }
     
-    .pet-desc {
-      font-size: 11px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 15px;
+    .walking-pet:hover .pet-name-tag {
+      opacity: 1;
     }
     
-    .pet-equip-btn {
-      background: rgba(45, 90, 227, 0.3);
-      border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 30px;
+    /* Thought bubble */
+    .thought-bubble {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      z-index: 25;
+    }
+    
+    .thought-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px 8px 0 8px;
+      border-style: solid;
+      border-color: white transparent transparent transparent;
+    }
+    
+    .walking-pet:hover .thought-bubble {
+      opacity: 1;
+    }
+    
+    /* Food bowl */
+    .food-bowl {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+      cursor: pointer;
+      z-index: 15;
+      transition: all 0.2s;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+    }
+    
+    .food-bowl:hover {
+      transform: translateX(-50%) scale(1.1);
+    }
+    
+    .food-bowl.fed {
+      animation: foodGlow 0.5s ease;
+    }
+    
+    @keyframes foodGlow {
+      0%, 100% { filter: drop-shadow(0 0 5px #ffcc00); }
+      50% { filter: drop-shadow(0 0 20px #ffcc00); }
+    }
+    
+    /* Speech bubble for pet messages */
+    .pet-speech {
+      position: absolute;
+      background: white;
+      border-radius: 20px;
       padding: 8px 15px;
-      color: white;
       font-size: 12px;
+      color: #333;
+      max-width: 150px;
+      white-space: normal;
+      word-wrap: break-word;
+      z-index: 100;
+      animation: fadeInUp 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .pet-speech::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 20px;
+      border-width: 8px 8px 0 8px;
+      border-style: solid;
+      border-color: white transparent transparent transparent;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Hay bales decoration */
+    .hay-bale {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      font-size: 40px;
+      opacity: 0.4;
+      z-index: 1;
+    }
+    
+    .hay-bale-right {
+      right: 20px;
+      left: auto;
+    }
+    
+    /* Water trough */
+    .water-trough {
+      position: absolute;
+      bottom: 20px;
+      left: 100px;
+      font-size: 35px;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    
+    /* Barn door */
+    .barn-door {
+      position: absolute;
+      bottom: 0;
+      right: 30px;
+      width: 60px;
+      height: 100px;
+      background: #6B3A1A;
+      border-radius: 10px 10px 0 0;
+      border: 2px solid #8B6914;
+      z-index: 3;
+    }
+    
+    .barn-door::before,
+    .barn-door::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: #8B6914;
+    }
+    
+    .barn-door::before { left: 50%; transform: translateX(-50%); }
+    .barn-door::after { left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: #ffcc00; border-radius: 50%; top: 50%; transform: translate(-50%, -50%); }
+    
+    /* Close button */
+    .barn-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #ffcc00;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 20px;
       cursor: pointer;
+      color: white;
+      z-index: 50;
       transition: all 0.2s ease;
-      width: 100%;
     }
     
-    .pet-equip-btn:hover {
-      background: rgba(45, 90, 227, 0.6);
-      border-color: #ffcc00;
-      transform: translateY(-2px);
+    .barn-modal-close:hover {
+      background: rgba(255,204,0,0.3);
+      transform: scale(1.1);
     }
     
-    .pet-equip-btn.equipped {
-      background: rgba(0, 255, 0, 0.2);
-      border-color: #00ff88;
-      color: #00ff88;
-    }
-    
-    .pet-equip-btn.owned-btn {
-      background: rgba(255, 204, 0, 0.2);
-      border-color: #ffcc00;
-      color: #ffcc00;
-    }
-    
-    .no-pets-message {
-      text-align: center;
-      padding: 40px;
-      color: rgba(255,255,255,0.5);
-      background: rgba(0,0,0,0.2);
-      border-radius: 16px;
-    }
-    
+    /* Shop link */
     .shop-link-barn {
-      display: inline-block;
       background: linear-gradient(135deg, #2d5ae3, #1a3a8a);
       border: none;
       border-radius: 30px;
-      padding: 10px 20px;
+      padding: 8px 20px;
       color: white;
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
-      margin-top: 15px;
     }
     
     .shop-link-barn:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(45,90,227,0.4);
     }
-
-    /* ========== ALL MENU OVERLAYS ========== */
+    
+    /* No pets message */
+    .no-pets-barn {
+      text-align: center;
+      padding: 60px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      margin: 20px;
+    }
+    
+    /* ========== ALL MENU OVERLAYS (keep existing) ========== */
     #gameOverlay, #visualOverlay, #audioOverlay, #performanceOverlay, #privacyOverlay, #presetOverlay {
       position: fixed;
       inset: 0;
@@ -453,25 +588,8 @@
   <div class="barn-btn-container">
     <button class="barn-btn" id="barnBtn" onclick="openBarnModal()">
       <span class="barn-icon">🐾</span>
-      <span class="barn-text">my pets</span>
+      <span class="barn-text">the barn</span>
     </button>
-  </div>
-
-  <!-- Barn Modal -->
-  <div id="barnModal" class="barn-modal-overlay">
-    <div class="barn-modal">
-      <button class="barn-modal-close" onclick="closeBarnModal()">✕</button>
-      <div class="barn-header">
-        <div>
-          <span class="barn-title">🐾 MY PETS</span>
-          <div class="barn-subtitle">your loyal companions</div>
-        </div>
-        <button class="shop-link-barn" onclick="window.location.href='shop.html'">🛒 visit shop →</button>
-      </div>
-      <div id="petsGridContainer">
-        <div style="text-align: center; padding: 40px;">loading your pets...</div>
-      </div>
-    </div>
   </div>
 
   <div class="center">
@@ -497,30 +615,21 @@
     <div class="settings-card"><div class="settings-card-icon">✨</div><h2>theme presets</h2><p>seasonal, dynamic & custom themes.</p><button class="settings-btn" onclick="openPresetMenu()">customize</button></div>
   </div>
 
-  <!-- ==================== ALL MENUS ==================== -->
-
-  <!-- Theme Menu -->
+  <!-- ==================== ALL MENUS (keep existing) ==================== -->
   <div id="themeOverlay" style="display:none;"><div id="themeMenu"><div id="themeTabSelector"><h2>🎨 customize</h2><p class="safety-desc">pick a category to customize.</p><div class="theme-tab-grid"><button class="theme-tab-card" onclick="showThemeTab('background')"><div class="theme-tab-icon">🌅</div><div>background</div></button><button class="theme-tab-card" onclick="showThemeTab('text')"><div class="theme-tab-icon">🔤</div><div>text styling</div></button><button class="theme-tab-card" onclick="showThemeTab('themes')"><div class="theme-tab-icon">✨</div><div>themes</div></button></div><div class="safety-btn-row"><button class="settings-btn" onclick="saveTheme()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closeThemeMenu()">cancel</button></div></div><div id="themeTab-background" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>🌅 background</h2><p class="safety-desc">choose how your background looks.</p><div class="theme-option-grid"><button class="theme-option-btn" onclick="selectBg('chill')" id="bg-chill">🌈 chill cycle</button><button class="theme-option-btn" onclick="selectBg('parallax')" id="bg-parallax">🌌 parallax stars</button><button class="theme-option-btn" onclick="selectBg('solid')" id="bg-solid">🎨 solid color</button><button class="theme-option-btn" onclick="selectBg('aurora')" id="bg-aurora">🌊 aurora</button><button class="theme-option-btn" onclick="selectBg('void')" id="bg-void">🕳️ void</button></div><div id="colorPickerWrap" style="display:none; margin-top:18px;"><label>pick your color</label><input type="color" id="solidColorPicker" value="#1a1a2e" style="width:100%; height:50px; border-radius:10px; border:none; cursor:pointer; margin-top:8px;" /></div></div><div id="themeTab-text" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>🔤 text styling</h2><p class="safety-desc">customize how text looks across the site.</p><label>font size</label><div class="theme-slider-row"><span>small</span><input type="range" id="fontSizeSlider" min="12" max="24" value="16" oninput="updateFontPreview()" /><span>large</span></div><label style="margin-top:18px;">font color</label><div style="display:flex; gap:10px; align-items:center; margin-top:8px;"><input type="color" id="fontColorPicker" value="#ffffff" style="flex:1; height:45px; border-radius:10px; border:none; cursor:pointer;" oninput="updateFontPreview()" /><button class="settings-btn" onclick="resetFontColor()" style="white-space:nowrap;">↺ reset</button></div><div id="fontPreview" class="font-preview">preview text 🎮</div><label style="margin-top:18px;">font style</label><div class="theme-option-grid"><button class="theme-option-btn" onclick="selectFont('ubuntu')" id="font-ubuntu" style="font-family:ubuntu">Ubuntu</button><button class="theme-option-btn" onclick="selectFont('orbitron')" id="font-orbitron" style="font-family:orbitron">Orbitron</button><button class="theme-option-btn" onclick="selectFont('rajdhani')" id="font-rajdhani" style="font-family:rajdhani">Rajdhani</button><button class="theme-option-btn" onclick="selectFont('exo2')" id="font-exo2" style="font-family:'Exo 2'">Exo 2</button><button class="theme-option-btn" onclick="selectFont('spacegrotesk')" id="font-spacegrotesk" style="font-family:'Space Grotesk'">Space Grotesk</button></div></div><div id="themeTab-themes" class="theme-tab-content" style="display:none;"><button class="theme-back-btn" onclick="showThemeTabSelector()">← back</button><h2>✨ themes</h2><p class="safety-desc">pick a full preset theme.</p><div class="theme-option-grid"><button class="theme-option-btn theme-preset" onclick="selectTheme('chill')" id="theme-chill">chill (normal)</button><button class="theme-option-btn theme-preset" onclick="selectTheme('dark')" id="theme-dark">dark mode</button><button class="theme-option-btn theme-preset" onclick="selectTheme('light')" id="theme-light">light mode</button><button class="theme-option-btn theme-preset" onclick="selectTheme('rainbow')" id="theme-rainbow">rainbow</button><button class="theme-option-btn theme-preset" onclick="selectTheme('neon')" id="theme-neon">neon city</button></div></div></div></div>
 
-  <!-- Safety Key Menu -->
   <div id="safetyKeyOverlay" style="display:none;"><div id="safetyKeyMenu"><h2>safety key 🔑</h2><p class="safety-desc">set a url and a key — press it twice quickly on any page to escape there instantly.</p><label>redirect url</label><input type="text" id="safetyUrl" placeholder="https://google.com" /><label>escape key</label><div id="keyDisplay" class="key-display">press a key...</div><input type="text" id="safetyKeyInput" class="key-capture" placeholder="click here then press a key" readonly /><div class="safety-btn-row"><button class="settings-btn" onclick="saveSafetyKey()">save</button><button class="settings-btn danger-btn" onclick="closeSafetyKeyMenu()">cancel</button></div></div></div>
 
-  <!-- Game Menu -->
   <div id="gameOverlay"><div id="gameMenu"><h2>🎮 game settings</h2><p class="safety-desc">customize your gaming experience.</p><label>grid layout</label><select id="gridLayout" onchange="setGridLayout(this.value)"><option value="3">3 columns</option><option value="4" selected>4 columns</option><option value="5">5 columns</option><option value="6">6 columns</option></select><label>card size</label><select id="cardSize" onchange="setCardSize(this.value)"><option value="small">small (160px)</option><option value="medium" selected>medium (200px)</option><option value="large">large (240px)</option></select><div class="setting-row"><span>hide animations</span><div id="hideAnimationsToggle" class="settings-toggle" onclick="toggleHideAnimations()"></div></div><div class="setting-row"><span>compact mode</span><div id="compactModeToggle" class="settings-toggle" onclick="toggleCompactMode()"></div></div><div class="setting-row"><span>recently played</span><div id="recentlyPlayedToggle" class="settings-toggle" onclick="toggleRecentlyPlayed()"></div></div><div class="setting-row"><span>popular games tracker</span><div id="popularGamesToggle" class="settings-toggle" onclick="togglePopularGames()"></div></div><button class="settings-btn" onclick="openRandomGame()" style="margin-top:20px;">🎲 random game</button><div class="safety-btn-row"><button class="settings-btn" onclick="saveGameSettings()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closeGameMenu()">cancel</button></div></div></div>
 
-  <!-- Visual Menu -->
   <div id="visualOverlay"><div id="visualMenu"><h2>🎨 visual settings</h2><p class="safety-desc">customize how the site looks.</p><label>custom accent color</label><input type="color" id="accentColor" value="#2d5ae3" onchange="setAccentColor(this.value)" /><div id="accentPreview" style="width:30px; height:30px; border-radius:50%; background:#2d5ae3; margin-top:5px;"></div><label>blur intensity</label><input type="range" id="blurIntensity" min="0" max="20" value="6" onchange="setBlurIntensity(this.value)" /><label>card transparency</label><input type="range" id="cardOpacity" min="0.5" max="1" step="0.05" value="0.8" onchange="setCardOpacity(this.value)" /><label>border style</label><select id="borderStyle" onchange="setBorderStyle(this.value)"><option value="solid">solid</option><option value="glowing" selected>glowing</option><option value="neon">neon</option><option value="minimal">minimal</option></select><label>shadow intensity</label><input type="range" id="shadowIntensity" min="0" max="30" value="15" onchange="setShadowIntensity(this.value)" /><label>corner roundness</label><input type="range" id="cornerRoundness" min="0" max="30" value="15" onchange="setCornerRoundness(this.value)" /><div class="setting-row"><span>sidebar position (right)</span><div id="sidebarRightToggle" class="settings-toggle" onclick="toggleSidebarPosition()"></div></div><div class="setting-row"><span>reduce motion</span><div id="reduceMotionToggle" class="settings-toggle" onclick="toggleReduceMotion()"></div></div><div class="safety-btn-row"><button class="settings-btn" onclick="saveVisualSettings()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closeVisualMenu()">cancel</button></div></div></div>
 
-  <!-- Audio Menu -->
   <div id="audioOverlay"><div id="audioMenu"><h2>🔊 audio settings</h2><p class="safety-desc">control sounds and music.</p><div class="setting-row"><span>hover sounds</span><div id="hoverSoundsToggle" class="settings-toggle" onclick="toggleHoverSounds()"></div></div><div class="setting-row"><span>background music</span><div id="bgMusicToggle" class="settings-toggle" onclick="toggleBackgroundMusic()"></div></div><div class="setting-row"><span>click effects</span><div id="clickEffectsToggle" class="settings-toggle" onclick="toggleClickEffects()"></div></div><div class="setting-row"><span>mute all</span><div id="muteAllToggle" class="settings-toggle" onclick="toggleMuteAll()"></div></div><label>music volume</label><input type="range" id="musicVolume" min="0" max="100" value="30" onchange="setMusicVolume(this.value)" /><label>sfx volume</label><input type="range" id="sfxVolume" min="0" max="100" value="50" onchange="setSFXVolume(this.value)" /><div class="safety-btn-row"><button class="settings-btn" onclick="saveAudioSettings()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closeAudioMenu()">cancel</button></div></div></div>
 
-  <!-- Performance Menu -->
   <div id="performanceOverlay"><div id="performanceMenu"><h2>⚡ performance settings</h2><p class="safety-desc">optimize for your device.</p><div class="setting-row"><span>low performance mode</span><div id="lowPerfModeToggle" class="settings-toggle" onclick="toggleLowPerformanceMode()"></div></div><div class="setting-row"><span>lazy loading</span><div id="lazyLoadToggle" class="settings-toggle" onclick="toggleLazyLoading()"></div></div><div class="setting-row"><span>disable shadows</span><div id="disableShadowsToggle" class="settings-toggle" onclick="toggleDisableShadows()"></div></div><div class="setting-row"><span>disable animations</span><div id="disableAnimationsToggle" class="settings-toggle" onclick="toggleDisableAnimations()"></div></div><div class="safety-btn-row"><button class="settings-btn" onclick="savePerformanceSettings()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closePerformanceMenu()">cancel</button></div></div></div>
 
-  <!-- Privacy Menu -->
   <div id="privacyOverlay"><div id="privacyMenu"><h2>🔒 privacy settings</h2><p class="safety-desc">control your data.</p><div class="setting-row"><span>incognito mode</span><div id="incognitoToggle" class="settings-toggle" onclick="toggleIncognito()"></div></div><div class="setting-row"><span>recommended games</span><div id="recommendedToggle" class="settings-toggle" onclick="toggleRecommended()"></div></div><button class="settings-btn" onclick="clearHistory()">🗑️ clear search history</button><button class="settings-btn" onclick="clearRecentlyPlayed()">🎮 clear recently played</button><button class="settings-btn danger-btn" onclick="resetAllSettings()">⚠️ reset all settings</button><div class="safety-btn-row"><button class="settings-btn" onclick="savePrivacySettings()">💾 save changes</button><button class="settings-btn danger-btn" onclick="closePrivacyMenu()">cancel</button></div></div></div>
 
-  <!-- Preset Menu -->
   <div id="presetOverlay"><div id="presetMenu"><h2>✨ theme presets</h2><p class="safety-desc">seasonal, dynamic & custom themes.</p><label>seasonal themes</label><div class="theme-option-grid"><button class="theme-option-btn" onclick="selectSeasonalTheme('halloween')">🎃 halloween</button><button class="theme-option-btn" onclick="selectSeasonalTheme('christmas')">🎄 christmas</button><button class="theme-option-btn" onclick="selectSeasonalTheme('spring')">🌸 spring</button><button class="theme-option-btn" onclick="selectSeasonalTheme('summer')">☀️ summer</button></div><label>dynamic themes</label><div class="theme-option-grid"><button class="theme-option-btn" onclick="setDynamicTheme('time')">🕐 time of day</button><button class="theme-option-btn" onclick="setDynamicTheme('weather')">🌤️ weather based</button></div><label>custom background image</label><input type="file" id="bgImageUpload" accept="image/*" onchange="uploadBackgroundImage(this)" /><button class="settings-btn" onclick="resetBackgroundImage()">↺ reset background</button><label>user themes (save/load)</label><input type="text" id="themeName" placeholder="theme name" /><button class="settings-btn" onclick="saveUserTheme()">💾 save current theme</button><select id="savedThemesList" onchange="loadUserTheme(this.value)"><option value="">-- load saved theme --</option></select><div class="safety-btn-row"><button class="settings-btn" onclick="closePresetMenu()">close</button></div></div></div>
 
   <audio id="bgMusic" loop style="display:none;"><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
@@ -671,35 +780,78 @@
     };
     document.getElementById("themeOverlay")?.addEventListener("click", (e) => { if (e.target.id === "themeOverlay") closeThemeMenu(); });
 
-    // ========== BARN MODAL FUNCTIONS ==========
+    // ========== BARN MODAL - REAL BARN WITH WALKING PETS ==========
+    let petPositions = {};
+    let petMoveIntervals = {};
+    let currentPetMessages = {};
+    
+    const PETS_DATA = {
+      'chinchilla': { name: 'Sir Chinchilla', icon: '🐹', multiplier: 1.0, desc: 'Your loyal guide', speed: 1.5, messages: ['🧀', 'so fluffyyyy', 'chill vibes', 'wanna play?', '🍃'] },
+      'dragon': { name: 'Baby Dragon', icon: '🐉', multiplier: 1.5, desc: 'Fiery companion', speed: 1.8, messages: ['🔥', 'fwoosh!', 'warm hug?', 'fly with me', '✨'] },
+      'cat': { name: 'Space Cat', icon: '🐱', multiplier: 1.2, desc: 'Interstellar feline', speed: 1.3, messages: ['🐟', 'meow', 'staring contest', '🐾', 'purrr'] },
+      'dog': { name: 'Cyber Dog', icon: '🐶', multiplier: 1.2, desc: 'Robotic pup', speed: 1.6, messages: ['🦴', 'woof!', 'throw the ball!', '🐕', '*tail wagging*'] },
+      'owl': { name: 'Wise Owl', icon: '🦉', multiplier: 1.3, desc: 'Ancient knowledge', speed: 0.9, messages: ['📚', 'hoot hoot', 'wise beyond years', '🌙', 'the future is bright'] },
+      'fox': { name: 'Fire Fox', icon: '🦊', multiplier: 1.4, desc: 'Flame-tailed fox', speed: 1.7, messages: ['🍂', 'quick as fire', 'foxy!', '✨', 'zoom!'] }
+    };
+    
     function openBarnModal() {
       const modal = document.getElementById('barnModal');
-      modal.classList.add('show');
-      loadPetsBarn();
+      if (!modal) {
+        createBarnModal();
+      } else {
+        modal.classList.add('show');
+        startBarnAnimations();
+      }
+    }
+    
+    function createBarnModal() {
+      const modalHTML = `
+        <div id="barnModal" class="barn-modal-overlay">
+          <div class="barn-modal">
+            <button class="barn-modal-close" onclick="closeBarnModal()">✕</button>
+            <div class="barn-roof"></div>
+            <div class="barn-interior">
+              <div class="barn-wood-panel"></div>
+              <div class="barn-header">
+                <div>
+                  <span class="barn-title">🐾 THE BARN</span>
+                  <div class="barn-subtitle">your companions are waiting</div>
+                </div>
+                <button class="shop-link-barn" onclick="window.location.href='shop.html'">🛒 adopt more →</button>
+              </div>
+              <div class="pet-arena" id="petArena"></div>
+              <div class="barn-floor"></div>
+              <div class="hay-bale">🌾🌾</div>
+              <div class="hay-bale hay-bale-right">🌾🌾</div>
+              <div class="water-trough">💧💧</div>
+              <div class="barn-door"></div>
+              <div class="food-bowl" id="foodBowl" onclick="feedAllPets()">🥣</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      document.getElementById('barnModal').classList.add('show');
+      startBarnAnimations();
     }
     
     function closeBarnModal() {
       const modal = document.getElementById('barnModal');
-      modal.classList.remove('show');
+      if (modal) {
+        modal.classList.remove('show');
+        // Clear all intervals
+        for (const id in petMoveIntervals) {
+          clearInterval(petMoveIntervals[id]);
+        }
+        petMoveIntervals = {};
+      }
     }
     
-    const PETS_DATA = {
-      'chinchilla': { name: 'Sir Chinchilla', icon: '🐹', multiplier: 1.0, desc: 'Your loyal guide', color: '#aa88ff' },
-      'dragon': { name: 'Baby Dragon', icon: '🐉', multiplier: 1.5, desc: 'Fiery companion', color: '#ff4444' },
-      'cat': { name: 'Space Cat', icon: '🐱', multiplier: 1.2, desc: 'Interstellar feline', color: '#44aaff' },
-      'dog': { name: 'Cyber Dog', icon: '🐶', multiplier: 1.2, desc: 'Robotic pup', color: '#ffaa44' },
-      'owl': { name: 'Wise Owl', icon: '🦉', multiplier: 1.3, desc: 'Ancient knowledge', color: '#aa44ff' },
-      'fox': { name: 'Fire Fox', icon: '🦊', multiplier: 1.4, desc: 'Flame-tailed fox', color: '#ff8844' }
-    };
-    
-    function loadPetsBarn() {
-      const container = document.getElementById('petsGridContainer');
-      if (!container) return;
-      
+    function startBarnAnimations() {
       const userInventory = JSON.parse(localStorage.getItem('fanter_inventory') || '{}');
       const equippedPet = localStorage.getItem('equippedPet');
-      
       const ownedPets = [];
+      
       for (const [petId, petData] of Object.entries(PETS_DATA)) {
         const inventoryKey = `pet_${petId}`;
         if (userInventory[inventoryKey]) {
@@ -707,51 +859,195 @@
         }
       }
       
+      const arena = document.getElementById('petArena');
+      if (!arena) return;
+      
       if (ownedPets.length === 0) {
-        container.innerHTML = `
-          <div class="no-pets-message">
-            <div style="font-size: 48px; margin-bottom: 15px;">🐾</div>
-            <div>you don't have any pets yet!</div>
-            <div style="font-size: 12px; margin-top: 10px;">visit the shop to adopt your first companion</div>
-            <button class="shop-link-barn" onclick="window.location.href='shop.html'" style="margin-top: 15px;">🛒 go to shop</button>
+        arena.innerHTML = `
+          <div class="no-pets-barn">
+            <div style="font-size: 64px; margin-bottom: 20px;">🐾</div>
+            <div style="font-size: 20px; margin-bottom: 10px;">the barn is empty...</div>
+            <div style="font-size: 14px; margin-bottom: 20px;">visit the shop to adopt some companions!</div>
+            <button class="shop-link-barn" onclick="window.location.href='shop.html'">🛒 go to shop</button>
           </div>
         `;
         return;
       }
       
-      let html = '<div class="pet-grid">';
+      // Calculate positions for pets (spread them out)
+      const arenaWidth = arena.clientWidth - 100;
+      const positions = [];
+      for (let i = 0; i < ownedPets.length; i++) {
+        positions.push({
+          x: 50 + (i * (arenaWidth / ownedPets.length)),
+          y: Math.random() * 150 + 50
+        });
+      }
       
-      ownedPets.forEach(pet => {
+      arena.innerHTML = '';
+      
+      ownedPets.forEach((pet, index) => {
+        const pos = positions[index];
         const isEquipped = equippedPet === pet.id;
+        const petElement = document.createElement('div');
+        petElement.className = 'walking-pet';
+        petElement.setAttribute('data-pet-id', pet.id);
+        petElement.style.left = pos.x + 'px';
+        petElement.style.top = pos.y + 'px';
+        petElement.style.position = 'absolute';
+        petElement.style.cursor = 'pointer';
         
-        html += `
-          <div class="pet-card ${isEquipped ? 'equipped' : 'owned'}" data-pet="${pet.id}">
-            <div class="pet-avatar">${pet.icon}</div>
-            <div class="pet-name">${pet.name}</div>
-            <div class="pet-multiplier">✨ ${pet.multiplier}x coins</div>
-            <div class="pet-desc">${pet.desc}</div>
-            <button class="pet-equip-btn ${isEquipped ? 'equipped' : 'owned-btn'}" data-pet-id="${pet.id}" data-pet-mult="${pet.multiplier}" onclick="equipPetFromBarn('${pet.id}', ${pet.multiplier})">
-              ${isEquipped ? '✓ EQUIPPED' : '⚡ EQUIP'}
-            </button>
-          </div>
+        petElement.innerHTML = `
+          <div class="pet-emoji">${pet.icon}</div>
+          <div class="pet-name-tag">${pet.name}${isEquipped ? ' ✨' : ''}</div>
+          <div class="thought-bubble"></div>
         `;
+        
+        petElement.onclick = () => interactWithPet(pet.id, pet.name, petElement);
+        
+        arena.appendChild(petElement);
+        
+        // Start random movement
+        startPetMovement(pet.id, petElement, pet.speed, arena);
+        
+        // Random messages
+        setInterval(() => {
+          if (Math.random() > 0.7 && petElement.parentElement) {
+            showPetThought(petElement, pet.messages[Math.floor(Math.random() * pet.messages.length)]);
+          }
+        }, 15000 + Math.random() * 10000);
+      });
+    }
+    
+    function startPetMovement(petId, petElement, speed, arena) {
+      let direction = Math.random() * Math.PI * 2;
+      let x = parseFloat(petElement.style.left);
+      let y = parseFloat(petElement.style.top);
+      const step = speed * 0.5;
+      
+      petMoveIntervals[petId] = setInterval(() => {
+        if (!petElement.parentElement) {
+          clearInterval(petMoveIntervals[petId]);
+          return;
+        }
+        
+        const arenaRect = arena.getBoundingClientRect();
+        const petRect = petElement.getBoundingClientRect();
+        const maxX = arenaRect.width - petRect.width - 20;
+        const maxY = arenaRect.height - petRect.height - 30;
+        
+        // Randomly change direction
+        if (Math.random() < 0.02) {
+          direction = Math.random() * Math.PI * 2;
+        }
+        
+        let newX = x + Math.cos(direction) * step;
+        let newY = y + Math.sin(direction) * step;
+        
+        // Bounce off walls
+        if (newX < 10) {
+          newX = 10;
+          direction = Math.PI - direction;
+        }
+        if (newX > maxX) {
+          newX = maxX;
+          direction = Math.PI - direction;
+        }
+        if (newY < 20) {
+          newY = 20;
+          direction = -direction;
+        }
+        if (newY > maxY) {
+          newY = maxY;
+          direction = -direction;
+        }
+        
+        x = newX;
+        y = newY;
+        
+        petElement.style.left = x + 'px';
+        petElement.style.top = y + 'px';
+        
+        // Add a little bounce animation
+        petElement.style.transform = `translateY(${Math.sin(Date.now() * 0.005) * 2}px)`;
+      }, 50);
+    }
+    
+    function showPetThought(petElement, message) {
+      const thoughtBubble = petElement.querySelector('.thought-bubble');
+      if (!thoughtBubble) return;
+      
+      thoughtBubble.textContent = message;
+      thoughtBubble.style.opacity = '1';
+      
+      setTimeout(() => {
+        thoughtBubble.style.opacity = '0';
+      }, 3000);
+    }
+    
+    function interactWithPet(petId, petName, petElement) {
+      const messages = [
+        `${petName} nuzzles against you! 🥰`,
+        `${petName} makes a happy sound! ✨`,
+        `${petName} follows you around! 🐾`,
+        `${petName} wants attention! 💕`
+      ];
+      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+      showToast(randomMsg);
+      
+      // Also show a speech bubble above pet
+      const speechDiv = document.createElement('div');
+      speechDiv.className = 'pet-speech';
+      speechDiv.textContent = randomMsg;
+      speechDiv.style.position = 'absolute';
+      speechDiv.style.top = '-50px';
+      speechDiv.style.left = '50%';
+      speechDiv.style.transform = 'translateX(-50%)';
+      speechDiv.style.whiteSpace = 'nowrap';
+      
+      petElement.style.position = 'relative';
+      petElement.appendChild(speechDiv);
+      
+      setTimeout(() => {
+        speechDiv.remove();
+      }, 2000);
+      
+      // Bounce animation
+      petElement.style.transform = 'scale(1.2)';
+      setTimeout(() => {
+        petElement.style.transform = '';
+      }, 300);
+    }
+    
+    function feedAllPets() {
+      const foodBowl = document.getElementById('foodBowl');
+      foodBowl.classList.add('fed');
+      setTimeout(() => foodBowl.classList.remove('fed'), 500);
+      
+      const pets = document.querySelectorAll('.walking-pet');
+      pets.forEach(pet => {
+        const petId = pet.getAttribute('data-pet-id');
+        const petData = PETS_DATA[petId];
+        if (petData) {
+          showPetThought(pet, `🍽️ yum!`);
+        }
       });
       
-      html += '</div>';
-      container.innerHTML = html;
+      showToast(`🍖 all pets have been fed! they love you!`);
+      
+      // Give a small coin reward for feeding pets
+      const currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+      if (currentUser) {
+        currentUser.coins = (currentUser.coins || 0) + 5;
+        localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+        if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
+        showToast(`+5 🪙 for feeding your pets!`);
+      }
     }
     
-    function equipPetFromBarn(petId, multiplier) {
-      localStorage.setItem('equippedPet', petId);
-      const petData = PETS_DATA[petId];
-      showToast(`✨ ${petData.name} equipped! ${multiplier}x coin multiplier active`);
-      loadPetsBarn();
-      if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
-    }
-    
-    window.equipPetFromBarn = equipPetFromBarn;
     window.openBarnModal = openBarnModal;
     window.closeBarnModal = closeBarnModal;
+    window.feedAllPets = feedAllPets;
 
     // ========== HELPER FUNCTIONS FOR NEW MENUS ==========
     function openGameMenu() { document.getElementById("gameOverlay").style.display = "flex"; requestAnimationFrame(() => document.getElementById("gameOverlay").classList.add("visible")); }
@@ -807,17 +1103,6 @@
     function saveUserTheme() { const name = document.getElementById('themeName').value; if(name) alert(`Theme "${name}" saved!`); else alert("Enter a name!"); }
     function loadUserTheme(name) { if(name) alert(`Loading "${name}"...`); }
     function openRandomGame() { alert("Random game feature coming soon!"); }
-
-    // Load pets barn when modal opens
-    document.addEventListener('DOMContentLoaded', function() {
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'equippedPet' || e.key === 'fanter_inventory') {
-          if (document.getElementById('barnModal').classList.contains('show')) {
-            loadPetsBarn();
-          }
-        }
-      });
-    });
 
     // Safety key double-tap
     let lastKeyTime = 0, lastKey = "";
