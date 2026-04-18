@@ -606,134 +606,109 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-   // ===== SUPABASE CONFIG =====
-const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
-
-// Use existing supabase from index.html or create new
-let supabase;
-if (window.supabase) {
-  supabase = window.supabase;
-} else {
-  supabase = supabaseClient.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  window.supabase = supabase;
-}
-console.log('✅ Supabase ready');
+    // ===== SUPABASE CONFIG =====
+    const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
+    
+    // Use the global supabase from index.html, or create if needed
+    const supabase = window.supabase || supabaseClient.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase ready');
     
     // ===== COMPLETE ACHIEVEMENTS DATA =====
-const ACHIEVEMENTS_DATA = {
-  newbie: {
-    name: "Newbie",
-    icon: "🌱",
-    color: "#00ff88",
-    pointsPer: 0.1,
-    achievements: [
-      { id: 1, name: "Welcome Aboard", desc: "Create an account", requirement: "register", required: 1, icon: "🎉", hint: null },
-      { id: 2, name: "First Impression", desc: "Rate your first game", requirement: "ratings_given", required: 1, icon: "⭐", hint: null },
-      { id: 3, name: "Hearted", desc: "Favorite your first game", requirement: "favorites_count", required: 1, icon: "💖", hint: null },
-      { id: 4, name: "Let's Play", desc: "Play your first game", requirement: "games_played", required: 1, icon: "🎮", hint: null },
-      { id: 5, name: "Getting There", desc: "Rate 10 games", requirement: "ratings_given", required: 10, icon: "📈", hint: null },
-      { id: 6, name: "Small Collection", desc: "Favorite 10 games", requirement: "favorites_count", required: 10, icon: "📦", hint: null },
-      { id: 7, name: "Ten Played", desc: "Play 10 games", requirement: "games_played", required: 10, icon: "🔟", hint: null },
-      { id: 8, name: "Opinionated", desc: "Rate 25 games", requirement: "ratings_given", required: 25, icon: "🗣️", hint: null },
-      { id: 9, name: "Devoted Fan", desc: "Favorite 25 games", requirement: "favorites_count", required: 25, icon: "💝", hint: null },
-      { id: 10, name: "Newbie+", desc: "Get all Newbie achievements", requirement: "categoryComplete", required: "newbie", icon: "🌟", hint: null }
-    ]
-  },
-  beginner: {
-    name: "Beginner",
-    icon: "📘",
-    color: "#2d5ae3",
-    pointsPer: 0.2,
-    achievements: [
-      { id: 11, name: "Rookie Rater", desc: "Rate 50 games", requirement: "ratings_given", required: 50, icon: "🎯", hint: "50 opinions shared. people are listening." },
-      { id: 12, name: "Budding Collector", desc: "Favorite 50 games", requirement: "favorites_count", required: 50, icon: "🌱", hint: "halfway to a full house. keep collecting." },
-      { id: 13, name: "Getting Serious", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "💪", hint: "25 games. you're not just passing through anymore." },
-      { id: 14, name: "Consistent", desc: "Log in 7 days total", requirement: "login_days", required: 7, icon: "📅", hint: "a full week of showing up. routine is forming." },
-      { id: 15, name: "Daily Driver", desc: "Log in 3 days in a row", requirement: "login_streak", required: 3, icon: "🚗", hint: "three days in a row. the habit is sticking." },
-      { id: 16, name: "Halfway There", desc: "Rate 75 games", requirement: "ratings_given", required: 75, icon: "⏳", hint: "75 ratings. the finish line is getting closer." },
-      { id: 17, name: "Almost a Hoarder", desc: "Favorite 75 games", requirement: "favorites_count", required: 75, icon: "📚", hint: "75 favorites. your collection is growing." },
-      { id: 18, name: "Twenty-Five Played", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "🎯", hint: "25 games played. variety is the spice of life." },
-      { id: 19, name: "Variety Seeker", desc: "Rate games from 5 different genres", requirement: "genres_rated", required: 5, icon: "🎭", hint: "taste tester. you like a little bit of everything." },
-      { id: 20, name: "Beginner+", desc: "Get all Beginner achievements", requirement: "categoryComplete", required: "beginner", icon: "🏅", hint: null }
-    ]
-  },
-  climbing: {
-    name: "Climbing",
-    icon: "⛰️",
-    color: "#ff8800",
-    pointsPer: 0.4,
-    achievements: [
-      { id: 21, name: "Century Approaching", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "📊", hint: "100 ratings. your voice matters." },
-      { id: 22, name: "Collection Growing", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📈", hint: "100 favorites. this is a library now." },
-      { id: 23, name: "Marathon", desc: "Play 50 games", requirement: "games_played", required: 50, icon: "🏃", hint: "50 games. you're putting in the work." },
-      { id: 24, name: "Weekly Warrior", desc: "Log in 5 days in a row", requirement: "login_streak", required: 5, icon: "⚔️", hint: "5 days. no days off." },
-      { id: 25, name: "One Session Wonder", desc: "Play 10 games in one session", requirement: "games_in_session", required: 10, icon: "⚡", hint: "10 games in one sitting. hyperfocus unlocked." },
-      { id: 26, name: "Double Time", desc: "Rate 150 games", requirement: "ratings_given", required: 150, icon: "⏱️", hint: "150 ratings. people are noticing." },
-      { id: 27, name: "Dedicated Fan", desc: "Favorite 150 games", requirement: "favorites_count", required: 150, icon: "💪", hint: "150 favorites. commitment looks good on you." },
-      { id: 28, name: "Fifty More", desc: "Play 75 games", requirement: "games_played", required: 75, icon: "🎲", hint: "75 games. the grind is real." },
-      { id: 29, name: "Genre Explorer", desc: "Play games from 10 different genres", requirement: "genres_played", required: 10, icon: "🗺️", hint: "10 genres explored. you get around." },
-      { id: 30, name: "Climbing+", desc: "Get all Climbing achievements", requirement: "categoryComplete", required: "climbing", icon: "⛰️✨", hint: null }
-    ]
-  },
-  difficult: {
-    name: "Difficult",
-    icon: "💀",
-    color: "#ff4444",
-    pointsPer: 0.7,
-    achievements: [
-      { id: 31, name: "Two Hundred Ratings", desc: "Rate 200 games", requirement: "ratings_given", required: 200, icon: "🏆", hint: "200 ratings. you're basically a critic now." },
-      { id: 32, name: "Two Hundred Favorites", desc: "Favorite 200 games", requirement: "favorites_count", required: 200, icon: "💎", hint: "200 favorites. your taste is elite." },
-      { id: 33, name: "Century Player", desc: "Play 100 games", requirement: "games_played", required: 100, icon: "🎖️", hint: "100 games. that's a lot of gaming." },
-      { id: 34, name: "Monthly Master", desc: "Log in 15 days total", requirement: "login_days", required: 15, icon: "📆", hint: "15 days total. consistency pays off." },
-      { id: 35, name: "Streak Master", desc: "Log in 10 days in a row", requirement: "login_streak", required: 10, icon: "🔥", hint: "10 days in a row. unstoppable." },
-      { id: 36, name: "Perfect Balance", desc: "Rate 10 games 1★ and 10 games 5★", requirement: "balanced_ratings", required: 10, icon: "⚖️", hint: "the yin and yang of ratings. 1★ and 5★ in harmony." },
-      { id: 37, name: "Pure Taste", desc: "Have 10 favorites that are all 5★ rated", requirement: "pure_favorites", required: 10, icon: "✨", hint: "10 favorites. all 5★. no guilty pleasures here." },
-      { id: 38, name: "Hidden Gem Hunter", desc: "Favorite a game with less than 10 total ratings", requirement: "hidden_gem", required: 1, icon: "💎", hint: "find the overlooked. greatness hides in shadows." },
-      { id: 39, name: "Trend Setter", desc: "Be among first 10 to rate a new game", requirement: "first_rater", required: 1, icon: "👑", hint: "be first. before the hype train leaves." },
-      { id: 40, name: "Difficult+", desc: "Get all Difficult achievements", requirement: "categoryComplete", required: "difficult", icon: "💀✨", hint: null }
-    ]
-  },
-  elite: {
-    name: "Elite",
-    icon: "👑",
-    color: "#ffcc00",
-    pointsPer: 1.0,
-    achievements: [
-      { id: 41, name: "Centurion", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "🏅", hint: "100 ratings. you've got opinions and you're not afraid to share." },
-      { id: 42, name: "Collector's Edition", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📀", hint: "100 favorites. your collection is impressive." },
-      { id: 43, name: "Gaming Devotee", desc: "Play 150 games", requirement: "games_played", required: 150, icon: "🎮👑", hint: "150 games. you're dedicated." },
-      { id: 44, name: "Yearly Legend", desc: "Log in 50 days total", requirement: "login_days", required: 50, icon: "📅👑", hint: "50 days total. you've been here a while." },
-      { id: 45, name: "Iron Will", desc: "Log in 14 days in a row", requirement: "login_streak", required: 14, icon: "⚙️", hint: "14 days in a row. nothing stops you." },
-      { id: 46, name: "The Decider", desc: "Your rating appears on 100+ games", requirement: "ratings_given", required: 100, icon: "⚖️👑", hint: "100+ games feel your influence." },
-      { id: 47, name: "Completionist", desc: "Get all Newbie + Beginner + Climbing + Difficult", requirement: "all_lower_categories", required: true, icon: "🏆", hint: "earn everything below. then we talk." },
-      { id: 48, name: "Elite Rater", desc: "Average rating given is within 0.5 of global average", requirement: "elite_rater", required: 1, icon: "⭐👑", hint: "your taste matches the crowd. perfectly balanced." },
-      { id: 49, name: "Community Choice", desc: "Your review liked by 10+ users", requirement: "likes_received", required: 10, icon: "💬👑", hint: "10 people liked what you had to say." },
-      { id: 50, name: "Elite+", desc: "Get all Elite achievements", requirement: "categoryComplete", required: "elite", icon: "👑✨", hint: null }
-    ]
-  },
-  secret: {
-    name: "Secret",
-    icon: "🔮",
-    color: "linear-gradient(90deg, #ff00ff, #00ffff)",
-    pointsPer: 2.0,
-    achievements: [
-      { id: 51, name: "The Owner's Gift", desc: "given by abcatlmfao", requirement: "manual", required: 1, icon: "🎁", hidden: false, hint: "special recognition from the creator" },
-      { id: 52, name: "Konami Code", desc: "↑↑↓↓←→←→BA", requirement: "konami", required: 1, icon: "🎮", hidden: false, hint: "type the konami code anywhere on the site" },
-      { id: 53, name: "The Chosen One", desc: "Find the secret dev names", requirement: "secret_names", required: 1, icon: "👑", hidden: true, hint: "try searching for something special..." },
-      { id: 54, name: "Alt+F4", desc: "Tried to escape?", requirement: "alt_f4", required: 1, icon: "💀", hidden: false, hint: "close fanter within 10 seconds of opening" },
-      { id: 55, name: "Mentally Insane", desc: "Just... why?", requirement: "idle_hour", required: 1, icon: "🤪", hidden: false, hint: "stay on fanter for 1 hour without playing anything" },
-      { id: 56, name: "Indecisive", desc: "Can't make up your mind", requirement: "theme_changes", required: 10, icon: "🎨", hidden: false, hint: "change your background 10 times" },
-      { id: 57, name: "Big Back", desc: "Hungry gamer", requirement: "food_game", required: 1, icon: "🍔", hidden: false, hint: "play a food-related game" },
-      { id: 58, name: "OG Fanter", desc: "Been here since the beginning", requirement: "early_adopter", required: 1, icon: "🦖", hidden: false, hint: "joined within first month of launch" },
-      { id: 59, name: "Addicted", desc: "One more game...", requirement: "same_game_50", required: 50, icon: "🎮", hidden: false, hint: "play the same game 50 times" },
-      { id: 60, name: "Committed", desc: "Dedication", requirement: "same_game_100", required: 100, icon: "💪", hidden: false, hint: "play the same game 100 times" },
-      { id: 61, name: "Top 1 Unemployed", desc: "No life detected", requirement: "total_play_time", required: 50, icon: "🛋️", hidden: false, hint: "play fanter for 50 hours total" },
-      { id: 62, name: "Loyal Customer", desc: "Taste tester", requirement: "rate_all_games", required: 1, icon: "⭐", hidden: false, hint: "rate every game on fanter" },
-      { id: 63, name: "System Failure", desc: "You broke it", requirement: "crash", required: 1, icon: "💻", hidden: true, hint: "find the hidden crash" }
-    ]
-  }
-
+    const ACHIEVEMENTS_DATA = {
+      newbie: {
+        name: "Newbie", icon: "🌱", color: "#00ff88", pointsPer: 0.1,
+        achievements: [
+          { id: 1, name: "Welcome Aboard", desc: "Create an account", requirement: "register", required: 1, icon: "🎉", hint: null },
+          { id: 2, name: "First Impression", desc: "Rate your first game", requirement: "ratings_given", required: 1, icon: "⭐", hint: null },
+          { id: 3, name: "Hearted", desc: "Favorite your first game", requirement: "favorites_count", required: 1, icon: "💖", hint: null },
+          { id: 4, name: "Let's Play", desc: "Play your first game", requirement: "games_played", required: 1, icon: "🎮", hint: null },
+          { id: 5, name: "Getting There", desc: "Rate 10 games", requirement: "ratings_given", required: 10, icon: "📈", hint: null },
+          { id: 6, name: "Small Collection", desc: "Favorite 10 games", requirement: "favorites_count", required: 10, icon: "📦", hint: null },
+          { id: 7, name: "Ten Played", desc: "Play 10 games", requirement: "games_played", required: 10, icon: "🔟", hint: null },
+          { id: 8, name: "Opinionated", desc: "Rate 25 games", requirement: "ratings_given", required: 25, icon: "🗣️", hint: null },
+          { id: 9, name: "Devoted Fan", desc: "Favorite 25 games", requirement: "favorites_count", required: 25, icon: "💝", hint: null },
+          { id: 10, name: "Newbie+", desc: "Get all Newbie achievements", requirement: "categoryComplete", required: "newbie", icon: "🌟", hint: null }
+        ]
+      },
+      beginner: {
+        name: "Beginner", icon: "📘", color: "#2d5ae3", pointsPer: 0.2,
+        achievements: [
+          { id: 11, name: "Rookie Rater", desc: "Rate 50 games", requirement: "ratings_given", required: 50, icon: "🎯", hint: "50 opinions shared" },
+          { id: 12, name: "Budding Collector", desc: "Favorite 50 games", requirement: "favorites_count", required: 50, icon: "🌱", hint: "halfway to a full house" },
+          { id: 13, name: "Getting Serious", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "💪", hint: "25 games" },
+          { id: 14, name: "Consistent", desc: "Log in 7 days total", requirement: "login_days", required: 7, icon: "📅", hint: "a full week" },
+          { id: 15, name: "Daily Driver", desc: "Log in 3 days in a row", requirement: "login_streak", required: 3, icon: "🚗", hint: "three days in a row" },
+          { id: 16, name: "Halfway There", desc: "Rate 75 games", requirement: "ratings_given", required: 75, icon: "⏳", hint: "75 ratings" },
+          { id: 17, name: "Almost a Hoarder", desc: "Favorite 75 games", requirement: "favorites_count", required: 75, icon: "📚", hint: "75 favorites" },
+          { id: 18, name: "Twenty-Five Played", desc: "Play 25 games", requirement: "games_played", required: 25, icon: "🎯", hint: "25 games played" },
+          { id: 19, name: "Variety Seeker", desc: "Rate games from 5 different genres", requirement: "genres_rated", required: 5, icon: "🎭", hint: "taste tester" },
+          { id: 20, name: "Beginner+", desc: "Get all Beginner achievements", requirement: "categoryComplete", required: "beginner", icon: "🏅", hint: null }
+        ]
+      },
+      climbing: {
+        name: "Climbing", icon: "⛰️", color: "#ff8800", pointsPer: 0.4,
+        achievements: [
+          { id: 21, name: "Century Approaching", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "📊", hint: "100 ratings" },
+          { id: 22, name: "Collection Growing", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📈", hint: "100 favorites" },
+          { id: 23, name: "Marathon", desc: "Play 50 games", requirement: "games_played", required: 50, icon: "🏃", hint: "50 games" },
+          { id: 24, name: "Weekly Warrior", desc: "Log in 5 days in a row", requirement: "login_streak", required: 5, icon: "⚔️", hint: "5 days" },
+          { id: 25, name: "One Session Wonder", desc: "Play 10 games in one session", requirement: "games_in_session", required: 10, icon: "⚡", hint: "10 games in one sitting" },
+          { id: 26, name: "Double Time", desc: "Rate 150 games", requirement: "ratings_given", required: 150, icon: "⏱️", hint: "150 ratings" },
+          { id: 27, name: "Dedicated Fan", desc: "Favorite 150 games", requirement: "favorites_count", required: 150, icon: "💪", hint: "150 favorites" },
+          { id: 28, name: "Fifty More", desc: "Play 75 games", requirement: "games_played", required: 75, icon: "🎲", hint: "75 games" },
+          { id: 29, name: "Genre Explorer", desc: "Play games from 10 different genres", requirement: "genres_played", required: 10, icon: "🗺️", hint: "10 genres" },
+          { id: 30, name: "Climbing+", desc: "Get all Climbing achievements", requirement: "categoryComplete", required: "climbing", icon: "⛰️✨", hint: null }
+        ]
+      },
+      difficult: {
+        name: "Difficult", icon: "💀", color: "#ff4444", pointsPer: 0.7,
+        achievements: [
+          { id: 31, name: "Two Hundred Ratings", desc: "Rate 200 games", requirement: "ratings_given", required: 200, icon: "🏆", hint: "200 ratings" },
+          { id: 32, name: "Two Hundred Favorites", desc: "Favorite 200 games", requirement: "favorites_count", required: 200, icon: "💎", hint: "200 favorites" },
+          { id: 33, name: "Century Player", desc: "Play 100 games", requirement: "games_played", required: 100, icon: "🎖️", hint: "100 games" },
+          { id: 34, name: "Monthly Master", desc: "Log in 15 days total", requirement: "login_days", required: 15, icon: "📆", hint: "15 days" },
+          { id: 35, name: "Streak Master", desc: "Log in 10 days in a row", requirement: "login_streak", required: 10, icon: "🔥", hint: "10 days streak" },
+          { id: 36, name: "Perfect Balance", desc: "Rate 10 games 1★ and 10 games 5★", requirement: "balanced_ratings", required: 10, icon: "⚖️", hint: "yin and yang" },
+          { id: 37, name: "Pure Taste", desc: "Have 10 favorites that are all 5★ rated", requirement: "pure_favorites", required: 10, icon: "✨", hint: "perfect taste" },
+          { id: 38, name: "Hidden Gem Hunter", desc: "Favorite a game with less than 10 total ratings", requirement: "hidden_gem", required: 1, icon: "💎", hint: "find the overlooked" },
+          { id: 39, name: "Trend Setter", desc: "Be among first 10 to rate a new game", requirement: "first_rater", required: 1, icon: "👑", hint: "be first" },
+          { id: 40, name: "Difficult+", desc: "Get all Difficult achievements", requirement: "categoryComplete", required: "difficult", icon: "💀✨", hint: null }
+        ]
+      },
+      elite: {
+        name: "Elite", icon: "👑", color: "#ffcc00", pointsPer: 1.0,
+        achievements: [
+          { id: 41, name: "Centurion", desc: "Rate 100 games", requirement: "ratings_given", required: 100, icon: "🏅", hint: "100 ratings" },
+          { id: 42, name: "Collector's Edition", desc: "Favorite 100 games", requirement: "favorites_count", required: 100, icon: "📀", hint: "100 favorites" },
+          { id: 43, name: "Gaming Devotee", desc: "Play 150 games", requirement: "games_played", required: 150, icon: "🎮👑", hint: "150 games" },
+          { id: 44, name: "Yearly Legend", desc: "Log in 50 days total", requirement: "login_days", required: 50, icon: "📅👑", hint: "50 days" },
+          { id: 45, name: "Iron Will", desc: "Log in 14 days in a row", requirement: "login_streak", required: 14, icon: "⚙️", hint: "14 days streak" },
+          { id: 46, name: "The Decider", desc: "Your rating appears on 100+ games", requirement: "ratings_given", required: 100, icon: "⚖️👑", hint: "influence" },
+          { id: 47, name: "Completionist", desc: "Get all Newbie + Beginner + Climbing + Difficult", requirement: "all_lower_categories", required: true, icon: "🏆", hint: "complete everything below" },
+          { id: 48, name: "Elite Rater", desc: "Average rating given is within 0.5 of global average", requirement: "elite_rater", required: 1, icon: "⭐👑", hint: "perfectly balanced" },
+          { id: 49, name: "Community Choice", desc: "Your review liked by 10+ users", requirement: "likes_received", required: 10, icon: "💬👑", hint: "people like you" },
+          { id: 50, name: "Elite+", desc: "Get all Elite achievements", requirement: "categoryComplete", required: "elite", icon: "👑✨", hint: null }
+        ]
+      },
+      secret: {
+        name: "Secret", icon: "🔮", color: "linear-gradient(90deg, #ff00ff, #00ffff)", pointsPer: 2.0,
+        achievements: [
+          { id: 51, name: "The Owner's Gift", desc: "given by abcatlmfao", requirement: "manual", required: 1, icon: "🎁", hidden: false, hint: "special recognition" },
+          { id: 52, name: "Konami Code", desc: "↑↑↓↓←→←→BA", requirement: "konami", required: 1, icon: "🎮", hidden: false, hint: "type the code" },
+          { id: 53, name: "The Chosen One", desc: "Find the secret dev names", requirement: "secret_names", required: 1, icon: "👑", hidden: true, hint: "try searching..." },
+          { id: 54, name: "Alt+F4", desc: "Tried to escape?", requirement: "alt_f4", required: 1, icon: "💀", hidden: false, hint: "close within 10 seconds" },
+          { id: 55, name: "Mentally Insane", desc: "Just... why?", requirement: "idle_hour", required: 1, icon: "🤪", hidden: false, hint: "idle for 1 hour" },
+          { id: 56, name: "Indecisive", desc: "Can't make up your mind", requirement: "theme_changes", required: 10, icon: "🎨", hidden: false, hint: "change background 10 times" },
+          { id: 57, name: "Big Back", desc: "Hungry gamer", requirement: "food_game", required: 1, icon: "🍔", hidden: false, hint: "play food game" },
+          { id: 58, name: "OG Fanter", desc: "Been here since the beginning", requirement: "early_adopter", required: 1, icon: "🦖", hidden: false, hint: "first month" },
+          { id: 59, name: "Addicted", desc: "One more game...", requirement: "same_game_50", required: 50, icon: "🎮", hidden: false, hint: "same game 50 times" },
+          { id: 60, name: "Committed", desc: "Dedication", requirement: "same_game_100", required: 100, icon: "💪", hidden: false, hint: "same game 100 times" },
+          { id: 61, name: "Top 1 Unemployed", desc: "No life detected", requirement: "total_play_time", required: 50, icon: "🛋️", hidden: false, hint: "50 hours" },
+          { id: 62, name: "Loyal Customer", desc: "Taste tester", requirement: "rate_all_games", required: 1, icon: "⭐", hidden: false, hint: "rate every game" },
+          { id: 63, name: "System Failure", desc: "You broke it", requirement: "crash", required: 1, icon: "💻", hidden: true, hint: "find the crash" }
+        ]
+      }
     };
     
     // ===== STATE =====
@@ -1004,11 +979,10 @@ const ACHIEVEMENTS_DATA = {
       
       const users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
       
-      // Add achievement points to each user
       users.forEach(u => {
         const ach = JSON.parse(localStorage.getItem(`fanter_achievements_${u.id}`) || '{}');
         let points = 0;
-        for (const [catKey, cat] of Object.entries(ACHIEVEMENTS_DATA)) {
+        for (const cat of Object.values(ACHIEVEMENTS_DATA)) {
           cat.achievements.forEach(a => { if (ach[a.id]) points += cat.pointsPer; });
         }
         u.achievementPoints = points;
@@ -1107,7 +1081,11 @@ const ACHIEVEMENTS_DATA = {
       
       if (user) {
         nameEl.textContent = user.displayName || user.username || 'User';
-        tabs.forEach(t => { if (t.getAttribute('data-tab') === 'login' || t.getAttribute('data-tab') === 'register') t.style.display = 'none'; });
+        tabs.forEach(t => { 
+          if (t.getAttribute('data-tab') === 'login' || t.getAttribute('data-tab') === 'register') {
+            t.style.display = 'none'; 
+          }
+        });
       } else {
         nameEl.textContent = 'Guest';
         tabs.forEach(t => t.style.display = 'block');
@@ -1115,8 +1093,7 @@ const ACHIEVEMENTS_DATA = {
     }
     
     function toggleCategory(cat) {
-      const card = document.querySelector(`.category-card[data-category="${cat}"]`) || 
-                   document.querySelector(`.category-${cat}`);
+      const card = document.querySelector(`.category-${cat}`);
       if (card) {
         card.classList.toggle('open');
         localStorage.setItem(`category_${cat}_open`, card.classList.contains('open'));
