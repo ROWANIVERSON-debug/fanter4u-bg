@@ -297,3 +297,4 @@ body.no-animations * { animation: none !important; transition: none !important; 
 .daily-bonus-card h2 { color: #ffcc00; margin-bottom: 20px; }
 .daily-reward { font-size: 48px; color: #ffcc00; margin: 20px 0; }
 .daily-streak { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 15px; }
+.game { opacity: 1 !important; visibility: visible !important; display: block !important; }
