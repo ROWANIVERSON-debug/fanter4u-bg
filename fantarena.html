@@ -134,16 +134,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ===== SUPABASE SETUP (FIXED) =====
-    const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
-    
-    // Use existing supabase - DON'T redeclare
-    if (!window.supabase) {
-      window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-    const supabaseClient = window.supabase;
-    console.log('✅ Fantarena Supabase ready!');
+    // ===== SUPABASE SETUP (FIXED - CREATE FRESH CLIENT) =====
+const SUPABASE_URL = "https://gvzgnclowylrrpovdvtw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2emduY2xvd3lscnJwb3ZkdnR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjM5ODEsImV4cCI6MjA5MjAzOTk4MX0.p7oeYBVX870iSK-TLDRj6pfW7wLj7HJsTHjNWaNpL7o";
+
+// Create a FRESH supabase client - don't rely on window.supabase
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log('✅ Fantarena Supabase ready!', supabaseClient);
     
     // ===== STATE =====
     let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
