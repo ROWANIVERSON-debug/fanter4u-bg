@@ -315,3 +315,7 @@ body.no-animations * { animation: none !important; transition: none !important; 
   opacity: 1 !important;
   visibility: visible !important;
 }
+#mainContent {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
