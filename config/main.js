@@ -1,1016 +1,190 @@
-// ===== MAIN.JS - CLEAN CARD DESIGN WITH GAMES BIN SYNC =====
-
-// Make gamesData global
+// ===== MAIN.JS - FANTER v0.3 =====
 window.gamesData = [];
 window.gameEarnings = JSON.parse(localStorage.getItem('gameEarnings') || '{}');
 window.gamePlayCounts = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}');
 
-// ===== GAMES BIN SYNC =====
-const GAMES_BIN_ID = "69e4616f856a6821894c5ef5";
-const GAMES_BIN_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etLdT33.";
+// ===== BIN CONFIG =====
+const GAMES_BIN_ID = "69e4616f856a6821894c5ef5", REVIEWS_BIN_ID = "69e4369d856a6821894bd849", RATINGS_BIN_ID = "69e045ec856a6821893bc134";
+const BIN_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etLdT33.";
+var globalRatings = {}, globalReviews = {}, userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
 
-async function syncGamesToBin(gamesData) {
+// ===== SYNC GAMES TO BIN =====
+async function syncGamesToBin(data) {
+  if (!data?.length) return;
   try {
-    if (!gamesData || gamesData.length === 0) return;
-    
-    const binData = {
-      games: gamesData.map(game => ({
-        name: game.name,
-        desc: game.desc || getDefaultDescription(game.category),
-        category: game.category,
-        url: game.url
-      })),
-      lastUpdated: new Date().toISOString()
-    };
-    
-    await fetch(`https://api.jsonbin.io/v3/b/${GAMES_BIN_ID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': GAMES_BIN_API_KEY
-      },
-      body: JSON.stringify(binData)
-    });
-    
-    console.log('✅ Games synced to bin');
-  } catch (error) {
-    console.error('Failed to sync games to bin:', error);
-  }
+    await fetch(`https://api.jsonbin.io/v3/b/${GAMES_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_API_KEY }, body: JSON.stringify({ games: data.map(g => ({ name: g.name, desc: g.desc || getDefaultDescription(g.category), category: g.category, url: g.url })), lastUpdated: new Date().toISOString() }) });
+    console.log('✅ Games synced');
+  } catch (e) { console.error('Sync failed:', e); }
 }
 
-// ===== REVIEWS BIN CONFIG =====
-const REVIEWS_BIN_ID = "69e4369d856a6821894bd849";
-const REVIEWS_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etLdT33.";
-var globalReviews = {};
-
-async function loadGlobalReviews() {
-  try {
-    var response = await fetch('https://api.jsonbin.io/v3/b/' + REVIEWS_BIN_ID + '/latest', {
-      headers: { 'X-Master-Key': REVIEWS_API_KEY }
-    });
-    var data = await response.json();
-    if (data.record && data.record.reviews) {
-      globalReviews = data.record.reviews;
-    }
-    console.log('✅ Global reviews loaded');
-  } catch (error) {
-    console.error('Failed to load reviews:', error);
-  }
-}
-
-async function saveGlobalReviews() {
-  try {
-    await fetch('https://api.jsonbin.io/v3/b/' + REVIEWS_BIN_ID, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': REVIEWS_API_KEY
-      },
-      body: JSON.stringify({ reviews: globalReviews })
-    });
-    console.log('✅ Reviews saved to cloud');
-  } catch (error) {
-    console.error('Failed to save reviews:', error);
-  }
-}
-
-async function submitGameReview(gameName, username, text, rating) {
-  if (!globalReviews[gameName]) globalReviews[gameName] = [];
-  
-  var existingIndex = globalReviews[gameName].findIndex(r => r.username === username);
-  var review = {
-    username: username, text: text, rating: rating,
-    date: new Date().toLocaleDateString(), timestamp: Date.now()
-  };
-  
-  if (existingIndex !== -1) globalReviews[gameName][existingIndex] = review;
-  else globalReviews[gameName].push(review);
-  
+// ===== REVIEWS =====
+async function loadGlobalReviews() { try { var r = await fetch(`https://api.jsonbin.io/v3/b/${REVIEWS_BIN_ID}/latest`, { headers: { 'X-Master-Key': BIN_API_KEY } }), d = await r.json(); if (d.record?.reviews) globalReviews = d.record.reviews; } catch (e) {} }
+async function saveGlobalReviews() { try { await fetch(`https://api.jsonbin.io/v3/b/${REVIEWS_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_API_KEY }, body: JSON.stringify({ reviews: globalReviews }) }); } catch (e) {} }
+async function submitGameReview(game, user, text, rating) {
+  if (!globalReviews[game]) globalReviews[game] = [];
+  var rev = { username: user, text, rating, date: new Date().toLocaleDateString(), timestamp: Date.now() }, idx = globalReviews[game].findIndex(r => r.username === user);
+  if (idx !== -1) globalReviews[game][idx] = rev; else globalReviews[game].push(rev);
   await saveGlobalReviews();
-  
-  var localReviews = JSON.parse(localStorage.getItem('gameReviews_' + gameName) || '[]');
-  var localIndex = localReviews.findIndex(r => r.username === username);
-  if (localIndex !== -1) localReviews[localIndex] = review;
-  else localReviews.push(review);
-  localStorage.setItem('gameReviews_' + gameName, JSON.stringify(localReviews));
-  
-  return review;
+  var local = JSON.parse(localStorage.getItem('gameReviews_' + game) || '[]'), lIdx = local.findIndex(r => r.username === user);
+  if (lIdx !== -1) local[lIdx] = rev; else local.push(rev);
+  localStorage.setItem('gameReviews_' + game, JSON.stringify(local));
+}
+async function deleteGameReview(game, user) {
+  if (!globalReviews[game]) return;
+  globalReviews[game] = globalReviews[game].filter(r => r.username !== user); await saveGlobalReviews();
+  var local = JSON.parse(localStorage.getItem('gameReviews_' + game) || '[]').filter(r => r.username !== user);
+  localStorage.setItem('gameReviews_' + game, JSON.stringify(local));
+}
+function getGameReviews(game) {
+  var revs = globalReviews[game] ? [...globalReviews[game]] : [], local = JSON.parse(localStorage.getItem('gameReviews_' + game) || '[]');
+  local.forEach(r => { if (!revs.find(x => x.username === r.username && x.timestamp === r.timestamp)) revs.push(r); });
+  return revs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 }
 
-async function deleteGameReview(gameName, username) {
-  if (!globalReviews[gameName]) return false;
-  globalReviews[gameName] = globalReviews[gameName].filter(r => r.username !== username);
-  await saveGlobalReviews();
-  
-  var localReviews = JSON.parse(localStorage.getItem('gameReviews_' + gameName) || '[]');
-  localReviews = localReviews.filter(r => r.username !== username);
-  localStorage.setItem('gameReviews_' + gameName, JSON.stringify(localReviews));
-  return true;
+// ===== RATINGS =====
+async function loadGlobalRatings() { try { var r = await fetch(`https://api.jsonbin.io/v3/b/${RATINGS_BIN_ID}/latest`, { headers: { 'X-Master-Key': BIN_API_KEY } }), d = await r.json(); if (d.record?.ratings) globalRatings = d.record.ratings; if (window.updateStarDisplays) window.updateStarDisplays(); } catch (e) {} }
+async function saveGlobalRatings() { try { await fetch(`https://api.jsonbin.io/v3/b/${RATINGS_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_API_KEY }, body: JSON.stringify({ ratings: globalRatings }) }); } catch (e) {} }
+function submitRating(game, rating) {
+  if (!globalRatings[game]) globalRatings[game] = { total: 0, count: 0, average: 0 };
+  var user = getCurrentUser();
+  if (user) { user.stats = user.stats || { ratingsGiven: 0 }; user.stats.ratingsGiven++; localStorage.setItem('fanter_currentUser', JSON.stringify(user)); }
+  if (userVotes[game]) { globalRatings[game].total -= userVotes[game]; globalRatings[game].count--; }
+  globalRatings[game].total += rating; globalRatings[game].count++; globalRatings[game].average = globalRatings[game].total / globalRatings[game].count;
+  userVotes[game] = rating; localStorage.setItem('userVotes', JSON.stringify(userVotes));
+  saveGlobalRatings(); showToast('You rated "' + game + '" ' + rating + '★!');
 }
 
-function getGameReviews(gameName) {
-  var reviews = [];
-  if (globalReviews[gameName]) reviews = [...globalReviews[gameName]];
-  
-  var localReviews = JSON.parse(localStorage.getItem('gameReviews_' + gameName) || '[]');
-  localReviews.forEach(localReview => {
-    if (!reviews.find(r => r.username === localReview.username && r.timestamp === localReview.timestamp)) {
-      reviews.push(localReview);
-    }
-  });
-  
-  reviews.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-  return reviews;
-}
+// ===== HELPERS =====
+function getCategoryColor(c) { return { action: '#ff4444', puzzle: '#44ff44', racing: '#ff8844', sports: '#44ff88', adventure: '#44aaff', platformer: '#ff44ff', strategy: '#88ff44', horror: '#aa44ff', arcade: '#ff44aa', simulation: '#44ffcc', sandbox: '#ff8844', multiplayer: '#ffaa44' }[c] || '#aaaaaa'; }
+function getCategoryIcon(c) { return { action: '⚔️', puzzle: '🧩', racing: '🏎️', sports: '⚽', adventure: '🗺️', platformer: '🏃', strategy: '♟️', horror: '👻', arcade: '🕹️', simulation: '🏭', sandbox: '🎨', multiplayer: '👥' }[c] || '🎮'; }
+function getDefaultDescription(c) { return { action: 'fast-paced action', puzzle: 'challenge your brain', racing: 'high-speed racing', sports: 'competitive sports', adventure: 'epic adventure', platformer: 'jump and run', strategy: 'plan and outsmart', horror: 'survive the terror', arcade: 'classic arcade', simulation: 'build and manage', sandbox: 'create and explore' }[c] || 'fun game'; }
+function escapeHtml(s) { return s?.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]) || ''; }
+function showToast(m) { var t = document.querySelector('.rating-toast') || (t = document.createElement('div'), t.className = 'rating-toast', document.body.appendChild(t)); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+function getCurrentUser() { return JSON.parse(localStorage.getItem('fanter_currentUser') || 'null'); }
+function updateHeaderCoins() { var u = getCurrentUser(), e = document.getElementById('headerCoinAmount'); if (e && u) e.textContent = Math.floor((u.coins || 0) * 100) / 100; }
+function getActiveCoinMultiplier() { return { chinchilla: 1, dragon: 1.5, cat: 1.2, dog: 1.2, owl: 1.3, fox: 1.4 }[localStorage.getItem('equippedPet')] || 1; }
 
-function showToast(message) {
-  let toast = document.querySelector('.rating-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'rating-toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
+// ===== ACCOUNT =====
+function updateUserInStorage(u) { localStorage.setItem('fanter_currentUser', JSON.stringify(u)); var users = JSON.parse(localStorage.getItem('fanter_users') || '[]'), i = users.findIndex(x => x.id === u.id); if (i !== -1) { users[i] = u; localStorage.setItem('fanter_users', JSON.stringify(users)); } }
+function syncFavoriteToAccount(game, add) { var u = getCurrentUser(); if (!u) return; u.favorites = u.favorites || []; u.favorites = add ? [...new Set([...u.favorites, game])] : u.favorites.filter(f => f !== game); u.stats.favoritesCount = u.favorites.length; updateUserInStorage(u); localStorage.setItem('favourites', JSON.stringify(u.favorites)); }
+function trackPlayedGame(game) { var u = getCurrentUser(), earned = 0.05 * getActiveCoinMultiplier(); window.gameEarnings[game] = (window.gameEarnings[game] || 0) + earned; window.gamePlayCounts[game] = (window.gamePlayCounts[game] || 0) + 1; localStorage.setItem('gameEarnings', JSON.stringify(window.gameEarnings)); localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts)); if (u) { u.coins = (u.coins || 0) + earned; u.playedGames = [game, ...(u.playedGames || []).filter(g => g !== game)].slice(0, 50); u.stats.gamesPlayed = u.playedGames.length; updateUserInStorage(u); } updateHeaderCoins(); return earned; }
 
-// Wait for DOM to be fully loaded
+// ===== DOM READY =====
 document.addEventListener('DOMContentLoaded', function() {
-  var sitename = "fanter beta.";
-  var subtext = "v0.3, achievements added, shop, pets, and more! :3";
+  var sitename = "fanter beta.", subtext = "v0.3, achievements added, shop, pets, and more! :3", serverUrl1 = "https://gms.parcoil.com";
+  document.title = document.title + " | " + sitename;
+  document.getElementById("title").innerHTML = sitename;
+  document.getElementById("subtitle").innerHTML = subtext;
 
-  var serverUrl1 = "https://gms.parcoil.com";
-  var currentPageTitle = document.title;
-  document.title = currentPageTitle + " | " + sitename;
+  function getFavourites() { return JSON.parse(localStorage.getItem("favourites") || "[]"); }
 
-  function getFavourites() {
-    return JSON.parse(localStorage.getItem("favourites") || "[]");
-  }
-
-  window.toggleFavourite = function(gameName) {
-    var favs = getFavourites();
-    var isAdding = false;
-    
-    if (favs.indexOf(gameName) !== -1) {
-      favs = favs.filter(function(f) { return f !== gameName; });
-      isAdding = false;
-    } else {
-      favs.push(gameName);
-      isAdding = true;
-    }
+  window.toggleFavourite = function(game) {
+    var favs = getFavourites(), isAdding = !favs.includes(game);
+    favs = isAdding ? [...favs, game] : favs.filter(f => f !== game);
     localStorage.setItem("favourites", JSON.stringify(favs));
-    
-    var favBtn = document.querySelector('.game-fav-btn[data-game="' + gameName.replace(/['"]/g, '\\"') + '"]');
-    if (favBtn) {
-      favBtn.textContent = isAdding ? "★" : "☆";
-      favBtn.classList.toggle('active', isAdding);
-    }
-    
-    if (typeof syncFavoriteToAccount === 'function') {
-      syncFavoriteToAccount(gameName, isAdding);
-    }
-    
-    if (typeof checkAchievements === 'function') {
-      setTimeout(function() { checkAchievements(); }, 100);
-    }
+    var btn = document.querySelector('.game-fav-btn[data-game="' + game.replace(/['"]/g, '\\"') + '"]');
+    if (btn) { btn.textContent = isAdding ? "★" : "☆"; btn.classList.toggle('active', isAdding); }
+    syncFavoriteToAccount(game, isAdding);
+    if (typeof checkAchievements === 'function') setTimeout(checkAchievements, 100);
   };
 
-  window.displayFilteredGames = function(filteredGames) {
-    var gamesContainer = document.getElementById("gamesContainer");
-    if (!gamesContainer) return;
-    gamesContainer.innerHTML = "";
-    
-    if (!filteredGames || filteredGames.length === 0) {
-      gamesContainer.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);">no games found 😔</div>';
-      return;
-    }
-    
-    var favourites = getFavourites();
-    
-    for (var i = 0; i < filteredGames.length; i++) {
-      var game = filteredGames[i];
-      var gameDiv = document.createElement("div");
-      gameDiv.className = "game";
-      gameDiv.setAttribute("data-game-name", game.name);
-      
-      var earnedCoins = window.gameEarnings[game.name] || 0;
-      var playCount = window.gamePlayCounts[game.name] || 0;
-      var isFav = favourites.indexOf(game.name) !== -1;
-      
-      var avgRating = '0.0';
-      if (typeof globalRatings !== 'undefined' && globalRatings[game.name]) {
-        avgRating = globalRatings[game.name].average.toFixed(1);
-      }
-      
-      var imageSrc;
-      if (game.image && game.image.indexOf('http') === 0) {
-        imageSrc = game.image;
-      } else if (game.image) {
-        imageSrc = serverUrl1 + "/" + game.url + "/" + game.image;
-      } else {
-        imageSrc = 'https://via.placeholder.com/200x113?text=No+Image';
-      }
-      
-      var categoryColor = getCategoryColor(game.category);
-      var categoryIcon = getCategoryIcon(game.category);
-      var shortName = game.name.length > 18 ? game.name.substring(0, 16) + '...' : game.name;
-      
-      gameDiv.innerHTML = `
-        <div class="game-image-container">
-          <img src="${imageSrc}" alt="${escapeHtml(game.name)}" loading="lazy">
-        </div>
-        <div class="game-info">
-          <div class="game-title-row">
-            <span class="game-name" title="${escapeHtml(game.name)}">${escapeHtml(shortName)}</span>
-            <button class="game-fav-btn ${isFav ? 'active' : ''}" data-game="${escapeHtml(game.name)}">${isFav ? '★' : '☆'}</button>
-          </div>
-          <div class="game-category-tag" style="background: ${categoryColor}20; color: ${categoryColor}">${categoryIcon} ${game.category || 'other'}</div>
-          <div class="game-stats-row">
-            <span>🎮 ${playCount}</span>
-            <span>🪙 ${Math.floor(earnedCoins * 100) / 100}</span>
-            <span>⏱️ ${game.loadTime || '1-3s'}</span>
-          </div>
-          <div class="game-rating-row">
-            <div class="game-stars">
-              ${[1,2,3,4,5].map(function(s) { 
-                return '<span class="game-star" data-value="' + s + '">★</span>';
-              }).join('')}
-            </div>
-            <span class="game-rating-text">${avgRating}</span>
-          </div>
-          <button class="game-play-btn" data-game="${escapeHtml(game.name)}" data-url="${escapeHtml(game.url)}">▶ play</button>
-        </div>
-      `;
-      
-      gamesContainer.appendChild(gameDiv);
-    }
-    
-    attachGameCardEvents();
-    updateStarDisplays();
+  window.displayFilteredGames = function(games) {
+    var container = document.getElementById("gamesContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!games?.length) { container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);">no games found 😔</div>'; return; }
+    var favs = getFavourites();
+    games.forEach(g => {
+      var earned = window.gameEarnings[g.name] || 0, plays = window.gamePlayCounts[g.name] || 0, isFav = favs.includes(g.name);
+      var avg = (globalRatings[g.name] ? globalRatings[g.name].average.toFixed(1) : '0.0');
+      var img = g.image?.startsWith('http') ? g.image : (g.image ? serverUrl1 + "/" + g.url + "/" + g.image : 'https://via.placeholder.com/200x113?text=No+Image');
+      var color = getCategoryColor(g.category), icon = getCategoryIcon(g.category), short = g.name.length > 18 ? g.name.substring(0, 16) + '...' : g.name;
+      var div = document.createElement("div"); div.className = "game"; div.setAttribute("data-game-name", g.name);
+      div.innerHTML = `<div class="game-image-container"><img src="${img}" alt="${escapeHtml(g.name)}" loading="lazy"></div><div class="game-info"><div class="game-title-row"><span class="game-name" title="${escapeHtml(g.name)}">${escapeHtml(short)}</span><button class="game-fav-btn ${isFav ? 'active' : ''}" data-game="${escapeHtml(g.name)}">${isFav ? '★' : '☆'}</button></div><div class="game-category-tag" style="background:${color}20;color:${color}">${icon} ${g.category||'other'}</div><div class="game-stats-row"><span>🎮 ${plays}</span><span>🪙 ${Math.floor(earned*100)/100}</span><span>⏱️ ${g.loadTime||'1-3s'}</span></div><div class="game-rating-row"><div class="game-stars">${[1,2,3,4,5].map(s=>'<span class="game-star" data-value="'+s+'">★</span>').join('')}</div><span class="game-rating-text">${avg}</span></div><button class="game-play-btn" data-game="${escapeHtml(g.name)}" data-url="${escapeHtml(g.url)}">▶ play</button></div>`;
+      container.appendChild(div);
+    });
+    attachGameCardEvents(); updateStarDisplays();
   };
 
   function updateStarDisplays() {
-    if (typeof globalRatings === 'undefined' || typeof userVotes === 'undefined') return;
-    
-    document.querySelectorAll('.game').forEach(function(gameCard) {
-      var gameName = gameCard.getAttribute('data-game-name');
-      if (!gameName) return;
-      
-      var userRating = userVotes[gameName] || 0;
-      var stars = gameCard.querySelectorAll('.game-star');
-      
-      for (var i = 0; i < stars.length; i++) {
-        if (i < userRating) {
-          stars[i].classList.add('active');
-        } else {
-          stars[i].classList.remove('active');
-        }
-      }
-      
-      var ratingText = gameCard.querySelector('.game-rating-text');
-      if (ratingText && globalRatings[gameName]) {
-        ratingText.textContent = globalRatings[gameName].average.toFixed(1);
-      }
+    document.querySelectorAll('.game').forEach(c => {
+      var n = c.getAttribute('data-game-name'), r = userVotes[n] || 0;
+      c.querySelectorAll('.game-star').forEach((s, i) => s.classList.toggle('active', i < r));
+      var t = c.querySelector('.game-rating-text');
+      if (t && globalRatings[n]) t.textContent = globalRatings[n].average.toFixed(1);
     });
   }
-
   window.updateStarDisplays = updateStarDisplays;
 
-  function updateStarDisplay(gameName, userRating) {
-    var gameCard = document.querySelector('.game[data-game-name="' + CSS.escape(gameName) + '"]');
-    if (gameCard) {
-      var stars = gameCard.querySelectorAll('.game-star');
-      for (var i = 0; i < stars.length; i++) {
-        if (i < userRating) stars[i].classList.add('active');
-        else stars[i].classList.remove('active');
-      }
-      var ratingText = gameCard.querySelector('.game-rating-text');
-      if (ratingText && globalRatings[gameName]) {
-        ratingText.innerHTML = globalRatings[gameName].average.toFixed(1);
-      }
-    }
-    
-    var modalStars = document.querySelectorAll('.modal-star');
-    if (modalStars.length > 0) {
-      for (var i = 0; i < modalStars.length; i++) {
-        modalStars[i].style.color = i < userRating ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-      }
-    }
-  }
-  
   function attachGameCardEvents() {
-    document.querySelectorAll('.game-play-btn').forEach(function(btn) {
-      btn.onclick = function(e) {
-        e.stopPropagation();
-        var gameName = btn.getAttribute('data-game');
-        var gameUrl = btn.getAttribute('data-url');
-        if (gameName && gameUrl) {
-          if (typeof trackPlayedGame === 'function') trackPlayedGame(gameName);
-          if (typeof trackGamePlayCount === 'function') trackGamePlayCount(gameName);
-          var playUrl = 'play.html?gameurl=' + encodeURIComponent(gameUrl) + '&game=' + encodeURIComponent(gameName);
-          window.open(playUrl, '_blank');
-        }
-      };
-    });
-    
-    document.querySelectorAll('.game-fav-btn').forEach(function(btn) {
-      btn.onclick = function(e) {
-        e.stopPropagation();
-        var gameName = btn.getAttribute('data-game');
-        if (gameName && typeof window.toggleFavourite === 'function') {
-          window.toggleFavourite(gameName);
-          var isFav = JSON.parse(localStorage.getItem("favourites") || "[]").indexOf(gameName) !== -1;
-          btn.textContent = isFav ? '★' : '☆';
-          btn.classList.toggle('active', isFav);
-        }
-      };
-    });
-    
-    document.querySelectorAll('.game-star').forEach(function(star) {
-      star.onclick = function(e) {
-        e.stopPropagation();
-        var gameDiv = star.closest('.game');
-        var gameName = gameDiv.getAttribute('data-game-name');
-        var value = parseInt(star.getAttribute('data-value'));
-        if (gameName && typeof submitRating === 'function') {
-          submitRating(gameName, value);
-          var stars = gameDiv.querySelectorAll('.game-star');
-          for (var i = 0; i < stars.length; i++) {
-            stars[i].classList.toggle('active', i < value);
-          }
-          var ratingText = gameDiv.querySelector('.game-rating-text');
-          if (ratingText && typeof globalRatings !== 'undefined' && globalRatings[gameName]) {
-            ratingText.innerHTML = globalRatings[gameName].average.toFixed(1);
-          }
-        }
-      };
-    });
-    
-    document.querySelectorAll('.game').forEach(function(card) {
-      card.onclick = function(e) {
-        if (e.target.tagName === 'BUTTON' || e.target.classList.contains('game-star')) return;
-        var gameName = card.getAttribute('data-game-name');
-        if (gameName && window.gamesData) {
-          var gameData = window.gamesData.find(g => g.name === gameName);
-          if (gameData) {
-            var img = card.querySelector('.game-image-container img');
-            showGameDetailsModal(
-              gameData.name, gameData.url, img ? img.src : '',
-              gameData.desc || getDefaultDescription(gameData.category),
-              gameData.category, gameData.loadTime, gameData.developer, gameData.releaseDate
-            );
-          }
-        }
-      };
-    });
+    document.querySelectorAll('.game-play-btn').forEach(b => b.onclick = e => { e.stopPropagation(); var n = b.dataset.game, u = b.dataset.url; if (n && u) { trackPlayedGame(n); if (typeof trackGamePlayCount === 'function') trackGamePlayCount(n); window.open('play.html?gameurl=' + encodeURIComponent(u) + '&game=' + encodeURIComponent(n), '_blank'); } });
+    document.querySelectorAll('.game-fav-btn').forEach(b => b.onclick = e => { e.stopPropagation(); var n = b.dataset.game; if (n) { window.toggleFavourite(n); var f = JSON.parse(localStorage.getItem("favourites")||"[]").includes(n); b.textContent = f ? '★' : '☆'; b.classList.toggle('active', f); } });
+    document.querySelectorAll('.game-star').forEach(s => s.onclick = e => { e.stopPropagation(); var c = s.closest('.game'), n = c.dataset.gameName, v = parseInt(s.dataset.value); if (n) { submitRating(n, v); c.querySelectorAll('.game-star').forEach((st, i) => st.classList.toggle('active', i < v)); var t = c.querySelector('.game-rating-text'); if (t && globalRatings[n]) t.innerHTML = globalRatings[n].average.toFixed(1); } });
+    document.querySelectorAll('.game').forEach(c => c.onclick = e => { if (e.target.tagName === 'BUTTON' || e.target.classList.contains('game-star')) return; var n = c.dataset.gameName, g = window.gamesData?.find(g => g.name === n); if (g) { var img = c.querySelector('.game-image-container img'); showGameDetailsModal(g.name, g.url, img?.src||'', g.desc||getDefaultDescription(g.category), g.category, g.loadTime, g.developer, g.releaseDate); } });
   }
 
   function handleSearchInput() {
-    var searchInput = document.getElementById("searchInput");
-    if (!searchInput) return;
-    var searchInputValue = searchInput.value.toLowerCase();
-    
-    if (typeof checkSecretNames === 'function') checkSecretNames(searchInputValue);
-    
-    var filteredGames;
-    var favFilterOn = localStorage.getItem("favFilter") === "true";
-    if (favFilterOn) {
-      var favs = getFavourites();
-      filteredGames = window.gamesData.filter(function(game) {
-        return favs.indexOf(game.name) !== -1 && game.name.toLowerCase().indexOf(searchInputValue) !== -1;
-      });
-    } else {
-      filteredGames = window.gamesData.filter(function(game) {
-        return game.name.toLowerCase().indexOf(searchInputValue) !== -1;
-      });
-    }
-    window.displayFilteredGames(filteredGames);
+    var v = document.getElementById("searchInput")?.value.toLowerCase() || '', favOn = localStorage.getItem("favFilter") === "true", favs = getFavourites();
+    var filtered = window.gamesData.filter(g => (favOn ? favs.includes(g.name) : true) && g.name.toLowerCase().includes(v));
+    window.displayFilteredGames(filtered);
   }
 
-  window.toggleFavFilter = function() {
-    var current = localStorage.getItem("favFilter") === "true";
-    localStorage.setItem("favFilter", (!current).toString());
-    handleSearchInput();
-    var favToggleBtn = document.getElementById("favToggleBtn");
-    if (favToggleBtn) {
-      var on = localStorage.getItem("favFilter") === "true";
-      favToggleBtn.textContent = on ? "show: on ✅" : "show: off ❌";
-    }
-  };
+  window.toggleFavFilter = function() { var c = localStorage.getItem("favFilter") === "true"; localStorage.setItem("favFilter", !c); handleSearchInput(); var b = document.getElementById("favToggleBtn"); if (b) b.textContent = !c ? "show: on ✅" : "show: off ❌"; };
+  window.toggleFavSidebar = function() { var b = document.getElementById("favSidebarBtn"); if (!b) return; var o = localStorage.getItem("favFilter") === "true"; b.classList.toggle("active", !o); b.classList.toggle("visible", !o); b.textContent = !o ? "✕" : "★"; };
 
-  window.toggleFavSidebar = function() {
-    var btn = document.getElementById("favSidebarBtn");
-    if (!btn) return;
-    var favFilterOn = localStorage.getItem("favFilter") === "true";
-    btn.classList.toggle("active", !favFilterOn);
-    btn.classList.toggle("visible", !favFilterOn);
-    btn.textContent = !favFilterOn ? "✕" : "★";
-  };
-
- fetch("./config/games.json")
-  .then(function(response) { return response.json(); })
-  .then(function(data) {
-    window.gamesData = data;
-    handleSearchInput();
-    console.log("✅ Loaded " + window.gamesData.length + " games successfully!");
-    
-    // Only sync once per day
-    const lastSync = localStorage.getItem('lastGamesBinSync');
-    const today = new Date().toDateString();
-    if (lastSync !== today) {
-      syncGamesToBin(data);
-      localStorage.setItem('lastGamesBinSync', today);
-    } else {
-      console.log('⏭️ Games already synced today, skipping');
-    }
-    
+  fetch("./config/games.json").then(r => r.json()).then(d => {
+    window.gamesData = d; handleSearchInput();
+    console.log("✅ Loaded " + d.length + " games!");
+    var last = localStorage.getItem('lastGamesBinSync'), today = new Date().toDateString();
+    if (last !== today) { syncGamesToBin(d); localStorage.setItem('lastGamesBinSync', today); } else console.log('⏭️ Games already synced today');
     if (typeof updateGameOfDay === 'function') updateGameOfDay();
     if (typeof loadUserFavorites === 'function') loadUserFavorites();
-  })
+  }).catch(e => console.error("Error fetching games:", e));
 
-// ===== HELPER FUNCTIONS =====
-function getCategoryColor(category) {
-  var colors = {
-    'action': '#ff4444', 'puzzle': '#44ff44', 'racing': '#ff8844',
-    'sports': '#44ff88', 'adventure': '#44aaff', 'platformer': '#ff44ff',
-    'strategy': '#88ff44', 'horror': '#aa44ff', 'arcade': '#ff44aa',
-    'simulation': '#44ffcc', 'sandbox': '#ff8844', 'multiplayer': '#ffaa44'
-  };
-  return colors[category] || '#aaaaaa';
-}
+  document.getElementById("searchInput")?.addEventListener("input", handleSearchInput);
+  setInterval(updateHeaderCoins, 1000); updateHeaderCoins();
+});
 
-function getCategoryIcon(category) {
-  var icons = {
-    'action': '⚔️', 'puzzle': '🧩', 'racing': '🏎️', 'sports': '⚽',
-    'adventure': '🗺️', 'platformer': '🏃', 'strategy': '♟️',
-    'horror': '👻', 'arcade': '🕹️', 'simulation': '🏭', 'sandbox': '🎨',
-    'multiplayer': '👥'
-  };
-  return icons[category] || '🎮';
-}
-
-function getDefaultDescription(category) {
-  var desc = {
-    'action': 'fast-paced action game', 'puzzle': 'challenge your brain',
-    'racing': 'high-speed racing action', 'sports': 'competitive sports gameplay',
-    'adventure': 'epic adventure awaits', 'platformer': 'jump and run through levels',
-    'strategy': 'plan and outsmart opponents', 'horror': 'survive the terror',
-    'arcade': 'classic arcade fun', 'simulation': 'build and manage',
-    'sandbox': 'create and explore'
-  };
-  return desc[category] || 'fun game to play';
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
-// ===== GAME DETAILS MODAL WITH CLOUD REVIEWS =====
-function showGameDetailsModal(gameName, gameUrl, gameImage, gameDescription, gameCategory, gameLoadTime, gameDeveloper, gameReleaseDate) {
-  var existingModal = document.getElementById('gameModal');
-  if (existingModal) existingModal.remove();
-  
-  var gamePlayCount = window.gamePlayCounts[gameName] || 0;
-  var gameEarned = window.gameEarnings[gameName] || 0;
-  var isFavorited = JSON.parse(localStorage.getItem("favourites") || "[]").indexOf(gameName) !== -1;
-  
-  var userRating = (typeof userVotes !== 'undefined' && userVotes[gameName]) ? userVotes[gameName] : 0;
-  
-  var avgRating = '0.0', ratingCount = 0;
-  if (typeof globalRatings !== 'undefined' && globalRatings[gameName]) {
-    avgRating = globalRatings[gameName].average.toFixed(1);
-    ratingCount = globalRatings[gameName].count;
-  }
-  
-  var playtimeHours = Math.floor(gamePlayCount * 0.5);
-  var categoryColor = getCategoryColor(gameCategory);
-  var categoryIcon = getCategoryIcon(gameCategory);
-  
-  var gameReviews = getGameReviews(gameName);
-  var currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-  var userHasReviewed = gameReviews.some(r => r.username === currentUser?.username);
-  
-  var modal = document.createElement('div');
-  modal.id = 'gameModal';
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:20000;display:flex;align-items:center;justify-content:center;';
-  
-  modal.innerHTML = `
-    <div style="background:linear-gradient(135deg,#1a1a2e,#0f0f2a);border-radius:20px;max-width:900px;width:90%;max-height:85vh;overflow-y:auto;position:relative;">
-      <button onclick="this.closest('#gameModal').remove()" style="position:absolute;top:15px;right:15px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:35px;height:35px;font-size:20px;cursor:pointer;color:white;z-index:10;">✕</button>
-      <div style="position:relative;height:200px;overflow:hidden;">
-        <img src="${gameImage}" alt="${gameName}" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7);">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(0,0,0,0.9));">
-          <div style="font-size:28px;font-weight:bold;color:white;font-family:Orbitron">${escapeHtml(gameName)}</div>
-          <div style="display:inline-block;font-size:12px;padding:4px 12px;border-radius:20px;margin-top:10px;background:${categoryColor}20;color:${categoryColor}">${categoryIcon} ${gameCategory || 'other'}</div>
-        </div>
-      </div>
-      
-      <div style="display:flex;gap:5px;padding:15px 20px 0 20px;border-bottom:1px solid rgba(255,255,255,0.1);">
-        <button class="modal-tab active" data-tab="details" style="background:none;border:none;color:white;padding:10px 20px;cursor:pointer;font-size:14px;border-bottom:2px solid #ffcc00;margin-bottom:-1px;">📋 details</button>
-        <button class="modal-tab" data-tab="reviews" style="background:none;border:none;color:rgba(255,255,255,0.5);padding:10px 20px;cursor:pointer;font-size:14px;border-bottom:2px solid transparent;margin-bottom:-1px;">💬 reviews (${gameReviews.length})</button>
-      </div>
-      
-      <div id="modalTab-details" class="modal-tab-content" style="display:block;">
-        <div style="display:flex;flex-wrap:wrap;padding:20px;gap:20px;">
-          <div style="width:200px;flex-shrink:0;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;text-align:center;margin-bottom:15px;">
-              <div style="font-size:11px;color:rgba(255,255,255,0.5);">TIME PLAYED</div>
-              <div style="font-size:28px;font-weight:bold;color:#00ff88;">${playtimeHours}h</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;">
-              <div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:rgba(255,255,255,0.6);">🎮 PLAYS</span><span style="font-size:12px;font-weight:bold;color:#ffcc00;">${gamePlayCount}</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:rgba(255,255,255,0.6);">🪙 EARNED</span><span style="font-size:12px;font-weight:bold;color:#ffcc00;">${Math.floor(gameEarned * 100) / 100}</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:rgba(255,255,255,0.6);">⭐ RATING</span><span style="font-size:12px;font-weight:bold;color:#ffcc00;">${avgRating}/5 (${ratingCount})</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:rgba(255,255,255,0.6);">⏱️ LOAD TIME</span><span style="font-size:12px;font-weight:bold;color:#ffcc00;">${gameLoadTime || '1-3 sec'}</span></div>
-              ${gameDeveloper ? `<div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:rgba(255,255,255,0.6);">👨‍💻 DEV</span><span style="font-size:12px;font-weight:bold;color:#ffcc00;">${escapeHtml(gameDeveloper)}</span></div>` : ''}
-            </div>
-          </div>
-          <div style="flex:1;">
-            <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:15px;">
-              <p style="font-size:13px;line-height:1.5;color:rgba(255,255,255,0.8);">${escapeHtml(gameDescription)}</p>
-            </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:15px;">
-              <div style="margin-bottom:15px;">
-                <div style="display:flex;gap:5px;">
-                  ${[1,2,3,4,5].map(s => `<span class="modal-star" data-value="${s}" style="font-size:24px;cursor:pointer;color:${userRating >= s ? '#ffcc00' : 'rgba(255,255,255,0.2)'};">★</span>`).join('')}
-                </div>
-                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:5px;">your rating: ${userRating > 0 ? '★'.repeat(userRating) + '☆'.repeat(5-userRating) : 'not rated'}</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:15px;">
-              <button id="modalPlayBtn" style="flex:1;background:linear-gradient(135deg,#2d5ae3,#1a3a8a);border:none;border-radius:30px;padding:12px;color:white;font-size:14px;font-weight:bold;cursor:pointer;">🎮 PLAY NOW</button>
-              <button id="modalFavBtn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:30px;padding:12px 20px;color:white;cursor:pointer;">${isFavorited ? '★ FAVORITED' : '☆ FAVORITE'}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div id="modalTab-reviews" class="modal-tab-content" style="display:none;padding:20px;">
-        ${currentUser && currentUser.username !== 'Guest' && !userHasReviewed ? `
-          <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:20px;">
-            <div style="font-size:14px;color:white;margin-bottom:10px;">write a review</div>
-            <textarea id="reviewText" placeholder="share your thoughts..." style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(45,90,227,0.4);background:rgba(0,0,0,0.3);color:white;font-size:13px;resize:vertical;min-height:80px;margin-bottom:10px;"></textarea>
-            <div style="display:flex;gap:10px;align-items:center;">
-              <div style="display:flex;gap:5px;" id="reviewStars">
-                ${[1,2,3,4,5].map(s => `<span class="review-star" data-value="${s}" style="font-size:20px;cursor:pointer;color:rgba(255,255,255,0.2);">★</span>`).join('')}
-              </div>
-              <button id="submitReviewBtn" style="background:linear-gradient(135deg,#2d5ae3,#1a3a8a);border:none;border-radius:20px;padding:8px 20px;color:white;font-size:13px;cursor:pointer;margin-left:auto;">post review</button>
-            </div>
-          </div>
-        ` : (currentUser && currentUser.username !== 'Guest' ? `
-          <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">
-            <p style="color:rgba(255,255,255,0.5);">you've already reviewed this game</p>
-            <button id="deleteReviewBtn" style="background:rgba(220,50,50,0.2);border:1px solid rgba(220,50,50,0.5);border-radius:20px;padding:8px 20px;color:#ff6666;font-size:12px;cursor:pointer;margin-top:10px;">delete my review</button>
-          </div>
-        ` : `
-          <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">
-            <p style="color:rgba(255,255,255,0.5);">please log in to write a review</p>
-          </div>
-        `)}
-        
-        <div id="reviewsList">
-          ${gameReviews.length === 0 ? `
-            <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);">
-              <div style="font-size:48px;margin-bottom:10px;">💬</div>
-              <div>no reviews yet. be the first!</div>
-            </div>
-          ` : gameReviews.map(review => `
-            <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:15px;margin-bottom:10px;border-left:3px solid ${review.rating >= 4 ? '#00ff88' : review.rating >= 2 ? '#ffcc00' : '#ff4444'};">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <div style="width:30px;height:30px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;">${review.username[0].toUpperCase()}</div>
-                <div>
-                  <div style="font-size:13px;font-weight:bold;color:white;">${escapeHtml(review.username)}</div>
-                  <div style="font-size:10px;color:rgba(255,255,255,0.4);">${review.date}</div>
-                </div>
-                <div style="margin-left:auto;color:#ffcc00;">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
-              </div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.8);padding-left:40px;">${escapeHtml(review.text)}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-  
+// ===== GAME DETAILS MODAL =====
+function showGameDetailsModal(n, u, img, desc, cat, load, dev, rel) {
+  var old = document.getElementById('gameModal'); if (old) old.remove();
+  var plays = window.gamePlayCounts[n] || 0, earned = window.gameEarnings[n] || 0, isFav = JSON.parse(localStorage.getItem("favourites")||"[]").includes(n);
+  var ur = (typeof userVotes !== 'undefined' && userVotes[n]) || 0, avg = '0.0', cnt = 0;
+  if (globalRatings[n]) { avg = globalRatings[n].average.toFixed(1); cnt = globalRatings[n].count; }
+  var hrs = Math.floor(plays * 0.5), color = getCategoryColor(cat), icon = getCategoryIcon(cat), revs = getGameReviews(n), user = getCurrentUser(), hasRev = revs.some(r => r.username === user?.username);
+  var modal = document.createElement('div'); modal.id = 'gameModal'; modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:20000;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:linear-gradient(135deg,#1a1a2e,#0f0f2a);border-radius:20px;max-width:900px;width:90%;max-height:85vh;overflow-y:auto;position:relative;"><button onclick="this.closest('#gameModal').remove()" style="position:absolute;top:15px;right:15px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:35px;height:35px;font-size:20px;cursor:pointer;color:white;z-index:10;">✕</button><div style="position:relative;height:200px;overflow:hidden;"><img src="${img}" alt="${n}" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7);"><div style="position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(0,0,0,0.9));"><div style="font-size:28px;font-weight:bold;color:white;font-family:Orbitron">${escapeHtml(n)}</div><div style="display:inline-block;font-size:12px;padding:4px 12px;border-radius:20px;margin-top:10px;background:${color}20;color:${color}">${icon} ${cat||'other'}</div></div></div><div style="display:flex;gap:5px;padding:15px 20px 0;border-bottom:1px solid rgba(255,255,255,0.1);"><button class="modal-tab active" data-tab="details" style="background:none;border:none;color:white;padding:10px 20px;cursor:pointer;font-size:14px;border-bottom:2px solid #ffcc00;">📋 details</button><button class="modal-tab" data-tab="reviews" style="background:none;border:none;color:rgba(255,255,255,0.5);padding:10px 20px;cursor:pointer;font-size:14px;border-bottom:2px solid transparent;">💬 reviews (${revs.length})</button></div><div id="modalTab-details" class="modal-tab-content" style="display:block;"><div style="display:flex;flex-wrap:wrap;padding:20px;gap:20px;"><div style="width:200px;"><div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;text-align:center;margin-bottom:15px;"><div style="font-size:11px;color:rgba(255,255,255,0.5);">TIME PLAYED</div><div style="font-size:28px;font-weight:bold;color:#00ff88;">${hrs}h</div></div><div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;"><div style="display:flex;justify-content:space-between;padding:8px 0;"><span>🎮 PLAYS</span><span style="color:#ffcc00;">${plays}</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;"><span>🪙 EARNED</span><span style="color:#ffcc00;">${Math.floor(earned*100)/100}</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;"><span>⭐ RATING</span><span style="color:#ffcc00;">${avg}/5 (${cnt})</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;"><span>⏱️ LOAD</span><span style="color:#ffcc00;">${load||'1-3s'}</span></div>${dev?`<div style="display:flex;justify-content:space-between;padding:8px 0;"><span>👨‍💻 DEV</span><span style="color:#ffcc00;">${escapeHtml(dev)}</span></div>`:''}</div></div><div style="flex:1;"><div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:15px;"><p>${escapeHtml(desc)}</p></div><div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:15px;"><div style="display:flex;gap:5px;">${[1,2,3,4,5].map(s=>`<span class="modal-star" data-value="${s}" style="font-size:24px;cursor:pointer;color:${ur>=s?'#ffcc00':'rgba(255,255,255,0.2)'};">★</span>`).join('')}</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:5px;">your rating: ${ur>0?'★'.repeat(ur)+'☆'.repeat(5-ur):'not rated'}</div></div><div style="display:flex;gap:15px;"><button id="modalPlayBtn" style="flex:1;background:linear-gradient(135deg,#2d5ae3,#1a3a8a);border:none;border-radius:30px;padding:12px;color:white;font-weight:bold;cursor:pointer;">🎮 PLAY NOW</button><button id="modalFavBtn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:30px;padding:12px 20px;color:white;cursor:pointer;">${isFav?'★ FAVORITED':'☆ FAVORITE'}</button></div></div></div></div><div id="modalTab-reviews" class="modal-tab-content" style="display:none;padding:20px;">${user&&user.username!=='Guest'&&!hasRev?`<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;margin-bottom:20px;"><div style="color:white;margin-bottom:10px;">write a review</div><textarea id="reviewText" placeholder="share your thoughts..." style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(45,90,227,0.4);background:rgba(0,0,0,0.3);color:white;resize:vertical;min-height:80px;margin-bottom:10px;"></textarea><div style="display:flex;gap:10px;align-items:center;"><div id="reviewStars" style="display:flex;gap:5px;">${[1,2,3,4,5].map(s=>`<span class="review-star" data-value="${s}" style="font-size:20px;cursor:pointer;color:rgba(255,255,255,0.2);">★</span>`).join('')}</div><button id="submitReviewBtn" style="background:linear-gradient(135deg,#2d5ae3,#1a3a8a);border:none;border-radius:20px;padding:8px 20px;color:white;margin-left:auto;cursor:pointer;">post</button></div></div>`:(user&&user.username!=='Guest'?`<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;"><p style="color:rgba(255,255,255,0.5);">you've already reviewed</p><button id="deleteReviewBtn" style="background:rgba(220,50,50,0.2);border:1px solid rgba(220,50,50,0.5);border-radius:20px;padding:8px 20px;color:#ff6666;margin-top:10px;cursor:pointer;">delete</button></div>`:`<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;"><p style="color:rgba(255,255,255,0.5);">log in to review</p></div>`}<div id="reviewsList">${revs.length?revs.map(r=>`<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:15px;margin-bottom:10px;border-left:3px solid ${r.rating>=4?'#00ff88':r.rating>=2?'#ffcc00':'#ff4444'};"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><div style="width:30px;height:30px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;">${r.username[0].toUpperCase()}</div><div><div style="font-weight:bold;color:white;">${escapeHtml(r.username)}</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">${r.date}</div></div><div style="margin-left:auto;color:#ffcc00;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div></div><div style="padding-left:40px;color:rgba(255,255,255,0.8);">${escapeHtml(r.text)}</div></div>`).join(''):'<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);"><div style="font-size:48px;">💬</div>no reviews yet</div>'}</div></div></div>`;
   document.body.appendChild(modal);
-  
-  modal.querySelectorAll('.modal-tab').forEach(tab => {
-    tab.onclick = () => {
-      modal.querySelectorAll('.modal-tab').forEach(t => {
-        t.style.color = 'rgba(255,255,255,0.5)';
-        t.style.borderBottom = '2px solid transparent';
-      });
-      tab.style.color = 'white';
-      tab.style.borderBottom = '2px solid #ffcc00';
-      
-      modal.querySelectorAll('.modal-tab-content').forEach(c => c.style.display = 'none');
-      document.getElementById('modalTab-' + tab.dataset.tab).style.display = 'block';
-    };
-  });
-  
-  let selectedReviewRating = 0;
-  modal.querySelectorAll('.review-star').forEach(star => {
-    star.onmouseenter = () => {
-      const val = parseInt(star.dataset.value);
-      modal.querySelectorAll('.review-star').forEach((s, i) => {
-        s.style.color = i < val ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-      });
-    };
-    star.onmouseleave = () => {
-      modal.querySelectorAll('.review-star').forEach((s, i) => {
-        s.style.color = i < selectedReviewRating ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-      });
-    };
-    star.onclick = () => {
-      selectedReviewRating = parseInt(star.dataset.value);
-      modal.querySelectorAll('.review-star').forEach((s, i) => {
-        s.style.color = i < selectedReviewRating ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-      });
-    };
-  });
-  
-  document.getElementById('submitReviewBtn')?.addEventListener('click', async () => {
-    const reviewText = document.getElementById('reviewText').value.trim();
-    if (!reviewText) { alert('please write something!'); return; }
-    if (selectedReviewRating === 0) { alert('please select a rating!'); return; }
-    
-    document.getElementById('submitReviewBtn').textContent = 'posting...';
-    document.getElementById('submitReviewBtn').disabled = true;
-    
-    await submitGameReview(gameName, currentUser.username, reviewText, selectedReviewRating);
-    
-    showGameDetailsModal(gameName, gameUrl, gameImage, gameDescription, gameCategory, gameLoadTime, gameDeveloper, gameReleaseDate);
-    showToast('✅ Review posted!');
-  });
-  
-  document.getElementById('deleteReviewBtn')?.addEventListener('click', async () => {
-    if (!confirm('delete your review?')) return;
-    await deleteGameReview(gameName, currentUser.username);
-    showGameDetailsModal(gameName, gameUrl, gameImage, gameDescription, gameCategory, gameLoadTime, gameDeveloper, gameReleaseDate);
-    showToast('🗑️ Review deleted');
-  });
-  
-  document.getElementById('modalPlayBtn').onclick = function() {
-    if (typeof trackPlayedGame === 'function') trackPlayedGame(gameName);
-    var playUrl = 'play.html?gameurl=' + encodeURIComponent(gameUrl) + '&game=' + encodeURIComponent(gameName);
-    window.open(playUrl, '_blank');
-    modal.remove();
-  };
-  
-  document.getElementById('modalFavBtn').onclick = function() {
-    if (typeof window.toggleFavourite === 'function') {
-      window.toggleFavourite(gameName);
-      var newFav = JSON.parse(localStorage.getItem("favourites") || "[]").indexOf(gameName) !== -1;
-      this.textContent = newFav ? '★ FAVORITED' : '☆ FAVORITE';
-    }
-  };
-  
-  document.querySelectorAll('.modal-star').forEach(function(star) {
-    star.onclick = function() {
-      var value = parseInt(this.getAttribute('data-value'));
-      if (typeof submitRating === 'function') {
-        submitRating(gameName, value);
-        var stars = document.querySelectorAll('.modal-star');
-        for (var i = 0; i < stars.length; i++) {
-          stars[i].style.color = i < value ? '#ffcc00' : 'rgba(255,255,255,0.2)';
-        }
-      }
-    };
-  });
+  modal.querySelectorAll('.modal-tab').forEach(t => t.onclick = () => { modal.querySelectorAll('.modal-tab').forEach(x => { x.style.color = 'rgba(255,255,255,0.5)'; x.style.borderBottom = '2px solid transparent'; }); t.style.color = 'white'; t.style.borderBottom = '2px solid #ffcc00'; modal.querySelectorAll('.modal-tab-content').forEach(c => c.style.display = 'none'); document.getElementById('modalTab-' + t.dataset.tab).style.display = 'block'; });
+  var sel = 0; modal.querySelectorAll('.review-star').forEach(s => { s.onmouseenter = () => modal.querySelectorAll('.review-star').forEach((x, i) => x.style.color = i < parseInt(s.dataset.value) ? '#ffcc00' : 'rgba(255,255,255,0.2)'); s.onmouseleave = () => modal.querySelectorAll('.review-star').forEach((x, i) => x.style.color = i < sel ? '#ffcc00' : 'rgba(255,255,255,0.2)'); s.onclick = () => { sel = parseInt(s.dataset.value); modal.querySelectorAll('.review-star').forEach((x, i) => x.style.color = i < sel ? '#ffcc00' : 'rgba(255,255,255,0.2)'); }; });
+  document.getElementById('submitReviewBtn')?.addEventListener('click', async () => { var t = document.getElementById('reviewText').value.trim(); if (!t) return alert('write something!'); if (!sel) return alert('pick a rating!'); await submitGameReview(n, user.username, t, sel); showGameDetailsModal(n, u, img, desc, cat, load, dev, rel); showToast('✅ Review posted!'); });
+  document.getElementById('deleteReviewBtn')?.addEventListener('click', async () => { if (!confirm('delete?')) return; await deleteGameReview(n, user.username); showGameDetailsModal(n, u, img, desc, cat, load, dev, rel); showToast('🗑️ Deleted'); });
+  document.getElementById('modalPlayBtn').onclick = () => { trackPlayedGame(n); window.open('play.html?gameurl=' + encodeURIComponent(u) + '&game=' + encodeURIComponent(n), '_blank'); modal.remove(); };
+  document.getElementById('modalFavBtn').onclick = function() { window.toggleFavourite(n); this.textContent = JSON.parse(localStorage.getItem("favourites")||"[]").includes(n) ? '★ FAVORITED' : '☆ FAVORITE'; };
+  document.querySelectorAll('.modal-star').forEach(s => s.onclick = function() { var v = parseInt(this.dataset.value); submitRating(n, v); document.querySelectorAll('.modal-star').forEach((x, i) => x.style.color = i < v ? '#ffcc00' : 'rgba(255,255,255,0.2)'); });
 }
 
-// ===== GAME RATINGS SYSTEM =====
-const RATINGS_BIN_ID = "69e045ec856a6821893bc134";
-const RATINGS_API_KEY = "$2a$10$2cPmKAGNYxPTRLV03OfVruvfhNpW/VHtJSzR.AVNHumZ7etLdT33.";
-
-var globalRatings = {};
-var userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-
-async function loadGlobalRatings() {
-  try {
-    var response = await fetch('https://api.jsonbin.io/v3/b/' + RATINGS_BIN_ID + '/latest', {
-      headers: { 'X-Master-Key': RATINGS_API_KEY }
-    });
-    var data = await response.json();
-    if (data.record && data.record.ratings) globalRatings = data.record.ratings;
-    console.log('✅ Global ratings loaded');
-    if (typeof window.updateStarDisplays === 'function') window.updateStarDisplays();
-  } catch (error) { console.error('Failed to load ratings:', error); }
-}
-
-async function saveGlobalRatings() {
-  try {
-    await fetch('https://api.jsonbin.io/v3/b/' + RATINGS_BIN_ID, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': RATINGS_API_KEY },
-      body: JSON.stringify({ ratings: globalRatings })
-    });
-    console.log('✅ Ratings saved to cloud');
-  } catch (error) { console.error('Failed to save ratings:', error); }
-}
-
-function submitRating(gameName, rating) {
-  if (!globalRatings[gameName]) globalRatings[gameName] = { total: 0, count: 0, average: 0 };
-  
-  var currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-  if (currentUser) {
-    currentUser.stats = currentUser.stats || { ratingsGiven: 0, favoritesCount: 0, gamesPlayed: 0 };
-    currentUser.stats.ratingsGiven = (currentUser.stats.ratingsGiven || 0) + 1;
-    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
-    
-    var users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-    var userIndex = users.findIndex(u => u.id === currentUser.id);
-    if (userIndex !== -1) {
-      users[userIndex].stats = currentUser.stats;
-      localStorage.setItem('fanter_users', JSON.stringify(users));
-    }
-  }
-  
-  if (userVotes[gameName]) {
-    globalRatings[gameName].total -= userVotes[gameName];
-    globalRatings[gameName].count -= 1;
-  }
-  
-  globalRatings[gameName].total += rating;
-  globalRatings[gameName].count += 1;
-  globalRatings[gameName].average = globalRatings[gameName].total / globalRatings[gameName].count;
-  
-  userVotes[gameName] = rating;
-  localStorage.setItem('userVotes', JSON.stringify(userVotes));
-  
-  saveGlobalRatings();
-  showRatingToast('You rated "' + gameName + '" ' + rating + '★!');
-}
-
-function showRatingToast(message) {
-  var toast = document.querySelector('.rating-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'rating-toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-loadGlobalRatings();
-loadGlobalReviews();
-
-// ===== ACCOUNT FUNCTIONS =====
-function getCurrentUser() {
-  return JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
-}
-
-function updateUserInStorage(updatedUser) {
-  localStorage.setItem('fanter_currentUser', JSON.stringify(updatedUser));
-  
-  var users = JSON.parse(localStorage.getItem('fanter_users') || '[]');
-  var index = users.findIndex(u => u.id === updatedUser.id);
-  if (index !== -1) {
-    users[index] = updatedUser;
-    localStorage.setItem('fanter_users', JSON.stringify(users));
-  }
-
-  if (window.supabase && updatedUser.id && !updatedUser.id.startsWith('guest_')) {
-    window.supabase.from('profiles').update({
-      coins: updatedUser.coins || 0,
-      games_played: (updatedUser.stats && updatedUser.stats.gamesPlayed) || 0,
-      achievements_count: Object.keys(JSON.parse(localStorage.getItem('fanter_achievements') || '{}')).length
-    }).eq('id', updatedUser.id).then(() => console.log('✅ Profile synced')).catch(err => console.warn('Supabase sync failed:', err));
-  }
-}
-
-function syncFavoriteToAccount(gameName, isAdding) {
-  var currentUser = getCurrentUser();
-  if (!currentUser) return;
-  
-  var favorites = currentUser.favorites || [];
-  if (isAdding) { if (!favorites.includes(gameName)) favorites.push(gameName); }
-  else { favorites = favorites.filter(f => f !== gameName); }
-  
-  currentUser.favorites = favorites;
-  currentUser.stats.favoritesCount = favorites.length;
-  updateUserInStorage(currentUser);
-  localStorage.setItem("favourites", JSON.stringify(favorites));
-}
-
-function trackPlayedGame(gameName) {
-  var currentUser = getCurrentUser();
-  var multiplier = getActiveCoinMultiplier();
-  var earned = 0.05 * multiplier;
-  
-  window.gameEarnings[gameName] = (window.gameEarnings[gameName] || 0) + earned;
-  localStorage.setItem('gameEarnings', JSON.stringify(window.gameEarnings));
-  
-  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
-  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
-  
-  if (currentUser) {
-    currentUser.coins = (currentUser.coins || 0) + earned;
-    
-    var playedGames = currentUser.playedGames || [];
-    var idx = playedGames.indexOf(gameName);
-    if (idx !== -1) playedGames.splice(idx, 1);
-    playedGames.unshift(gameName);
-    if (playedGames.length > 50) playedGames.pop();
-    
-    currentUser.playedGames = playedGames;
-    currentUser.stats.gamesPlayed = playedGames.length;
-    updateUserInStorage(currentUser);
-  }
-  
-  updateHeaderCoins();
-  
-  var gameCard = document.querySelector('.game[data-game-name="' + CSS.escape(gameName) + '"]');
-  if (gameCard) {
-    var statsRow = gameCard.querySelector('.game-stats-row');
-    if (statsRow) {
-      var playCountSpan = statsRow.querySelector('span:first-child');
-      var earningsSpan = statsRow.querySelector('span:nth-child(2)');
-      if (playCountSpan) playCountSpan.innerHTML = '🎮 ' + window.gamePlayCounts[gameName];
-      if (earningsSpan) earningsSpan.innerHTML = '🪙 ' + Math.floor(window.gameEarnings[gameName] * 100) / 100;
-    }
-  }
-  
-  console.log('🎮 Played: ' + gameName + ' | +' + earned.toFixed(2) + '🪙');
-  return earned;
-}
-
-function getActiveCoinMultiplier() {
-  var equippedPet = localStorage.getItem('equippedPet');
-  var petMultipliers = { 'chinchilla': 1.0, 'dragon': 1.5, 'cat': 1.2, 'dog': 1.2, 'owl': 1.3, 'fox': 1.4 };
-  return petMultipliers[equippedPet] || 1.0;
-}
-
-function loadUserFavorites() {
-  var currentUser = getCurrentUser();
-  if (currentUser) localStorage.setItem("favourites", JSON.stringify(currentUser.favorites || []));
-}
-
-function updateHeaderCoins() {
-  var currentUser = getCurrentUser();
-  var coinEl = document.getElementById('headerCoinAmount');
-  if (coinEl && currentUser) coinEl.textContent = Math.floor((currentUser.coins || 0) * 100) / 100;
-}
-
-function updateAccountButtonDisplay() {
-  var currentUser = getCurrentUser();
-  var accountNameSpan = document.getElementById('accountName');
-  if (accountNameSpan) accountNameSpan.textContent = currentUser ? (currentUser.displayName || currentUser.username) : 'Guest';
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  updateAccountButtonDisplay();
-  updateHeaderCoins();
-});
-
-setInterval(updateHeaderCoins, 1000);
-
-// ===== ACHIEVEMENT TRIGGERS =====
-function trackGamePlayCount(gameName) {
-  window.gamePlayCounts[gameName] = (window.gamePlayCounts[gameName] || 0) + 1;
-  localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts));
-  if (window.gamePlayCounts[gameName] >= 50 && typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(59);
-  if (window.gamePlayCounts[gameName] >= 100 && typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(60);
-}
-
-function trackThemeChange() {
-  var themeChangeCount = parseInt(localStorage.getItem('themeChangeCount') || '0') + 1;
-  localStorage.setItem('themeChangeCount', themeChangeCount);
-  if (themeChangeCount >= 10 && typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(56);
-}
-
-var idleAchievementGranted = false;
-function startIdleTracking() {
-  if (idleAchievementGranted) return;
-  var lastActivity = Date.now();
-  document.addEventListener('mousemove', () => lastActivity = Date.now());
-  document.addEventListener('keydown', () => lastActivity = Date.now());
-  document.addEventListener('click', () => lastActivity = Date.now());
-  setInterval(() => {
-    if (!idleAchievementGranted && (Date.now() - lastActivity) / 1000 / 60 >= 60) {
-      if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(55);
-      idleAchievementGranted = true;
-    }
-  }, 60000);
-}
-
-var FOOD_GAMES = ['burger', 'pizza', 'taco', 'sushi', 'cake', 'cookie', 'food', 'chef', 'restaurant', 'cooking', 'baking', 'donut', 'ice cream', 'candy', 'chocolate'];
-function isFoodGame(gameName) { return FOOD_GAMES.some(f => gameName.toLowerCase().includes(f)); }
-
-var SECRET_NAMES = [':)', 'creamypeanut', 'bloxy', 'abcatlmfao'];
-function checkSecretNames(searchTerm) {
-  if (SECRET_NAMES.every(name => searchTerm.toLowerCase().includes(name.toLowerCase()))) {
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(53);
-  }
-}
-
-var pageLoadTime = Date.now();
-window.addEventListener('beforeunload', () => {
-  if ((Date.now() - pageLoadTime) / 1000 <= 10) localStorage.setItem('pendingAltF4', 'true');
-});
-
-function checkAltF4() {
-  if (localStorage.getItem('pendingAltF4') === 'true') {
-    localStorage.removeItem('pendingAltF4');
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(54);
-  }
-}
-
-function checkOGFanter() {
-  var currentUser = getCurrentUser();
-  if (currentUser?.createdAt && new Date(currentUser.createdAt) >= new Date('2025-04-01')) {
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(58);
-  }
-}
-
-function checkLoyalCustomer() {
-  if (!window.gamesData) return;
-  if (Object.keys(userVotes).length >= window.gamesData.length) {
-    if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(62);
-  }
-}
-
-function checkTotalPlayTime() {
-  var sessionStart = localStorage.getItem('sessionStart');
-  if (sessionStart) {
-    var totalPausedTime = parseInt(localStorage.getItem('totalPausedTime') || '0');
-    if ((Date.now() - parseInt(sessionStart) - totalPausedTime) / 1000 / 60 / 60 >= 50) {
-      if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(61);
-    }
-  }
-}
-
-function checkAndUnlockAchievement(achievementId) {
-  var currentUser = getCurrentUser();
-  if (!currentUser) return;
-  
-  var achievements = JSON.parse(localStorage.getItem('fanter_achievements') || '{}');
-  if (achievements[achievementId]) return;
-  
-  achievements[achievementId] = true;
-  localStorage.setItem('fanter_achievements', JSON.stringify(achievements));
-  
-  var coinReward = achievementId <= 10 ? 3 : achievementId <= 20 ? 5 : achievementId <= 30 ? 10 : achievementId <= 40 ? 17.5 : achievementId <= 50 ? 25 : 50;
-  
-  if (coinReward > 0) {
-    currentUser.coins = (currentUser.coins || 0) + coinReward;
-    updateUserInStorage(currentUser);
-  }
-  
-  currentUser.achievements = achievements;
-  updateUserInStorage(currentUser);
-  
-  var achievementNames = { 53:"The Chosen One",54:"Alt+F4",55:"Mentally Insane",56:"Indecisive",57:"Big Back",58:"OG Fanter",59:"Addicted",60:"Committed",61:"Top 1 Unemployed",62:"Loyal Customer",63:"System Failure" };
-  var achievementIcons = { 53:"👑",54:"💀",55:"🤪",56:"🎨",57:"🍔",58:"🦖",59:"🎮",60:"💪",61:"🛋️",62:"⭐",63:"💻" };
-  
-  showAchievementToastNotification(achievementNames[achievementId] || "Achievement Unlocked!", achievementIcons[achievementId] || "🏆", coinReward);
-  console.log('🏆 Achievement Unlocked! +' + coinReward + '🪙');
-  if (typeof updateHeaderCoins === 'function') updateHeaderCoins();
-}
-
-function showAchievementToastNotification(name, icon, coins) {
-  var toast = document.querySelector('.achievement-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'achievement-toast';
-    document.body.appendChild(toast);
-  }
-  toast.innerHTML = '<span class="achievement-icon">' + icon + '</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT UNLOCKED!</div><div class="achievement-name">' + name + '</div><div class="achievement-reward">+' + coins + ' 🪙</div></div>';
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 4000);
-}
-
-function triggerPageCrash() {
-  if (typeof checkAndUnlockAchievement === 'function') checkAndUnlockAchievement(63);
-  var crashOverlay = document.createElement('div');
-  crashOverlay.id = 'crash-overlay';
-  crashOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000088;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:"Courier New",monospace;color:white;';
-  crashOverlay.innerHTML = '<div style="background:white;color:black;padding:20px;border:2px solid silver;max-width:500px;"><h1>:(</h1><p>Fanter ran into a problem.</p><p>Restarting in <span id="crash-countdown">5</span>s...</p></div>';
-  document.body.appendChild(crashOverlay);
-  
-  var seconds = 5;
-  var interval = setInterval(() => {
-    seconds--;
-    document.getElementById('crash-countdown').textContent = seconds;
-    if (seconds <= 0) { clearInterval(interval); window.location.reload(); }
-  }, 1000);
-}
-
-function initAchievementTriggers() {
-  checkAltF4(); checkOGFanter(); checkTotalPlayTime(); startIdleTracking();
-  setInterval(checkTotalPlayTime, 60000); setInterval(checkLoyalCustomer, 30000);
-}
+// ===== ACHIEVEMENT TRIGGERS (KEPT SHORT) =====
+function trackGamePlayCount(g) { window.gamePlayCounts[g] = (window.gamePlayCounts[g]||0)+1; localStorage.setItem('gamePlayCounts', JSON.stringify(window.gamePlayCounts)); if(window.gamePlayCounts[g]>=50&&typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(59); if(window.gamePlayCounts[g]>=100) checkAndUnlockAchievement(60); }
+function trackThemeChange() { var c = parseInt(localStorage.getItem('themeChangeCount')||'0')+1; localStorage.setItem('themeChangeCount', c); if(c>=10&&typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(56); }
+var idleGranted = false;
+function startIdleTracking() { if(idleGranted) return; var last = Date.now(); document.addEventListener('mousemove', ()=>last=Date.now()); document.addEventListener('keydown', ()=>last=Date.now()); setInterval(()=>{ if(!idleGranted && (Date.now()-last)/60000 >= 60) { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(55); idleGranted = true; } }, 60000); }
+var FOOD = ['burger','pizza','taco','sushi','cake','cookie','food','chef','restaurant','cooking','baking','donut','ice cream','candy','chocolate'];
+function isFoodGame(g) { return FOOD.some(f => g.toLowerCase().includes(f)); }
+var SECRETS = [':)','creamypeanut','bloxy','abcatlmfao'];
+function checkSecretNames(s) { if(SECRETS.every(n => s.toLowerCase().includes(n.toLowerCase()))) { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(53); } }
+var pageStart = Date.now();
+window.addEventListener('beforeunload', ()=>{ if((Date.now()-pageStart)/1000 <= 10) localStorage.setItem('pendingAltF4','true'); });
+function checkAltF4() { if(localStorage.getItem('pendingAltF4')==='true') { localStorage.removeItem('pendingAltF4'); if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(54); } }
+function checkOGFanter() { var u = getCurrentUser(); if(u?.createdAt && new Date(u.createdAt) >= new Date('2025-04-01')) { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(58); } }
+function checkLoyalCustomer() { if(!window.gamesData) return; if(Object.keys(userVotes).length >= window.gamesData.length) { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(62); } }
+function checkTotalPlayTime() { var s = localStorage.getItem('sessionStart'); if(s) { var p = parseInt(localStorage.getItem('totalPausedTime')||'0'); if((Date.now()-parseInt(s)-p)/3600000 >= 50) { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(61); } } }
+function initAchievementTriggers() { checkAltF4(); checkOGFanter(); checkTotalPlayTime(); startIdleTracking(); setInterval(checkTotalPlayTime,60000); setInterval(checkLoyalCustomer,30000); }
+function checkAndUnlockAchievement(id) { var u = getCurrentUser(); if(!u) return; var a = JSON.parse(localStorage.getItem('fanter_achievements')||'{}'); if(a[id]) return; a[id]=true; localStorage.setItem('fanter_achievements',JSON.stringify(a)); var r = id<=10?3:id<=20?5:id<=30?10:id<=40?17.5:id<=50?25:50; u.coins = (u.coins||0)+r; u.achievements = a; updateUserInStorage(u); var names={53:"The Chosen One",54:"Alt+F4",55:"Mentally Insane",56:"Indecisive",57:"Big Back",58:"OG Fanter",59:"Addicted",60:"Committed",61:"Top 1 Unemployed",62:"Loyal Customer",63:"System Failure"}, icons={53:"👑",54:"💀",55:"🤪",56:"🎨",57:"🍔",58:"🦖",59:"🎮",60:"💪",61:"🛋️",62:"⭐",63:"💻"}; showAchievementToast(names[id]||"Achievement!", icons[id]||"🏆", r); updateHeaderCoins(); }
+function showAchievementToast(n, i, c) { var t = document.querySelector('.achievement-toast') || (t = document.createElement('div'), t.className = 'achievement-toast', document.body.appendChild(t)); t.innerHTML = `<span class="achievement-icon">${i}</span><div class="achievement-content"><div class="achievement-title">ACHIEVEMENT!</div><div class="achievement-name">${n}</div><div class="achievement-reward">+${c} 🪙</div></div>`; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000); }
+function triggerPageCrash() { if(typeof checkAndUnlockAchievement==='function') checkAndUnlockAchievement(63); var o = document.createElement('div'); o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000088;z-index:999999;display:flex;align-items:center;justify-content:center;color:white;font-family:monospace;'; o.innerHTML = '<div style="background:white;color:black;padding:20px;border:2px solid silver;"><h1>:(</h1><p>Fanter ran into a problem.</p><p>Restarting in <span id="cc">5</span>s...</p></div>'; document.body.appendChild(o); var s=5, cc=document.getElementById('cc'), i=setInterval(()=>{ s--; cc.textContent=s; if(s<=0){ clearInterval(i); window.location.reload(); } },1000); }
 
 initAchievementTriggers();
+loadGlobalRatings(); loadGlobalReviews();
 window.crashFanter = () => triggerPageCrash();
 console.log('💀 Type "crashFanter()" for a surprise...');
-}
