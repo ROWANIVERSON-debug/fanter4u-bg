@@ -9,14 +9,11 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0f0f2a,#1a0a2a);color:#fff;min-height:100vh}
-
-/* ===== SMOOTH TRANSITIONS ===== */
 @keyframes slideIn{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{0%{transform:translateY(-100%)}100%{transform:translateY(0)}}
 @keyframes fadeInScale{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
 @keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(255,204,0,.3)}50%{box-shadow:0 0 40px rgba(255,204,0,.6)}}
 @keyframes messagePop{0%{opacity:0;transform:translateY(15px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
-
 .welcome-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a1a;z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
 .welcome-card{background:rgba(20,30,50,.95);border:2px solid #ffcc00;border-radius:30px;padding:40px;text-align:center;max-width:500px;animation:fadeInScale .4s ease}
 .welcome-card h1{font-size:48px;color:#ffcc00;margin-bottom:10px;animation:glowPulse 2s infinite}
@@ -25,7 +22,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
 .feature:hover{transform:translateY(-2px);background:rgba(45,90,227,.4)}
 .enter-btn{background:linear-gradient(135deg,#2d5ae3,#1a3a8a);border:none;border-radius:40px;padding:15px 40px;color:#fff;font-size:18px;font-weight:700;cursor:pointer;margin-top:20px;transition:all .2s}
 .enter-btn:hover{transform:scale(1.02);box-shadow:0 10px 25px rgba(45,90,227,.4)}
-
 .chat-container{display:none;height:100vh}
 .chat-container.show{display:flex}
 .sidebar{width:260px;background:rgba(10,15,30,.95);backdrop-filter:blur(10px);border-right:1px solid rgba(45,90,227,.3);display:flex;flex-direction:column;overflow-y:auto}
@@ -79,7 +75,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
 .gif-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:250px;overflow-y:auto}
 .gif-item img{width:100%;border-radius:8px;cursor:pointer;transition:transform .1s}
 .gif-item img:hover{transform:scale(1.02)}
-
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:10000;display:none;align-items:center;justify-content:center}
 .modal.show{display:flex}
 .modal-content{background:rgba(20,30,50,.98);border:1px solid rgba(45,90,227,.4);border-radius:20px;padding:25px;min-width:320px;max-width:400px;animation:fadeInScale .25s ease}
@@ -90,7 +85,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
 .modal-buttons{display:flex;gap:10px;justify-content:flex-end}
 .modal-buttons button{padding:8px 16px;border-radius:20px;border:none;cursor:pointer;transition:all .2s}
 .modal-buttons button:hover{transform:translateY(-2px)}
-
 .profile-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,30,50,.98);border:2px solid #ffcc00;border-radius:24px;padding:25px;width:360px;z-index:11000;display:none;flex-direction:column;align-items:center;text-align:center;animation:fadeInScale .25s ease}
 .profile-card.show{display:flex}
 .profile-avatar{width:100px;height:100px;background:linear-gradient(135deg,#2d5ae3,#ffcc00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:15px;border:3px solid #ffcc00}
@@ -185,7 +179,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0a1a,#0
 <div class="modal" id="dailyModal"><div class="modal-content" style="text-align:center"><h3>🎁 DAILY REWARD</h3><div id="dailyAmount" style="font-size:36px;color:#ffcc00;margin:20px 0">+50 🪙</div><div id="dailyStreak" style="margin-bottom:20px">streak: 1 day</div><div class="modal-buttons"><button id="claimDaily" style="background:#2d5ae3;color:#fff">claim</button><button id="closeDailyModal">close</button></div></div></div>
 
 <script>
-// ===== POLISHED FANTARENA =====
+<script>
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔥 Fantarena loading...');
   
@@ -220,7 +214,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
   
-  function getLevel(xp) { let lvl = 1; if (xp >= 2700) lvl = 10; else if (xp >= 2200) lvl = 9; else if (xp >= 1750) lvl = 8; else if (xp >= 1350) lvl = 7; else if (xp >= 1000) lvl = 6; else if (xp >= 700) lvl = 5; else if (xp >= 450) lvl = 4; else if (xp >= 250) lvl = 3; else if (xp >= 100) lvl = 2; return lvl; }
+  function getLevel(xp) { 
+    if (xp >= 2700) return 10;
+    if (xp >= 2200) return 9;
+    if (xp >= 1750) return 8;
+    if (xp >= 1350) return 7;
+    if (xp >= 1000) return 6;
+    if (xp >= 700) return 5;
+    if (xp >= 450) return 4;
+    if (xp >= 250) return 3;
+    if (xp >= 100) return 2;
+    return 1;
+  }
   
   function formatMessage(text) {
     if (!text) return '';
@@ -234,7 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
       let { data, error } = await supabaseClient.from('fanter_chat').select('*').eq('channel_id', currentChannel).order('created_at', { ascending: true }).limit(100);
       if (error) throw error;
       messages = data || [];
-      if (messages.length === 0) { document.getElementById('messages').innerHTML = '<div style="text-align:center;padding:40px;color:gray">✨ no messages yet — be the first! ✨</div>'; return; }
+      if (messages.length === 0) { 
+        document.getElementById('messages').innerHTML = '<div style="text-align:center;padding:40px;color:gray">✨ no messages yet — be the first! ✨</div>'; 
+        return; 
+      }
       document.getElementById('messages').innerHTML = messages.map(msg => `
         <div class="message" data-user-id="${msg.user_id}">
           <div class="message-avatar" onclick="window.showProfile('${msg.user_id}')">${(msg.username?.[0] || 'U').toUpperCase()}</div>
@@ -251,11 +259,23 @@ document.addEventListener('DOMContentLoaded', function() {
   async function sendMessage() {
     let text = document.getElementById('messageInput').value.trim();
     if (!text) return;
-    if (text.startsWith('/')) { handleCommand(text); document.getElementById('messageInput').value = ''; return; }
+    if (text.startsWith('/')) { 
+      handleCommand(text); 
+      document.getElementById('messageInput').value = ''; 
+      return; 
+    }
     try {
-      await supabaseClient.from('fanter_chat').insert({ channel_id: currentChannel, user_id: currentUser.id, username: currentUser.displayName || currentUser.username, message: text, nameColor: nameColor });
-      messageCounts[currentUser.id]++; userXP[currentUser.id] += 5;
-      localStorage.setItem('messageCounts', JSON.stringify(messageCounts)); localStorage.setItem('userXP', JSON.stringify(userXP));
+      await supabaseClient.from('fanter_chat').insert({ 
+        channel_id: currentChannel, 
+        user_id: currentUser.id, 
+        username: currentUser.displayName || currentUser.username, 
+        message: text, 
+        nameColor: nameColor 
+      });
+      messageCounts[currentUser.id]++; 
+      userXP[currentUser.id] += 5;
+      localStorage.setItem('messageCounts', JSON.stringify(messageCounts)); 
+      localStorage.setItem('userXP', JSON.stringify(userXP));
       document.getElementById('messageInput').value = '';
     } catch(e) { console.error(e); alert('Failed to send'); }
   }
@@ -272,7 +292,29 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function setupRealtime() {
     if (channelSubscription) supabaseClient.removeChannel(channelSubscription);
-    channelSubscription = supabaseClient.channel('fantarena-live').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fanter_chat', filter: `channel_id=eq.${currentChannel}` }, payload => { messages.push(payload.new); if (messages.length === 1) loadMessages(); else { let msg = payload.new; document.getElementById('messages').insertAdjacentHTML('beforeend', `<div class="message" data-user-id="${msg.user_id}"><div class="message-avatar" onclick="window.showProfile('${msg.user_id}')">${(msg.username?.[0] || 'U').toUpperCase()}</div><div class="message-content"><div><span class="message-name" onclick="window.showProfile('${msg.user_id}')" style="color:${msg.nameColor || '#ffcc00'}">${escapeHtml(msg.username)}</span><span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span></div><div class="message-text">${formatMessage(escapeHtml(msg.message))}</div></div></div>`); document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight; } }).subscribe();
+    channelSubscription = supabaseClient.channel('fantarena-live')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'fanter_chat', 
+        filter: `channel_id=eq.${currentChannel}` 
+      }, payload => { 
+        messages.push(payload.new); 
+        if (messages.length === 1) loadMessages(); 
+        else { 
+          let msg = payload.new; 
+          document.getElementById('messages').insertAdjacentHTML('beforeend', `
+            <div class="message" data-user-id="${msg.user_id}">
+              <div class="message-avatar" onclick="window.showProfile('${msg.user_id}')">${(msg.username?.[0] || 'U').toUpperCase()}</div>
+              <div class="message-content">
+                <div><span class="message-name" onclick="window.showProfile('${msg.user_id}')" style="color:${msg.nameColor || '#ffcc00'}">${escapeHtml(msg.username)}</span><span class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</span></div>
+                <div class="message-text">${formatMessage(escapeHtml(msg.message))}</div>
+              </div>
+            </div>
+          `); 
+          document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight; 
+        } 
+      }).subscribe();
   }
   
   async function loadMembers() {
@@ -281,7 +323,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (data) {
         let online = data.filter(m => m.status === 'online').length;
         document.getElementById('onlineCount').textContent = online + ' online';
-        document.getElementById('membersList').innerHTML = `<div style="font-size:11px;color:gray;margin:8px 0">ONLINE — ${online}</div>${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="window.showProfile('${m.user_id}')"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}<div style="font-size:11px;color:gray;margin:8px 0">OFFLINE</div>${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="window.showProfile('${m.user_id}')"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}`;
+        document.getElementById('membersList').innerHTML = `
+          <div style="font-size:11px;color:gray;margin:8px 0">ONLINE — ${online}</div>
+          ${data.filter(m => m.status === 'online').map(m => `<div class="member-item" onclick="window.showProfile('${m.user_id}')"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}
+          <div style="font-size:11px;color:gray;margin:8px 0">OFFLINE</div>
+          ${data.filter(m => m.status !== 'online').map(m => `<div class="member-item" onclick="window.showProfile('${m.user_id}')"><div class="member-avatar">${(m.username?.[0] || 'U').toUpperCase()}</div><span>${escapeHtml(m.display_name || m.username)}</span></div>`).join('')}
+        `;
       }
     } catch(e) {}
   }
@@ -309,27 +356,64 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('profileDmBtn').onclick = () => { alert('DM feature coming soon!'); document.getElementById('profileCard').classList.remove('show'); };
   
   async function updatePresence() {
-    try { await supabaseClient.from('fanter_presence').upsert({ user_id: currentUser.id, username: currentUser.displayName || currentUser.username, display_name: currentUser.displayName || currentUser.username, status: 'online', custom_activity: customActivity, bio: userBio, last_seen: new Date() }); } catch(e) {}
+    try { 
+      await supabaseClient.from('fanter_presence').upsert({ 
+        user_id: currentUser.id, 
+        username: currentUser.displayName || currentUser.username, 
+        display_name: currentUser.displayName || currentUser.username, 
+        status: 'online', 
+        custom_activity: customActivity, 
+        bio: userBio, 
+        last_seen: new Date() 
+      }); 
+    } catch(e) {}
   }
   
   function switchChannel(channel) {
     currentChannel = channel;
     let names = { general: '# general', 'game-recs': '# game recs', lfg: '# friending', flex: '# flex achievements' };
     document.getElementById('chatHeader').textContent = names[channel] || '# ' + channel;
-    document.querySelectorAll('.channel').forEach(c => { if (c.dataset.channel === channel) c.classList.add('active'); else c.classList.remove('active'); });
-    loadMessages(); setupRealtime();
+    document.querySelectorAll('.channel').forEach(c => { 
+      if (c.dataset.channel === channel) c.classList.add('active'); 
+      else c.classList.remove('active'); 
+    });
+    loadMessages(); 
+    setupRealtime();
   }
   
-  async function initChat() { await updatePresence(); await loadMessages(); await loadMembers(); setupRealtime(); setInterval(loadMembers, 10000); setInterval(updatePresence, 30000); }
+  async function initChat() { 
+    await updatePresence(); 
+    await loadMessages(); 
+    await loadMembers(); 
+    setupRealtime(); 
+    setInterval(loadMembers, 10000); 
+    setInterval(updatePresence, 30000); 
+  }
   
-  document.getElementById('enterBtn').onclick = () => { document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('chatContainer').classList.add('show'); initChat(); localStorage.setItem('fantarena_welcomed', 'true'); };
-  if (localStorage.getItem('fantarena_welcomed') === 'true') { document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('chatContainer').classList.add('show'); initChat(); }
+  document.getElementById('enterBtn').onclick = () => { 
+    document.getElementById('welcomeScreen').style.display = 'none'; 
+    document.getElementById('chatContainer').classList.add('show'); 
+    initChat(); 
+    localStorage.setItem('fantarena_welcomed', 'true'); 
+  };
+  
+  if (localStorage.getItem('fantarena_welcomed') === 'true') { 
+    document.getElementById('welcomeScreen').style.display = 'none'; 
+    document.getElementById('chatContainer').classList.add('show'); 
+    initChat(); 
+  }
   
   document.querySelectorAll('.channel').forEach(ch => ch.onclick = () => switchChannel(ch.dataset.channel));
   document.getElementById('sendBtn').onclick = sendMessage;
   document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
   
-  document.querySelectorAll('.format-btn[data-format]').forEach(btn => { btn.onclick = () => { let w = btn.dataset.format, inp = document.getElementById('messageInput'), s = inp.selectionStart, e = inp.selectionEnd, t = inp.value; inp.value = t.slice(0, s) + w + t.slice(s, e) + w + t.slice(e); inp.focus(); }; });
+  document.querySelectorAll('.format-btn[data-format]').forEach(btn => { 
+    btn.onclick = () => { 
+      let w = btn.dataset.format, inp = document.getElementById('messageInput'), s = inp.selectionStart, e = inp.selectionEnd, t = inp.value; 
+      inp.value = t.slice(0, s) + w + t.slice(s, e) + w + t.slice(e); 
+      inp.focus(); 
+    }; 
+  });
   
   let emojis = ['😀','😂','😊','😍','🔥','💀','🎮','🏆','⭐','👑','❤️','👻','🐉','🍕','⚡','👍','🎉','🥺'];
   document.getElementById('emojiPicker').innerHTML = emojis.map(e => `<span onclick="insertEmoji('${e}')">${e}</span>`).join('');
@@ -337,42 +421,110 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('emojiBtn').onclick = () => document.getElementById('emojiPicker').classList.toggle('show');
   document.getElementById('gifBtn').onclick = () => document.getElementById('gifPicker').classList.toggle('show');
   
-  async function searchGifs(q) { if (!q) q = 'trending'; let res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${q}&limit=12`); let data = await res.json(); document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join(''); }
+  async function searchGifs(q) { 
+    if (!q) q = 'trending'; 
+    let res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${q}&limit=12`); 
+    let data = await res.json(); 
+    document.getElementById('gifGrid').innerHTML = data.data.map(g => `<div class="gif-item" onclick="sendGif('${g.images.fixed_height.url}')"><img src="${g.images.fixed_height_small.url}"></div>`).join(''); 
+  }
   function sendGif(u) { document.getElementById('messageInput').value = u; sendMessage(); document.getElementById('gifPicker').classList.remove('show'); }
   document.getElementById('gifSearch').oninput = e => searchGifs(e.target.value);
   
   async function loadFriends() {
-    try { let { data } = await supabaseClient.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id); if (data?.length) { let { data: f } = await supabaseClient.from('fanter_presence').select('*').in('user_id', data.map(d => d.friend_id)); friends = f || []; } document.getElementById('friendsList').innerHTML = friends.length ? friends.map(f => `<div class="friend-item" onclick="window.showProfile('${f.user_id}')"><div class="friend-avatar">${(f.username?.[0] || 'U').toUpperCase()}</div><div>${escapeHtml(f.display_name || f.username)}</div></div>`).join('') : '<div style="padding:8px 12px;color:gray">no friends yet</div>'; } catch(e) {}
+    try { 
+      let { data } = await supabaseClient.from('fanter_friends').select('friend_id').eq('user_id', currentUser.id); 
+      if (data?.length) { 
+        let { data: f } = await supabaseClient.from('fanter_presence').select('*').in('user_id', data.map(d => d.friend_id)); 
+        friends = f || []; 
+      } 
+      document.getElementById('friendsList').innerHTML = friends.length ? friends.map(f => `<div class="friend-item" onclick="window.showProfile('${f.user_id}')"><div class="friend-avatar">${(f.username?.[0] || 'U').toUpperCase()}</div><div>${escapeHtml(f.display_name || f.username)}</div></div>`).join('') : '<div style="padding:8px 12px;color:gray">no friends yet</div>'; 
+    } catch(e) {}
   }
   
   async function loadGroups() {
-    try { let { data } = await supabaseClient.from('fanter_groups').select('*'); groups = (data || []).filter(g => g.members?.includes(currentUser.id)); document.getElementById('groupsList').innerHTML = groups.length ? groups.map(g => `<div class="group-item"><span>👥</span><span>${escapeHtml(g.name)}</span></div>`).join('') : '<div style="padding:8px 12px;color:gray">no groups yet</div>'; } catch(e) {}
+    try { 
+      let { data } = await supabaseClient.from('fanter_groups').select('*'); 
+      groups = (data || []).filter(g => g.members?.includes(currentUser.id)); 
+      document.getElementById('groupsList').innerHTML = groups.length ? groups.map(g => `<div class="group-item"><span>👥</span><span>${escapeHtml(g.name)}</span></div>`).join('') : '<div style="padding:8px 12px;color:gray">no groups yet</div>'; 
+    } catch(e) {}
   }
   
   loadFriends(); loadGroups();
   
-  const settingsModal = document.getElementById('settingsModal'); const settingsBtn = document.getElementById('settingsBtn'); const editProfileBtn = document.getElementById('editProfileBtn');
-  settingsBtn.onclick = () => settingsModal.classList.add('show'); editProfileBtn.onclick = () => settingsModal.classList.add('show');
+  const settingsModal = document.getElementById('settingsModal'); 
+  const settingsBtn = document.getElementById('settingsBtn'); 
+  const editProfileBtn = document.getElementById('editProfileBtn');
+  settingsBtn.onclick = () => settingsModal.classList.add('show'); 
+  editProfileBtn.onclick = () => settingsModal.classList.add('show');
   document.getElementById('closeSettingsModal').onclick = () => settingsModal.classList.remove('show');
-  document.getElementById('saveSettings').onclick = () => { nameColor = document.getElementById('nameColor').value; customActivity = document.getElementById('customActivity').value; userBio = document.getElementById('userBio').value; localStorage.setItem('fanter_nameColor', nameColor); localStorage.setItem('fanter_activity', customActivity); localStorage.setItem('fanter_bio', userBio); updatePresence(); settingsModal.classList.remove('show'); alert('Settings saved!'); };
-  document.getElementById('nameColor').value = nameColor; document.getElementById('customActivity').value = customActivity; document.getElementById('userBio').value = userBio;
+  document.getElementById('saveSettings').onclick = () => { 
+    nameColor = document.getElementById('nameColor').value; 
+    customActivity = document.getElementById('customActivity').value; 
+    userBio = document.getElementById('userBio').value; 
+    localStorage.setItem('fanter_nameColor', nameColor); 
+    localStorage.setItem('fanter_activity', customActivity); 
+    localStorage.setItem('fanter_bio', userBio); 
+    updatePresence(); 
+    settingsModal.classList.remove('show'); 
+    alert('Settings saved!'); 
+  };
+  document.getElementById('nameColor').value = nameColor; 
+  document.getElementById('customActivity').value = customActivity; 
+  document.getElementById('userBio').value = userBio;
   
-  const addFriendModal = document.getElementById('addFriendModal'); const addFriendBtn = document.getElementById('addFriendBtn');
+  const addFriendModal = document.getElementById('addFriendModal'); 
+  const addFriendBtn = document.getElementById('addFriendBtn');
   addFriendBtn.onclick = () => addFriendModal.classList.add('show');
   document.getElementById('closeAddFriendModal').onclick = () => addFriendModal.classList.remove('show');
-  document.getElementById('confirmAddFriend').onclick = async () => { let u = document.getElementById('friendUsername').value.trim(); if (!u) return; let { data: users } = await supabaseClient.from('fanter_presence').select('user_id').ilike('username', u); if (users?.length) { await supabaseClient.from('fanter_friend_requests').insert({ sender_id: currentUser.id, receiver_id: users[0].user_id }); alert('Friend request sent!'); } else alert('User not found'); addFriendModal.classList.remove('show'); document.getElementById('friendUsername').value = ''; };
+  document.getElementById('confirmAddFriend').onclick = async () => { 
+    let u = document.getElementById('friendUsername').value.trim(); 
+    if (!u) return; 
+    let { data: users } = await supabaseClient.from('fanter_presence').select('user_id').ilike('username', u); 
+    if (users?.length) { 
+      await supabaseClient.from('fanter_friend_requests').insert({ sender_id: currentUser.id, receiver_id: users[0].user_id }); 
+      alert('Friend request sent!'); 
+    } else alert('User not found'); 
+    addFriendModal.classList.remove('show'); 
+    document.getElementById('friendUsername').value = ''; 
+  };
   
-  const createGroupModal = document.getElementById('createGroupModal'); const createGroupBtn = document.getElementById('createGroupBtn');
+  const createGroupModal = document.getElementById('createGroupModal'); 
+  const createGroupBtn = document.getElementById('createGroupBtn');
   createGroupBtn.onclick = () => createGroupModal.classList.add('show');
   document.getElementById('closeCreateGroupModal').onclick = () => createGroupModal.classList.remove('show');
-  document.getElementById('confirmCreateGroup').onclick = async () => { let n = document.getElementById('groupName').value.trim(); if (!n) return; await supabaseClient.from('fanter_groups').insert({ name: n, owner_id: currentUser.id, members: [currentUser.id] }); alert('Group created!'); createGroupModal.classList.remove('show'); loadGroups(); document.getElementById('groupName').value = ''; };
+  document.getElementById('confirmCreateGroup').onclick = async () => { 
+    let n = document.getElementById('groupName').value.trim(); 
+    if (!n) return; 
+    await supabaseClient.from('fanter_groups').insert({ name: n, owner_id: currentUser.id, members: [currentUser.id] }); 
+    alert('Group created!'); 
+    createGroupModal.classList.remove('show'); 
+    loadGroups(); 
+    document.getElementById('groupName').value = ''; 
+  };
   
-  const dailyModal = document.getElementById('dailyModal'); const dailyBtn = document.getElementById('dailyBtn'); let lastDailyClaim = localStorage.getItem('lastDailyClaim');
-  dailyBtn.onclick = () => { if (lastDailyClaim === new Date().toDateString()) { alert('Already claimed today!'); return; } dailyModal.classList.add('show'); };
+  const dailyModal = document.getElementById('dailyModal'); 
+  const dailyBtn = document.getElementById('dailyBtn'); 
+  let lastDailyClaim = localStorage.getItem('lastDailyClaim');
+  dailyBtn.onclick = () => { 
+    if (lastDailyClaim === new Date().toDateString()) { 
+      alert('Already claimed today!'); 
+      return; 
+    } 
+    dailyModal.classList.add('show'); 
+  };
   document.getElementById('closeDailyModal').onclick = () => dailyModal.classList.remove('show');
-  document.getElementById('claimDaily').onclick = () => { let user = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null'); user.coins = (user.coins || 0) + 50; localStorage.setItem('fanter_currentUser', JSON.stringify(user)); localStorage.setItem('lastDailyClaim', new Date().toDateString()); let streak = parseInt(localStorage.getItem('dailyStreak') || 0); localStorage.setItem('dailyStreak', streak + 1); alert('🎁 You claimed 50 coins!'); dailyModal.classList.remove('show'); };
+  document.getElementById('claimDaily').onclick = () => { 
+    let user = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null'); 
+    user.coins = (user.coins || 0) + 50; 
+    localStorage.setItem('fanter_currentUser', JSON.stringify(user)); 
+    localStorage.setItem('lastDailyClaim', new Date().toDateString()); 
+    let streak = parseInt(localStorage.getItem('dailyStreak') || 0); 
+    localStorage.setItem('dailyStreak', streak + 1); 
+    alert('🎁 You claimed 50 coins!'); 
+    dailyModal.classList.remove('show'); 
+  };
   
-  console.log('✅ Fantarena polished!');
+  console.log('✅ Fantarena fully loaded!');
 });
 </script>
 </body>
